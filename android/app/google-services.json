@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "1023988305900",
+    "project_id": "wingspan-staging-de2ae",
+    "storage_bucket": "wingspan-staging-de2ae.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1023988305900:android:3bc0814768f82792bc7ac9",
+        "android_client_info": {
+          "package_name": "com.aapico.appname"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1023988305900-f6r7hfj4f2uqgad2457bhcsb7onosp69.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB6tg14ot5vp8g2QHBJo5sY6iPQ0lDmtwY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1023988305900-f6r7hfj4f2uqgad2457bhcsb7onosp69.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1023988305900-8t9jkpeepkh41p9pdq9f6koa7ekhthk7.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.aapico.wingspanwwt"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

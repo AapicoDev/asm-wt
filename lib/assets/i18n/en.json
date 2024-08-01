@@ -1,0 +1,347 @@
+{
+	"app_bar": 
+	{
+		"dashboard": "Tasks Schedule",
+		
+		"my_task": "My Tasks",
+		"today_task": "Today Task",
+		"my_request": "My Request",
+		"live_map": "Live Map",
+		"my_account": "My Account",
+		"demo_title": "ASM",
+
+		"maintenance_request": "Maintenance Request",
+		"maintenance_detail": "Maintenance Detail",
+		"select_maintenance_list": "Select Maintenance List",
+		"accident_report": "Accident Report",
+		"vehicle_break_down": "Vehicle Report",
+		"vehicle_check_list": "Vehicle Check List",
+		"notifications": "Notifications",
+		"task_detail": "My Tasks Detail",
+		"preview_image": "Preview Image",
+		"maintenance_bill": "Bill Submit",
+		"task_calendar": "Task Calendar",
+		"account_setting": "Account Setting",
+		"my_vehicle": "My Vehicle",
+		"on_board_task": "On Boarding Task",
+		"staff_management": "Staff Management",
+		"account_register": "Account Register"
+
+	},
+	"authentication": {
+		"username": "Username",
+		"required": "This field is required.",
+		"incorrect_otp": "Incorrect OPT",
+		"unrecognise_device": "Unrecognise Device",
+		"opt_sent": "OPT sent, Please check your SMS!",
+		"email": "Email",
+		"staff_id_not_found": "Staff ID Not Found",
+		"staff_id_message": "You can create account only with our partner",
+		"phone_number": "Phone Number",
+		"account_not_found": "Account Not Found!",
+		"password": "Password",
+		"staff_id": "Staff ID",
+		"confirm_password": "Confirm Password",
+		"dont_have_account": "Don't have an account?",
+		"register": " Register Account",
+		"remember_me": "Remember Me",
+		"login_title" : "Login Your Account",
+		"account_info" : "Basic Information",
+		"phone_verify" : "Phone Number Verified",
+		"create_password" : "Create Your Password",
+		"log_out" : "Log Out"
+
+	},
+	"button": 
+	{
+		"delete": "Delete",
+		"clock_in": "Clock In",
+		"clock_out": "Clock Out",
+		"accept": "Accept",
+		"deny": "Deny",
+		"cancel": "Cancel",
+		"save": "Save",
+		"create": "Create",
+		"ok": "Ok",
+		"edit": "Edit",
+		"retake_pic": "Take New Photo",
+		"discard": "Discard",
+		"sign_in": "Sign In",
+		"sign_up": "Sign Up",
+		"register": "Register Account",
+		"login_as_passenger": "Login as Passenger",
+		"previous": "Previous",
+		"next": "Next",
+		"submit": "Submit",
+		"bill_submit": "Submit Bill",
+		"change_language": "Change Language",
+		"eng_lang": "English Language",
+		"th_lang": "Thai Language",
+		"help" : "Help",
+		"pending_request" : "Pending Request",
+		"approved_request" : "Approved Request",
+		"accident" : "Accident",
+		"vehicle_break_down" : "Vehicle Break Down",
+		"normal" : "Normal",
+		"check_in" : "Check In",
+		"check_out" : "Check Out",
+		"view_checked_task" : "View Detail",
+		"confirm" : "Confirm",
+		"report_now" : "Report Now",
+		"abnormal" : "Abnormal",
+		"request_maintenance" : "Request a maintenance form",
+		"start_task_btn" : "Start Task", 
+		"press_to_skip" : "Press here to skip the task",
+		"skip" : "Skip"
+
+	},
+	"text_header": 
+	{
+		"change_lang": "Select Your Prefer Language",
+		"remark": "Remark",
+		"bio_scan": "Finger Scan or Face ID",
+		"staff_id": "Staff ID",
+		"unknow": "Unknow",
+		"selected_date": "Selected Date",
+		"sent_verified": "We've sent you the verification.",
+		"code_on": "Code on",
+		"confirm_location": "Confirm Your Location",
+		"all_task_list": "All Tasks List",
+		"start_process": "Start",
+		"progressing_process": "Progress",
+		"finish_process": "Finish",
+		"qr_code_scanner": "Vehicle Qr-Code Scanner",
+		"vehicle_check_option": "Vehicle Check Option",
+		"emergency_report": "Emergency Report",
+		"report_photo": "Report Photo",
+		"command": "Comment",
+		"select_vehicle": "Select Vehicle",
+		"maintenance_list": "Maintenance List",
+		"maintenance": "Maintenance",
+		"items_selected": "Items Selected",
+		"maintenance_list_detect": "Maintenance List Detection",
+		"task_detail" : "Detail",
+		"schedule" : "Schedule",
+		"ot" : "OT",
+		"vehicle_information" : "Vehicle Information",
+		"task_title" : "Title",
+		"task_noted" : "Write down your task noted.",
+		"noted" : "Noted",
+		"create_task" : "Create Your Task Noted",
+		"destination" : "Destination",
+		"description" : "Description",
+		"location" : "Location",
+		"assign_by" : "Create by",
+		"assign_date" : "Create at",
+		"start_date" : "Start Date",
+		"remain" : "Remain",
+		"start_time" : "Start Time",
+		"finish_date" : "Finish Date",
+		"finish_time" : "Finish Time",
+		"pysical" : "Physical",
+		"system" : "System",
+		"engine" : "Engine",
+		"other" : "Other",
+		"serial" : "Serial",
+		"color" : "Color",
+		"distance" : "Distance",
+		"vehicle_status" : "Vehicle Status",
+		"status" : "Status",
+		"help": "Help",
+		"detection_report": "Maintenance Report Detection",
+		"reques_specific": "Request a specific maintenance check items: ",
+		"approved_date": "Approved date",
+		"empty_data": "Empty Data",
+		"no_task": "No Task",
+		"not_found": "No Description",
+		"item_not_found": "Item Not Found",
+		"cannot_view": "Cannot read detail notification.",
+		"qr_code_task_list": "Select task you want to check in.",
+		"confirm_delete": "Delete Your Account",
+		"customer": "Customer Name :",
+		"tel": "Phone Number :",
+		"complete_task": "Completed Task",
+		"reason": "Reason",
+		"type": "Type",
+		"reason_hint": "I urgently need change main schedule to my schedule request.",
+		"skip_task_request" : "Skip Task Request",
+		"task_is_already_skip" : "You skipped this task !",
+		"log_out_title" : "Log out Your Account"
+
+
+
+	},
+	"contents": {
+		"create_task" : "You can create your overtime work a head, The controller will verify this information later.",
+		"maintenance_list_detect":"Abnormal items will be considered vehicle problems that need to be maintenance.",
+		"qr_code_scan":"Please scan your vehicle qr-code that place with your check-in or check-out vehicle.",
+		"msg_discard": "Discard Changed",
+		"contact_us_content": "Please contact us for more information",
+		"msg_discard_content": "Pressed Discard button to cancel your form. Press Cancel button to return.",
+		"msg_confirm": "Confirm Information",
+		"msg_confirm_content": "I confirm that all information above is correct. If not, I will take responsibility.",
+		"msg_required": "Not Complete Form",
+		"msg_required_content": "Please fill the inform that end by the red start!",
+		"cannot_view_msg": "This is a empty content notification.",
+		"item_not_found_msg": "There isn't data found with ",
+		"help": "Contact Support : +6664 xxx xxxx.",
+		"confirm_delete_content": "Please type your name to delete your account.",
+		"confirm_checkout": "Pressed Confirm to finish this task.",
+		"skip_task_content" : "Please fill your reasons for this request!",
+		"log_out_content" : "Are you sure, you want to log out your account?"
+
+
+
+	},
+
+	"message" : {
+		"success" : "Successful Report!",
+		"successful" : "Successful!",
+		"went_wrong" : "Something went wrong.!",
+		"exist_phon_num" : "Phone number is already used, Please use another phon number.",
+		"input_phone_num" : "Please input your phone number.",
+		"updated" : "Data is udated!",
+		"is_already_activated" :"This account is alread activated.",
+		"invalid_phone_number" : "Invalid Phone Number!",
+		"error" : "Error, There is something wrong!",
+		"no_maintenance_detect" : "There is no maintenace detected",
+		"under_dev" : "Under Development Phase.",
+		"done_task" : "This task is already done.",
+		"before_approved_msg" : "Status : Waiting to approved ",
+		"approved_msg" : "This request is already approved.",
+		"dont_permit_to_delete" : "You aren't allowed to edit this item."
+
+		
+	},
+
+	"check_list": {
+		"vehicleTire":  {
+			"title": "Vehicle  ’s Tires ",
+			"tireTickness": "1. Vehicle tire thickness",
+			"tireAir": "2. Tires air pressure is standard",
+			"nutTight": "3. Wheel nut is tight",
+			"spareWheel": "4. Spare Wheel condition",
+			"tirePhoto": "5. Tires Photos"
+		},
+		"volumnLiquid": {
+			"title": "Volumn of Liquid",
+			"waterWhiper": "6. Amount of water wipers",
+			"gearOil": "7. Gear oil",
+			"engineOil": "8. Engine oil"
+		},
+		"safetyNEquip": {
+			"title": "Saftey & Equipment",
+			"noOilLeak": "9. No oil leak below the vehicle",
+			"twoRubbers": "10. At least 2 rubber wheel lock",
+			"removeWater": "11. Remove water from air tank",
+			"vehicleSetting": "12. Vehicle setting tools"
+		},
+	
+		"general":  {
+			"title": "General",
+			"doorLock": "13. Door lock work normally",
+			"seatBelt": "14. Seat belt is good"
+		},
+		"mirror": {
+			"title": "Mirror Visible",
+			"leftRight": "15. Left & Right mirror can be visible",
+			"middle": "16. Middle mirror can be visible"
+		},
+		"vehicleData": {
+			"title": "Vehicle Data",
+			"distance": "17. Distance"
+		},
+		"systemCheck": {
+			"title": "System Check",
+			"beam": "18. High beam & Low beam",
+			"horn": "19. Horn Signal  is normal",
+			"allLight": "20. Right/Left/Front/ Back light",
+			"cabinetlight": "21. Cabinet light"
+		},
+	
+		"machineStatus":  {
+			"title": "Machine Status",
+			"rpm": "22. Rpm When parking 600-700rpm",
+			"brake": "23. Hand and foot brake test",
+			"brakeAccelerator": "24. Brake clutch accelerator pandel",
+			"tranmission": "25. Transmission, not jam"
+		},
+		
+		"other" : {
+			"title": "Other",
+			"license": "26. Driving license document",
+			"vehicleRegistration": "27. Copy of vehicle registration doc",
+			"insuranceDoc": "28. Insurance policy document",
+			"licensePlate": "29. License plate logo not tear"
+		},
+		"specific" : {
+			"battery" : "Battery",
+			"engine_oil" : "Engine Oil",
+			"gear_oil" : "Gear Oil",
+			"tire" : "Tires",
+			"direction_ligh" : "Direction Light",
+			"front_light" : "Front Light",
+			"back_light" : "Back Light",
+			"front_door" : "Front Door",
+			"back_door" : "Back Door",
+			"brake" : "Brake",
+			"air_filter" : "Air Filter"
+		}
+	},
+	
+	"my_account" : {
+		"management": "Management",
+		"my_vehicle": "My Vehicle",
+		"location": "Location Tracking",
+		"term_condition": "Term & Condition",
+		"contact_us": "Contact Us",
+		"privacy_policy": "Privacy Policy",
+		"terms&condition": "Terms & Condition",
+		"faq": "FAQ",
+		"account_setting": "Account Settings",
+		"delete_account": "Delete Account",
+		"settings": "Settings",
+		"app_setting": "App Setting",
+		"log_out": "LogOut", 
+		"delete_account_content" : "",
+		"app_version" : "Application Version : "
+	},
+
+	"task_checkIn" : {
+		"camera" : "Take Product Photo",
+		"signature" : "Request Customer Signature",
+		"noted" : "Noted",
+		"delete_task_title" : "Delete Task Confirmation",
+		"delete_task_content" : "Are you sure?, You still want to delete this task : ",
+		"geo_check_message": "Please note, you are now out of working area.",
+		"geo_location_message": "You are in areas : "
+
+	},
+
+	"permission" : {
+		"location_title1": "Location Request",
+		"location_title2": "Use Your Location",
+		"location_contents_1" :  "To enable clock-ins' locations, clock-outs' locations, and track your activities during working hours, even when the app is closed or not in use.",
+		"location_contents_2" :  "will use location in the background to display your latest position on the map to authorized personnel of your organization only when you're on duty (starting clock-in).",
+		"otp_request": "Request new OTP",
+		"phone_start_with_zero": "Phone number cannot start with 0.",
+		"enter_phone_number": "Please enter your phone number.",
+		"code_timeout": "Code sent timeout : "
+	},
+
+	"bio_scan" : {
+		"content" : "Scan your fingerprint (or face or whatever) to authenticate",
+		"message" : "Please enable your device finger scan or faceId first!"
+
+	},
+	"internet_connection" : {
+		"header" : "Whoops!",
+		"sub_header" : "No internet connection found.",
+		"content" : "Check your connection and try again."
+	},
+	"task_manage" : {
+		
+	}
+
+	
+}

@@ -1,0 +1,4 @@
+0000000000000000000000000000000000000000 1384b3ea473e2ed5405c5b09cd5abc14027f4bb6 tith <tith.v@aapico.com> 1702628640 +0700	branch: Created from HEAD
+1384b3ea473e2ed5405c5b09cd5abc14027f4bb6 23e6a16995ad1042f69bdebfde247a6c631e0231 tith <tith.v@aapico.com> 1702628656 +0700	commit: push for tith-master
+23e6a16995ad1042f69bdebfde247a6c631e0231 77bc55ec2e093aebedfcde9068cb9cfc62dbc002 tith <tith.v@aapico.com> 1704420400 +0700	commit: update dart version, timeout otp, appcheck, animate navigator, navigator bugs, geofencing check and map implementation, staff management for team lead
+77bc55ec2e093aebedfcde9068cb9cfc62dbc002 efac74612f0066c436123cb8cab3ec2da6eb59a5 tith <tith.v@aapico.com> 1706597117 +0700	commit: asm latest + 40% supervisor management

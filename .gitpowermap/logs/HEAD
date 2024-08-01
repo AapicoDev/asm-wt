@@ -1,0 +1,9 @@
+0000000000000000000000000000000000000000 1384b3ea473e2ed5405c5b09cd5abc14027f4bb6 tith <tith.v@aapico.com> 1702628588 +0700	clone: from https://gitlab.powermap.live/powertrack/asm-mobile.git
+1384b3ea473e2ed5405c5b09cd5abc14027f4bb6 1384b3ea473e2ed5405c5b09cd5abc14027f4bb6 tith <tith.v@aapico.com> 1702628640 +0700	checkout: moving from main to tith-master
+1384b3ea473e2ed5405c5b09cd5abc14027f4bb6 23e6a16995ad1042f69bdebfde247a6c631e0231 tith <tith.v@aapico.com> 1702628656 +0700	commit: push for tith-master
+23e6a16995ad1042f69bdebfde247a6c631e0231 77bc55ec2e093aebedfcde9068cb9cfc62dbc002 tith <tith.v@aapico.com> 1704420400 +0700	commit: update dart version, timeout otp, appcheck, animate navigator, navigator bugs, geofencing check and map implementation, staff management for team lead
+77bc55ec2e093aebedfcde9068cb9cfc62dbc002 efac74612f0066c436123cb8cab3ec2da6eb59a5 tith <tith.v@aapico.com> 1706597117 +0700	commit: asm latest + 40% supervisor management
+efac74612f0066c436123cb8cab3ec2da6eb59a5 efac74612f0066c436123cb8cab3ec2da6eb59a5 tith <tith.v@aapico.com> 1713754369 +0700	checkout: moving from tith-master to release-1.0.4
+efac74612f0066c436123cb8cab3ec2da6eb59a5 86c50dd262045e6a7a249c998ae37e7d07db9666 tith <tith.v@aapico.com> 1713754406 +0700	commit: add geofencing check, otp, app analytic, and fixed background notification
+86c50dd262045e6a7a249c998ae37e7d07db9666 86c50dd262045e6a7a249c998ae37e7d07db9666 tith <tith.v@aapico.com> 1722503616 +0700	checkout: moving from release-1.0.4 to release_v1.0.9
+86c50dd262045e6a7a249c998ae37e7d07db9666 6137057c40e23271974501b7383f4763ed1e1655 tith <tith.v@aapico.com> 1722504262 +0700	commit: optimize firebase transaction

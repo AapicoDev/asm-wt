@@ -1,0 +1,351 @@
+{
+	"app_bar": 
+	{
+		"dashboard": "แดชบอร์ด",
+		"my_task": "งานของฉัน",
+		"today_task": "งานวันนี้",
+		"my_request": "คำขอของฉัน",
+		"my_account": "บัญชีของฉัน",
+
+		"live_map": "แผนที่สด",
+		"demo_title": "ASM",
+
+		"maintenance_request": "คำขอการบำรุงรักษา",
+		"maintenance_detail": "รายละเอียดการบำรุงรักษา",
+		"select_maintenance_list": "เลือกรายการบำรุงรักษา",
+		"accident_report": "รายงานอุบัติเหตุ",
+		"vehicle_break_down": "รายงานรถเสีย",
+		"vehicle_check_list": "รายการตรวจสภาพรถ",
+		"notifications": "การแจ้งเตือน",
+		"task_detail": "รายละเอียดงานของฉัน",
+		"preview_image": "ภาพตัวอย่าง",
+		"maintenance_bill": "ส่งบิล",
+		"task_calendar": "ปฏิทินงาน",
+		"account_setting": "การตั้งค่าบัญชี",
+		"my_vehicle": "รถของฉัน",
+		"on_board_task": "ในงานขึ้นเครื่อง",
+		"staff_management": "Staff Management",
+
+		"account_register": "ลงทะเบียนบัญชี"
+
+
+
+	},
+	"authentication": {
+		"username": "ชื่อผู้ใช้งาน",
+		"required": "ช่องนี้จำเป็น",
+		"incorrect_otp": "OPT ไม่ถูกต้อง",
+
+		"email": "อีเมล",
+		"unrecognise_device": "ไม่รู้จักอุปกรณ์",
+		"staff_id_not_found": "ไม่พบรหัสพนักงาน",
+		"staff_id_message": "คุณสามารถสร้างบัญชีกับพันธมิตรของเราเท่านั้น",
+		"account_not_found": "ไม่พบบัญชี!",
+		"opt_sent": "OPT ส่งไปยังโทรศัพท์ของคุณ โปรดตรวจสอบ!",
+
+		"phone_number": "หมายเลขโทรศัพท์",
+		"dont_have_account": "ไม่มีบัญชี?",
+		"password": "รหัสผ่าน",
+		"staff_id": "รหัสพนักงาน",
+
+		"confirm_password": "ยืนยันรหัสผ่าน",
+		"phone_verify" : "ยืนยันหมายเลขโทรศัพท์แล้ว",
+		"create_password" : "สร้างรหัสผ่าน",
+
+		"remember_me": "จำรหัสผ่าน",
+		"register": " ลงทะเบียนบัญชี",
+		"account_info" : "ข้อมูลเกี่ยวกับบัญชี",
+		"login_title" : "เข้าสู่ระบบ",
+		"log_out" : "ออกจากระบบ"
+
+	},
+	"button": 
+
+	{
+		"clock_in": "ลงเวลาเข้างาน",
+		"clock_out": "ลงเวลาเลิกงาน",
+		"accept": "ยอมรับ",
+		"deny": "ปฏิเสธ",
+		"delete": "ลบ",
+
+		"cancel": "ยกเลิก",
+		"save": "บันทึก",
+		"create": "สร้าง",
+		"change_language": "เปลี่ยนภาษา",
+
+
+		"ok": "ตกลง",
+		"edit": "แก้ไข",
+		"retake_pic": "ถ่ายภาพใหม่",
+		"sign_in": "เข้าสู่ระบบ",
+		"sign_up": "ลงชื่อ",
+
+		"register": "ลงทะเบียนบัญชี",
+		"login_as_passenger": "เข้าสู่ระบบในฐานะผู้โดยสาร",
+		"discard": "ทิ้ง",
+		"previous": "ก่อนหน้า",
+		"next": "ต่อไป",
+		"submit": "ส่ง",
+		"bill_submit": "ส่งบิล",
+		"change_lang_title": "เลือกภาษาที่คุณต้องการ",
+		"eng_lang": "ภาษาอังกฤษ",
+		"th_lang": "ภาษาไทย",
+		"help" : "ช่วยเหลือ",
+		"pending_request" : "รอการตรวจสอบ",
+		"approved_request" : "รอการยืนยัน",
+		"accident" : "อุบัติเหตุ",
+		"vehicle_break_down" : "รถเสีย",
+		"normal" : "ปกติ",
+		"check_in" : "เช็คอิน",
+		"check_out" : "เช็คเอาท์",
+		"view_checked_task" : "ดูรายละเอียด",
+		"confirm" : "ยืนยัน",
+		"report_now" : "รายงานตอนนี้",
+		"abnormal" : "ผิดปกติ",
+		"request_maintenance" : "ขอแบบฟอร์มการบำรุงรักษา",
+		"start_task_btn" : "เริ่มงาน",
+		"press_to_skip" : "กดปุ่มนี้เพื่อข้ามงานนี้",
+		"skip" : "ข้าม"
+
+
+	},
+	"text_header": 
+	{
+		"change_lang": "เลือกภาษาที่คุณต้องการ",
+		"confirm_location": "ยืนยันตำแหน่งของคุณ",
+		"selected_date": "วันที่เลือก",
+		"remark": "หมายเหตุ",
+		"unknow": "ไม่ทราบ",
+		"staff_id": "รหัส",
+		"bio_scan": "สแกนนิ้วหรือ Face ID",
+		"sent_verified": "เราได้ส่งการยืนยันถึงคุณแล้ว",
+		"code_on": "เปิดรหัส",
+		"all_task_list": "รายการงานทั้งหมด",
+		"start_process": "เริ่ม",
+		"progressing_process": "ความคืบหน้า",
+		"finish_process": "เสร็จ",
+		"qr_code_scanner": "แสกนคิวอาร์โค้ดบนรถ",
+		"vehicle_check_option": "ตัวเลือกการตรวจสอบยานพาหนะ",
+		"emergency_report": "รายงานเหตุฉุกเฉิน",
+		"report_photo": "รูปรายงาน",
+		"command": "ข้อเสนอแนะ",
+		"select_vehicle": "เลือกรถ",
+		"maintenance_list": "รายการบำรุงรักษา",
+		"maintenance": "การซ่อมบำรุง",
+		"items_selected": "รายการที่เลือก",
+		"maintenance_list_detect": "พบรายการที่ต้องบำรุงรักษา",
+		"task_detail" : "รายละเอียดงานของฉัน",
+		"destination" : "ปลายทาง",
+		"schedule" : "กำหนดการ",
+		"ot" : "โอที",
+		"vehicle_information" : "ข้อมูลยานพาหนะ",
+		"task_title" : "ชื่องาน",
+		"task_noted" : "จดบันทึกงานของคุณ.",
+		"noted" : "บันทึก",
+		"description" : "คำอธิบาย",
+		"location" : "ที่ตั้ง",
+		"assign_by" : "ผู้มอบหมาย",
+		"assign_date" : "วันที่สร้าง",
+		"start_date" : "วันที่เริ่มต้น",
+		"remain" : "ยังคง",
+		"start_time" : "เวลาเริ่มต้น",
+		"finish_date" : "วันที่เสร็จสิ้น",
+
+		"finish_time" : "เวลาสิ้นสุด",
+		"pysical" : "ทางกายภาพ",
+		"system" : "ระบบ",
+		"engine" : "เครื่องยนต์",
+		"other" : "อื่น",
+		"serial" : "หมายเลขรถ",
+		"color" : "สี",
+		"distance" : "ระยะทาง",
+		"vehicle_status" : "สถานะรถ",
+		"help": "ช่วย",
+		"status" : "สถานะ",
+		"detection_report": "การตรวจจับรายงานการบำรุงรักษา",
+		"reques_specific": "ขอรายการตรวจสอบการบำรุงรักษาเฉพาะ:",
+		"approved_date": "วันที่ได้รับการอนุมัติ",
+		"empty_data": "ข้อมูลว่างเปล่า",
+		"no_task": "ไม่มีงาน",
+		"not_found": "ไม่มีคำอธิบาย",
+		"item_not_found": "ไม่พบรายการ",
+		"cannot_view": "ไม่สามารถดูรายการนี้ได้",
+		"qr_code_task_list": "เลือกงานที่คุณต้องการเช็คอิน",
+		"confirm_delete": "ลบบัญชีของคุณ",
+		"customer": "ชื่อลูกค้า :",
+		"tel": "หมายเลขโทรศัพท์ :",
+		"complete_task": "เสร็จสิ้นภารกิจ",
+		"create_task" : "สร้างงานของคุณ",
+		"reason": "เหตุผล",
+		"type": "ประเภท",
+		"reason_hint": "ฉันต้องการเปลี่ยนกำหนดการหลักเป็นการเร่งด่วนในการขอกำหนดการของฉัน.",
+		"skip_task_request" : "ข้ามคำของาน",
+		"task_is_already_skip" : "คุณข้ามงานนี้ !",
+		"log_out_title" : "ออกจากระบบ"
+
+
+	},
+	"contents": {
+		"create_task" : "คุณสามารถสร้างช่วงเวลาการทำงานล่วงเวลาของคุณให้กับหัวหน้าได้, ผู้ดูแลระบบจะตรวจสอบข้อมูลนี้ในภายหลัง.",
+		"maintenance_list_detect":"รายการผิดปกติจะถือเป็นปัญหาของรถที่ต้องซ่อมบำรุง",
+		"contact_us_content": "กรุณาติดต่อเราสำหรับข้อมูลเพิ่มเติม",
+
+		"qr_code_scan":"โปรดสแกนคิวอาร์โค้ดบนรถพร้อมยืนยันการเช็คอินหรือเช็คเอาท์",
+		"msg_discard": "ละทิ้งการเปลี่ยนแปลง",
+		"msg_discard_content": "กดปุ่ม Discard เพื่อยกเลิกแบบฟอร์มของคุณ กดปุ่มยกเลิกเพื่อย้อนกลับ",
+		"msg_confirm": "ยืนยันข้อมูล",
+		"msg_confirm_content": "ข้าพเจ้าขอยืนยันว่าข้อมูลทั้งหมดข้างต้นถูกต้อง ถ้าไม่ฉันจะรับผิดชอบ",
+		"msg_required": "ไม่กรอกแบบฟอร์ม",
+		"msg_required_content": "กรุณากรอกข้อมูลสำหรับบรรทัดสีแดง!",
+		"cannot_view_msg": "นี่คือการแจ้งเตือนเนื้อหาที่ว่างเปล่า",
+		"item_not_found_msg": "ไม่พบข้อมูล ",
+		"help": "ติดต่อฝ่ายสนับสนุน : +6664 xxx xxxx.",
+		"confirm_delete_content": "กรุณาพิมพ์ชื่อของคุณเพื่อลบบัญชีของคุณ",
+		"skip_task_content" : "กรุณากรอกเหตุผลของคุณสำหรับการร้องขอนี้!",
+		"log_out_content" : "คุณต้องการออกจากระบบหรือไม่?"
+
+
+	},
+
+	"message" : {
+		"success" : "รายงานผลสำเร็จ!",
+		"updated" : "มีการปรับปรุงข้อมูล",
+		"went_wrong" : "บางอย่างผิดพลาด.!",
+		"exist_phon_num" : "หมายเลขโทรศัพท์ถูกใช้ไปแล้ว กรุณาใช้หมายเลขโทรศัพท์อื่น",
+		"input_phone_num" : "กรุณากรอกหมายเลขโทรศัพท์ของคุณ.",
+		"dont_permit_to_delete" : "คุณไม่ได้รับอนุญาตให้แก้ไขรายการนี้",
+		"invalid_phone_number" : "หมายเลขโทรศัพท์ไม่ถูกต้อง!",
+		"successful" : "ประสบความสำเร็จ!",
+		"is_already_activated" :"บัญชีนี้เปิดใช้งานแล้ว.",
+		"error" : "ผิดพลาด มีบางอย่างผิดปกติ!",
+		"no_maintenance_detect" : "ไม่พบการบำรุงรักษา",
+		"under_dev" : "อยู่ระหว่างการพัฒนา",
+		"done_task" : "งานนี้เสร็จเรียบร้อยแล้ว",
+		"before_approved_msg" : "สถานะ :  รอการอนุมัติ",
+		"approved_msg" : "คำขอนี้ได้รับการอนุมัติแล้ว"
+	},
+
+	"check_list": {
+		"vehicleTire":  {
+			"title": "ยางรถ",
+			"tireTickness": "1. ความหนาของยาง",
+			"tireAir": "2. ค่าความดันยางอยู่ในค่ามาตรฐาน",
+			"nutTight": "3. น็อตล้อมีความแน่น",
+			"spareWheel": "4. สภาพล้ออะไหล่",
+			"tirePhoto": "5. รูปล้อ"
+
+		},
+		"volumnLiquid": {
+			"title": "ปริมาตรของเหลว",
+			"waterWhiper": "6. ที่ปัดน้ำฝนมีปริมาณตามมาตรฐาน",
+			"gearOil": "7. น้ำมันเกียร์",
+			"engineOil": "8. น้ำมันเครื่อง"
+		},
+		"safetyNEquip": {
+			"title": "อุปกรณ์ด้านความปลอดภัย",
+			"noOilLeak": "9. ใต้ท้องรถไม่มีน้ำมันต่างๆรั่วไหล",
+			"twoRubbers": "10. หมอนรองล้ออย่างน้อย 2 อัน",
+			"removeWater": "11. เอาน้ำออกจากถังลม",
+			"vehicleSetting": "12. เครื่องมือประจำรถ"
+		},
+
+		"general":  {
+			"title": "ทั่วไป",
+			"doorLock": "13. ระบบล๊อคประตูทำงานได้ปกติ",
+			"seatBelt": "14. เข็มขัดนิรภัยทำงานได้ปกติ"
+		},
+		"mirror": {
+			"title": "กระจก",
+			"leftRight": "15. กระจกมองซ้าย-ขวา มองเห็นชัดเจน",
+			"middle": "16. กระจกมองตรงกลาง มองเห็นชัดเจน"
+		},
+		"vehicleData": {
+			"title": "ข้อมูลรถยนต์",
+			"distance": "17. ระยะทาง"
+		},
+		"systemCheck": {
+			"title": "ตรวจสอบระบบ",
+			"beam": "18. ไฟสูง ไฟต่ำ",
+			"horn": "19. แตรสัญญาณทำงานได้ปกติ",
+			"allLight": "20. ไฟขวา/ซ้าย/หน้า/หลัง",
+			"cabinetlight": "21. ไฟห้องโดยสาร"
+		},
+	
+		"machineStatus":  {
+			"title": "สภาพเครื่องยนต์",
+			"rpm": "22. รอบเครื่องเมื่อจอดรถประมาณ 600-700 RPM",
+			"brake": "23. ระบบเบรกมือ-เท้าทำงานได้ปกติ",
+			"brakeAccelerator": "24. แป้นคันเร่งคลัทช์เบรก",
+			"tranmission": "25. ระบบเกียร์ใช้งานได้ปกติไม่ติดขัด"
+		},
+		
+		"other" : {
+			"title": "อื่นๆ",
+			"license": "26. ใบขับขี่",
+			"vehicleRegistration": "27. สำเนาทะเบียนรถกรมธรรม์",
+			"insuranceDoc": "28. ประกันภัย",
+			"licensePlate": "29. ป้ายทะเบียนไม่ฉีกขาด"
+		},
+		"specific" : {
+			"battery" : "แบตเตอรี่",
+			"engine_oil" : "น้ำมันเครื่อง",
+			"gear_oil" : "น้ำมันเกียร์",
+			"tire" : "เหนื่อย",
+			"direction_ligh" : "แสงทิศทาง",
+			"front_light" : "ไฟหน้า",
+			"back_light" : "ไฟหลัง",
+			"front_door" : "ประตูหน้า",
+			"back_door" : "ประตูหลัง",
+			"brake" : "เบรค",
+			"air_filter" : "กรองอากาศ"
+		}
+	},
+	
+	"my_account" : {
+		"management": "การจัดการ",
+		"my_vehicle": "ยานพาหนะของฉัน",
+		"location": "การติดตามตำแหน่ง",
+		"term_condition": "ข้อกำหนดและเงื่อนไข",
+		"contact_us": "ติดต่อเรา",
+		"privacy_policy": "นโยบายความเป็นส่วนตัว",
+		"terms&condition": "ข้อกำหนดและเงื่อนไข",
+		"faq": "คำถามที่พบบ่อย",
+		"account_setting": "การตั้งค่าบัญชี",
+		"delete_account": "ลบบัญชี",
+		"settings": "การตั้งค่า",
+		"app_setting": "การตั้งค่าแอพ",
+		"log_out": "LogออกจากระบบOut",
+		"app_version" : "เวอร์ชันแอปพลิเคชัน : "
+
+	},
+	"task_checkIn" : {
+		"camera" : "Take Product Photo",
+		"signature" : "Request Customer Signature",
+		"noted" : "Noted",
+		"delete_task_title" : "ยืนยันการลบงาน",
+		"delete_task_content" : "คุณต้องการลบงานนี้หรือไม่ : ",
+		"geo_check_message": "โปรดทราบว่าขณะนี้คุณอยู่นอกพื้นที่ทำงานแล้ว",
+		"geo_location_message": "คุณอยู่ในพื้นที่ : "
+
+	},
+
+	"permission" : {
+		"location_title1": "ต้องการเข้าถึงตำแหน่งผู้ใช้",
+		"location_title2": "ใช้ตำแหน่งที่อยู่ของคุณ",
+		"location_contents_1" :  "เพื่อเริ่มทำงานและเสร็จการทำงาน รวมทั้งติดตามตำแหน่งที่อยู่ในหว่างการทำงาน รวมไปถึงช่วงเวลาที่ไม่ได้เปิดแอปพลิเคชัน.",
+		"location_contents_2" :  "จะเก็บที่อยู่เป็นพื้นหลังเพื่อแสดงข้อมูลบนแผนที่สำหรับวัตถุประสงค์การบริหารภายในองค์กร",
+		"code_timeout": "รหัสที่ส่งหมดเวลาภายใน : ",
+		"enter_phone_number": "กรุณากรอกหมายเลขโทรศัพท์ของคุณ.",
+		"phone_start_with_zero": "หมายเลขโทรศัพท์ไม่สามารถเริ่มต้นได้ 0.",
+		"otp_request": "ขอ OTP ใหม่"
+	}, 
+	"bio_scan" : {
+		"content" : "สแกนลายนิ้วมือของคุณ (หรือใบหน้าหรืออะไรก็ตาม) เพื่อตรวจสอบสิทธิ์",
+		"message" : "โปรดเปิดใช้งานการสแกนนิ้วของอุปกรณ์หรือ faceId ก่อน!"
+	},
+	"internet_connection" : {
+		"header" : "อ๊ะ!",
+		"sub_header" : "ไม่พบการเชื่อมต่ออินเทอร์เน็ต",
+		"content" : "ตรวจสอบการเชื่อมต่อของคุณแล้วลองอีกครั้ง"
+	}
+}
