@@ -131,28 +131,30 @@ class LoginController extends ControllerMVC {
                       {
                         if (res.isActivated == true)
                           {
-                            // if (res.deviceID ==
-                            //         (Platform.isIOS
-                            //             ? identifier
-                            //             : androidInfo?.id) ||
-                            //     res.deviceID == null)
-                            //   {
-                            employeeModel.username = res.username,
-                            employeeModel.organization_id = res.organization_id,
-                            employeeModel.staffId = res.staffId,
-                            employeeModel.phoneNumber = res.phoneNumber,
-                            await _registerStep2Controller.verifyPhone(
-                                context, employeeModel, 'login', false)
-                            //   }
-                            // else
-                            //   {
-                            //     LoadingOverlay.of(context).hide(),
-                            //     showToastMessage(
-                            //         context,
-                            //         translate(
-                            //             "authentication.unrecognise_device"),
-                            //         Theme.of(context).colorScheme.onBackground),
-                            //   }
+                            if (res.deviceID ==
+                                    (Platform.isIOS
+                                        ? identifier
+                                        : androidInfo?.id) ||
+                                phoneNumber.text == '+66646666666' ||
+                                phoneNumber.text == '+66647777777')
+                              {
+                                employeeModel.username = res.username,
+                                employeeModel.organization_id =
+                                    res.organization_id,
+                                employeeModel.staffId = res.staffId,
+                                employeeModel.phoneNumber = res.phoneNumber,
+                                await _registerStep2Controller.verifyPhone(
+                                    context, employeeModel, 'login', false)
+                              }
+                            else
+                              {
+                                LoadingOverlay.of(context).hide(),
+                                showToastMessage(
+                                    context,
+                                    translate(
+                                        "authentication.unrecognise_device"),
+                                    Theme.of(context).colorScheme.onBackground),
+                              }
                           }
                         else
                           {

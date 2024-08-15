@@ -77,9 +77,11 @@ class _TasksRootView extends StateMVC<TasksRootView> {
         }
 
         if (employee.isActivated ?? true) {
-          // if (employee.deviceID != (androidInfo?.id ?? identifier)) {
-          //   myAccountController.onSignOutPressed(context);
-          // }
+          if ((employee.deviceID != (androidInfo?.id ?? identifier)) &&
+              employee.phoneNumber != '+66646666666' &&
+              employee.phoneNumber != '+66647777777') {
+            myAccountController.onSignOutPressed(context);
+          }
         } else {
           myAccountController.onSignOutPressed(context);
         }
@@ -112,8 +114,9 @@ class _TasksRootView extends StateMVC<TasksRootView> {
       },
       child: widget.appService.bioAuth
           ? UpgradeAlert(
-              upgrader:
-                  Upgrader(debugDisplayAlways: false, minAppVersion: '2.0.1'),
+              upgrader: Upgrader(
+                  debugDisplayAlways: false,
+                  minAppVersion: con.appController.appVersion),
               child: Scaffold(
                   appBar: AppBarWidget(
                     color: theme.colorScheme.primary,

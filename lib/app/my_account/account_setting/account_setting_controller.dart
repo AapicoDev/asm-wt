@@ -1,7 +1,7 @@
+import 'package:asm_wt/app/app_controller.dart';
 import 'package:asm_wt/widget/alert_dialog_widget.dart';
 import 'package:get_it/get_it.dart';
 import 'package:local_auth/local_auth.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -12,12 +12,11 @@ class AccountSettingController extends ControllerMVC {
   User? user;
   bool locatoinSwitchBtn = true;
   final SharedPreferences prefs = GetIt.instance<SharedPreferences>();
+  AppController appController = AppController();
   final LocalAuthentication auth = LocalAuthentication();
   bool? isLocationTracking;
   bool? isBioScanEnable;
   bool canCheckBiometrics = false;
-  String? appVersion;
-  String? buildVersion;
 
   factory AccountSettingController([StateMVC? state]) =>
       _this ??= AccountSettingController._(state);
@@ -35,16 +34,6 @@ class AccountSettingController extends ControllerMVC {
     super.initState();
     isLocationTracking = prefs.getBool("tracking");
     isBioScanEnable = prefs.getBool("bioScan");
-    getAppVersion();
-  }
-
-  Future<void> getAppVersion() async {
-    PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    setState(() {
-      appVersion = packageInfo.version;
-      buildVersion = packageInfo.buildNumber;
-    });
-    notifyListeners();
   }
 
   void showAction(BuildContext context) {

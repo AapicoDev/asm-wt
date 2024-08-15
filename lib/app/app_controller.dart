@@ -2,20 +2,31 @@ import 'package:asm_wt/app/app_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:mvc_pattern/mvc_pattern.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class AppController extends ControllerMVC {
   factory AppController() => _this ??= AppController._();
   AppController._();
   static AppController? _this;
   late final AppService appService;
+  String? appVersion;
+  String? buildVersion;
 
   /// Initialize any 'time-consuming' operations at the beginning.
   /// Initialize asynchronous items essential to the Mobile Applications.
   /// Typically called within a FutureBuilder() widget.
+
+  Future<void> getAppVersion() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    appVersion = packageInfo.version;
+    buildVersion = packageInfo.buildNumber;
+  }
+
   @override
   Future<bool> initAsync() async {
     // Simply wait for 10 seconds at startup.
     /// In production, this is where databases are opened, logins attempted, etc.
+    await getAppVersion();
     return Future.delayed(const Duration(seconds: 1), () {
       FlutterNativeSplash.remove();
       // FirebaseAuth.instance.idTokenChanges().listen((User? user) async {

@@ -1,4 +1,5 @@
 import "package:asm_wt/app/alert/notification/notification_view.dart";
+import "package:asm_wt/app/app_controller.dart";
 import "package:asm_wt/app/app_service.dart";
 import "package:asm_wt/app/authentication/login/login_view.dart";
 import "package:asm_wt/app/authentication/register_step1/register_step1_view.dart";
@@ -21,6 +22,8 @@ class AppRouter {
   GoRouter get router => _goRouter;
   final GlobalKey<NavigatorState> _rootNavigatorKey =
       GlobalKey<NavigatorState>();
+
+  AppController _appController = AppController();
 
   List<CameraDescription> cameras = [];
 
@@ -61,7 +64,8 @@ class AppRouter {
                 state: state,
                 child: UpgradeAlert(
                     upgrader: Upgrader(
-                        debugDisplayAlways: false, minAppVersion: '2.0.1'),
+                        debugDisplayAlways: false,
+                        minAppVersion: _appController.appVersion),
                     child: LoginView(key: UniqueKey())),
               ),
           routes: [

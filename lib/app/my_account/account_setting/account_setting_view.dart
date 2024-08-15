@@ -75,7 +75,7 @@ class _AccountSettingViewState extends StateMVC<AccountSettingView> {
       persistentFooterAlignment: AlignmentDirectional.center,
       persistentFooterButtons: [
         Text(
-          '${translate('my_account.app_version')}${con.appVersion}',
+          '${translate('my_account.app_version')}${con.appController.appVersion}',
           style: theme.textTheme.bodyMedium,
         )
       ],

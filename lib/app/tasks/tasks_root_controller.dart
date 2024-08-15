@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:asm_wt/app/app_controller.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
@@ -14,6 +15,7 @@ class TasksRootController extends ControllerMVC {
   User? user;
   final AuthService _authService = FirebaseAuthService();
   final SharedPreferences prefs = GetIt.instance<SharedPreferences>();
+  AppController appController = AppController();
   final Connectivity _connectivity = Connectivity();
   late StreamSubscription<List<ConnectivityResult>> connectivitySubscription;
   List<ConnectivityResult> connectivityResult = [];
