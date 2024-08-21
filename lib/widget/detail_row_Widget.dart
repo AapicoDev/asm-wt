@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:asm_wt/assets/static_data.dart';
 
 // ignore: must_be_immutable
 class DetailRowWidget extends StatelessWidget {
@@ -12,6 +11,7 @@ class DetailRowWidget extends StatelessWidget {
   int flex = 3;
   bool? isBladge = false;
   bool? isHasProblem;
+  Widget? subWidget;
 
   DetailRowWidget(
       {super.key,
@@ -22,13 +22,14 @@ class DetailRowWidget extends StatelessWidget {
       this.isHasProblem,
       required this.flex,
       this.height,
+      this.subWidget,
       this.icon,
       required this.underline});
 
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context);
-    double width = MediaQuery.of(context).size.width;
+    // double width = MediaQuery.of(context).size.width;
 
     return SizedBox(
       height: height,
@@ -44,9 +45,11 @@ class DetailRowWidget extends StatelessWidget {
             ),
             Expanded(
               flex: 1,
-              child: Text(
-                title ?? "",
-                style: theme.textTheme.headlineSmall,
+              child: Container(
+                child: Text(
+                  title ?? "",
+                  style: theme.textTheme.headlineSmall,
+                ),
               ),
             ),
             Expanded(
@@ -63,53 +66,84 @@ class DetailRowWidget extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             Container(
-                              width: width / 4,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(
-                                    StaticDataConfig.border_radius),
-                                color: theme.colorScheme.onTertiary,
-                              ),
                               child: Center(
                                 child: Padding(
-                                  padding:
-                                      const EdgeInsets.only(left: 5, right: 5),
-                                  child: Text(
-                                    subTitle ?? '',
-                                    style: theme.textTheme.headlineSmall
-                                        ?.merge(TextStyle(color: Colors.white)),
-                                  ),
+                                  padding: EdgeInsets.only(left: 5, right: 5),
+                                  child: subWidget ??
+                                      RichText(
+                                        softWrap: true,
+                                        text: TextSpan(
+                                            style: theme.textTheme.bodyMedium,
+                                            children: [
+                                              TextSpan(
+                                                  text: subTitle,
+                                                  style: underline
+                                                      ? theme
+                                                          .textTheme.bodyMedium
+                                                          ?.merge(const TextStyle(
+                                                              decorationStyle:
+                                                                  TextDecorationStyle
+                                                                      .wavy,
+                                                              decoration:
+                                                                  TextDecoration
+                                                                      .underline))
+                                                      : theme
+                                                          .textTheme.bodyMedium
+                                                          ?.merge(TextStyle(
+                                                              color: theme
+                                                                  .colorScheme
+                                                                  .onPrimary))),
+                                              TextSpan(
+                                                  text: sub2Title,
+                                                  style: theme
+                                                      .textTheme.headlineSmall
+                                                      ?.merge(TextStyle(
+                                                          color: isHasProblem ??
+                                                                  false
+                                                              ? theme
+                                                                  .colorScheme
+                                                                  .onBackground
+                                                              : theme
+                                                                  .colorScheme
+                                                                  .background)))
+                                            ]),
+                                      ),
                                 ),
                               ),
                             ),
                           ],
                         )
                       : Container(
-                          child: RichText(
-                            softWrap: true,
-                            text: TextSpan(
-                                style: theme.textTheme.bodyMedium,
-                                children: [
-                                  TextSpan(
-                                      text: subTitle,
-                                      style: underline
-                                          ? theme.textTheme.bodyMedium?.merge(
-                                              const TextStyle(
-                                                  decorationStyle:
-                                                      TextDecorationStyle.wavy,
-                                                  decoration:
-                                                      TextDecoration.underline))
-                                          : theme.textTheme.bodyMedium),
-                                  TextSpan(
-                                      text: sub2Title,
-                                      style: theme.textTheme.headlineSmall
-                                          ?.merge(TextStyle(
-                                              color: isHasProblem ?? false
-                                                  ? theme
-                                                      .colorScheme.onBackground
-                                                  : theme
-                                                      .colorScheme.background)))
-                                ]),
-                          ),
+                          child: subWidget ??
+                              RichText(
+                                softWrap: true,
+                                text: TextSpan(
+                                    style: theme.textTheme.bodyMedium,
+                                    children: [
+                                      TextSpan(
+                                          text: subTitle,
+                                          style: underline
+                                              ? theme.textTheme.bodyMedium
+                                                  ?.merge(const TextStyle(
+                                                      decorationStyle:
+                                                          TextDecorationStyle
+                                                              .wavy,
+                                                      decoration: TextDecoration
+                                                          .underline))
+                                              : theme.textTheme.bodyMedium),
+                                      TextSpan(
+                                          text: '                           '),
+                                      TextSpan(
+                                          text: sub2Title,
+                                          style: theme.textTheme.headlineSmall
+                                              ?.merge(TextStyle(
+                                                  color: isHasProblem ?? false
+                                                      ? theme.colorScheme
+                                                          .onBackground
+                                                      : theme.colorScheme
+                                                          .background)))
+                                    ]),
+                              ),
                         ),
                 )
               ]),

@@ -67,6 +67,8 @@ class TaskCalendarController extends ControllerMVC {
     initConnectivity();
     getConnectivity();
     loadTimeServer();
+
+    userId = prefs.getString('userId');
   }
 
   Future<void> loadTimeServer() async {
@@ -325,29 +327,7 @@ class TaskCalendarController extends ControllerMVC {
         DateTime onlyDate =
             DateTime(startDate.year, startDate.month, startDate.day);
         if (isSameDay(day, onlyDate)) {
-          eventList.add(TaskModel(
-              taskId: task.taskId,
-              name: task.name,
-              desc: task.desc,
-              type: task.type,
-              taskGroup: task.taskGroup,
-              skipReason: task.skipReason,
-              status: task.status,
-              userId: task.userId,
-              isDisable: task.isDisable,
-              clock_in_status: task.clock_in_status,
-              clock_out_status: task.clock_out_status,
-              clock_in_location: task.clock_in_location,
-              clock_out_location: task.clock_out_location,
-              location: task.location,
-              location_name: task.location_name,
-              controller_name: task.controller_name,
-              controller_id: task.controller_id,
-              start_date: task.start_date,
-              create_date: task.create_date,
-              finish_date: task.finish_date,
-              driverFinishAt: task.driverFinishAt,
-              driverStartAt: task.driverStartAt));
+          eventList.add(task);
         }
       }
     }

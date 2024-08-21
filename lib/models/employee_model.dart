@@ -20,6 +20,8 @@ class EmployeeModel {
   String? lastname_th;
   String? title_en;
   String? title_th;
+  String? site_th;
+  String? site_en;
   final String? userStatus;
   Timestamp? updatedAt;
 
@@ -44,6 +46,8 @@ class EmployeeModel {
       this.title_en,
       this.title_th,
       this.updatedAt,
+      this.site_en,
+      this.site_th,
       this.organization_id});
 
   factory EmployeeModel.fromDocumentSnapshot(DocumentSnapshot snapshot) {
@@ -63,6 +67,8 @@ class EmployeeModel {
       profileFileName: data['profile_file_name'],
       userStatus: data['user_status'],
       organization_id: data['organization_id'],
+      site_en: data['site_en'],
+      site_th: data['site_th'],
     );
   }
 

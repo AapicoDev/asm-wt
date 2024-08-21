@@ -314,7 +314,10 @@
 		"delete_task_title" : "Delete Task Confirmation",
 		"delete_task_content" : "Are you sure?, You still want to delete this task : ",
 		"geo_check_message": "Please note, you are now out of working area.",
-		"geo_location_message": "You are in areas : "
+		"geo_location_message": "You are in areas : ",
+		"position_error_title" : "Position Error",
+		"position_0_content" : "Please check your latitude and lontitude, we got 0 as your latitude/lontitude",
+		"position_null_content" : "Please check your latitude and lontitude, we got null as your latitude/lontitude"
 
 	},
 
@@ -340,6 +343,7 @@
 		"content" : "Check your connection and try again."
 	},
 	"task_manage" : {
+		"task_id" : "Task ID"
 		
 	}
 

@@ -45,8 +45,9 @@ class GeoFencingService extends ChangeNotifier {
     });
 
     if (result.statusCode == 200) {
-      if (result.body != []) {
-        var jsondata = const JsonDecoder().convert(result.body);
+      var jsondata = jsonDecode(result.body);
+
+      if (result.body != '[]') {
         for (var data in jsondata) {
           areaModel = AreaModel.fromDocumentSnapshot(data);
           geoAreadList.add(areaModel);
@@ -54,12 +55,14 @@ class GeoFencingService extends ChangeNotifier {
           clockInOutAreaNameTh?.add(areaModel.name_th ?? '');
           notifyListeners();
         }
-        return BaseService('S', 'Success get  customers data', geoAreadList);
+
+        return BaseService('S', 'You are in : ', result.body);
       } else {
-        return BaseService('E', 'Data Not Found', result.body);
+        return BaseService('S', 'Out of Geofencing', result.body);
       }
     } else {
-      return BaseService('E', 'Data Not Found', result.body);
+      return BaseService('E',
+          'Server Not Respone : Check geofence In/Out error.', result.body);
     }
   }
 
@@ -87,6 +90,7 @@ class GeoFencingService extends ChangeNotifier {
       } else {
         isHasGeofence = false;
         notifyListeners();
+        return BaseService('E', 'Success get  customers data', result.body);
       }
 
       for (var data in jsondata['data']) {

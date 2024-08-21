@@ -1,5 +1,7 @@
+import 'package:asm_wt/models/employee_model.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:intl/intl.dart';
 import 'package:location/location.dart';
@@ -34,6 +36,7 @@ class _STaskDetailWidgetState extends State<TaskDetailWidget> {
   // List<_MarkerState> _markerStates = [];
   Dio dio = Dio();
   LocationData? locationData;
+  EmployeeModel? employeeModel;
 
   // Future<dynamic> onMapCreated(MaplibreMapController controller) async {
   //   _mapController = controller;
@@ -64,9 +67,26 @@ class _STaskDetailWidgetState extends State<TaskDetailWidget> {
   // }
 
   @override
+  void initState() {
+    super.initState();
+    getEmployeeData();
+  }
+
+  Future<void> getEmployeeData() async {
+    var employeeData = await widget.taskModel.employeeModelRefData?.get();
+
+    setState(() {
+      employeeModel = EmployeeModel.fromDocumentSnapshot(employeeData!);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     double width = MediaQuery.of(context).size.width;
+
+    late LocalizationDelegate localizationDelegate =
+        LocalizedApp.of(context).delegate;
 
     return Container(
       constraints: const BoxConstraints(),
@@ -148,6 +168,42 @@ class _STaskDetailWidgetState extends State<TaskDetailWidget> {
                   ),
                   DetailRowWidget(
                     underline: false,
+                    isBladge: false,
+                    flex: 3,
+                    title: translate('task_manage.task_id'),
+                    subWidget: Row(
+                      children: [
+                        Expanded(
+                          child: RichText(
+                            text: TextSpan(
+                              style: DefaultTextStyle.of(context).style,
+                              children: <TextSpan>[
+                                TextSpan(
+                                  text: widget.taskModel.taskId,
+                                  style: TextStyle(
+                                      decoration: TextDecoration.underline),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () async => await Clipboard.setData(
+                              ClipboardData(
+                                  text: "${widget.taskModel.taskId}")),
+                          child: Icon(
+                            Icons.content_copy,
+                            color: theme.colorScheme.primary,
+                          ),
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                      ],
+                    ),
+                  ),
+                  DetailRowWidget(
+                    underline: false,
                     flex: 3,
                     height: 25,
                     title: translate('text_header.task_title'),
@@ -173,7 +229,10 @@ class _STaskDetailWidgetState extends State<TaskDetailWidget> {
                     underline: true,
                     height: 25,
                     title: translate('text_header.location'),
-                    subTitle: widget.taskModel.location_name ?? "NONE",
+                    subTitle:
+                        localizationDelegate.currentLocale.languageCode == 'en'
+                            ? employeeModel?.site_en
+                            : employeeModel?.site_th,
                     icon: Icons.place,
                   ),
                   DetailRowWidget(
@@ -249,8 +308,8 @@ class _STaskDetailWidgetState extends State<TaskDetailWidget> {
                               .taskModel.start_date!.millisecondsSinceEpoch))),
                   DetailRowWidget(
                     underline: false,
+                    isBladge: true,
                     flex: 3,
-                    height: 25,
                     title: translate('button.clock_in'),
                     isHasProblem:
                         widget.taskModel.clock_in_status == ClockStatus.Late
@@ -272,8 +331,8 @@ class _STaskDetailWidgetState extends State<TaskDetailWidget> {
                               .taskModel.finish_date!.millisecondsSinceEpoch))),
                   DetailRowWidget(
                     underline: false,
+                    isBladge: true,
                     flex: 3,
-                    height: 45,
                     title: translate('button.clock_out'),
                     isHasProblem:
                         widget.taskModel.clock_out_status == ClockStatus.Early

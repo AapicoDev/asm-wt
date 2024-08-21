@@ -144,6 +144,11 @@ class TaskModel {
     data['type'] = type;
     data['task_group'] = taskGroup;
     data['skip_reason'] = skipReason;
+
+    employeeModelRefData != null
+        ? data['employeeRef'] = employeeModelRefData
+        : null;
+
     return data;
   }
 

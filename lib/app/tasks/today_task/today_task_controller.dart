@@ -396,53 +396,64 @@ class TodayTaskController extends ControllerMVC {
   Future<void> onClockOutPressed(
       BuildContext context, TaskModel? taskModel, String? type) async {
     TextEditingController clockOutCommand = TextEditingController();
+    var theme = Theme.of(context);
 
-    await geoFencingService?.getGeofencingAreaByOrganizationId();
+    var geofenceResult =
+        await geoFencingService?.getGeofencingAreaByOrganizationId();
 
-    await determinePosition(context).then((position) async => {
-          LoadingOverlay.of(context).show(),
-          setState(() {
-            onClockInOrClockOutPress = false;
-          }),
-          notifyListeners(),
-          geoFencingService?.geoAreadList = [],
-          geoFencingService?.clockInOutAreaNameEn = [],
-          geoFencingService?.clockInOutAreaNameTh = [],
-          await geoFencingService?.confirmInGeofencingArea(
-              LatLng(position?.latitude ?? 0, position?.longitude ?? 0)),
-          LoadingOverlay.of(context).hide(),
-          taskModel?.clock_out_location =
-              GeoPoint(position?.latitude ?? 0, position?.longitude ?? 0),
-          modelConfirmWidgetFunc(
-              context,
-              translate("text_header.confirm_location"),
-              Column(
-                children: [
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  ButtonWidget(
-                    enable: true,
-                    fullStyle: true,
-                    color: geoFencingService!.isHasGeofence
-                        ? geoFencingService?.geoAreadList.length != 0
-                            ? Theme.of(context).colorScheme.primary
-                            : Theme.of(context).colorScheme.onBackground
-                        : Theme.of(context).colorScheme.primary,
-                    // onPressed: () => con.onCheckInPressed(context),
-                    onPressed: () => onClockOutConfirmPressed(
-                        context,
-                        taskModel,
-                        type,
-                        clockOutCommand.text,
-                        taskStatusReportDocId),
-                    title: translate('button.confirm'),
-                  ),
-                ],
-              ),
-              position,
-              clockOutCommand),
-        });
+    if (geofenceResult?.status == 'S') {
+      await determinePosition(context).then((position) async => {
+            setState(() {
+              onClockInOrClockOutPress = false;
+            }),
+            notifyListeners(),
+            geoFencingService?.geoAreadList = [],
+            geoFencingService?.clockInOutAreaNameEn = [],
+            geoFencingService?.clockInOutAreaNameTh = [],
+            modelConfirmWidgetFunc(
+                context,
+                translate("text_header.confirm_location"),
+                Column(
+                  children: [
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    ButtonWidget(
+                      enable: true,
+                      fullStyle: true,
+                      color: Theme.of(context).colorScheme.primary,
+                      // onPressed: () => con.onCheckInPressed(context),
+                      onPressed: () => onClockOutConfirmPressed(
+                          context,
+                          taskModel,
+                          type,
+                          clockOutCommand.text,
+                          taskStatusReportDocId),
+                      title: translate('button.confirm'),
+                    ),
+                  ],
+                ),
+                position,
+                clockOutCommand),
+            if (position?.latitude == 0 && position?.longitude == 0)
+              {
+                showToastMessage(
+                    context,
+                    translate('task_checkIn.position_0_content'),
+                    theme.colorScheme.onBackground)
+              }
+            else if (position?.latitude == null && position?.longitude == null)
+              {
+                showToastMessage(
+                    context,
+                    translate('task_checkIn.position_null_content'),
+                    theme.colorScheme.onBackground),
+              }
+          });
+    } else {
+      showToastMessage(context, "Server Not Respone : Get list geofence error!",
+          theme.colorScheme.onBackground);
+    }
   }
 
   Future<void> onClockOutConfirmPressed(
@@ -452,41 +463,69 @@ class TodayTaskController extends ControllerMVC {
       String? clockOutCommand,
       String? taskStatusReportDocId) async {
     LoadingOverlay.of(context).show();
-    taskModel?.clockOutCommand = clockOutCommand;
-    var finishDate = DateTime.fromMicrosecondsSinceEpoch(
-        taskModel!.finish_date!.microsecondsSinceEpoch);
-    DateTime serverTimeNow = await NTP.now();
 
-    taskModel.clockOutAreaEn = geoFencingService?.clockInOutAreaNameEn;
-    taskModel.clockOutAreaTh = geoFencingService?.clockInOutAreaNameTh;
-    taskModel.driverFinishAt = Timestamp.fromDate(serverTimeNow);
-    taskModel.status = TaskStatus.Done;
+    var currentUserPosition = await determinePosition(context);
 
-    var canCheckTask = finishDate.compareTo(serverTimeNow);
-    if (canCheckTask == 0) {
-      taskModel.clock_out_status = ClockStatus.Same;
-    } else if (canCheckTask < 0) {
-      taskModel.clock_out_status = ClockStatus.Late;
+    var userIsInGeofencing = await geoFencingService?.confirmInGeofencingArea(
+        LatLng(currentUserPosition?.latitude ?? 0,
+            currentUserPosition?.longitude ?? 0));
+
+    if (userIsInGeofencing?.status == 'S') {
+      taskModel?.clock_out_location = GeoPoint(
+          currentUserPosition?.latitude ?? 0,
+          currentUserPosition?.longitude ?? 0);
+      taskModel?.clockOutCommand = clockOutCommand;
+      var finishDate = DateTime.fromMicrosecondsSinceEpoch(
+          taskModel!.finish_date!.microsecondsSinceEpoch);
+      DateTime serverTimeNow = await NTP.now();
+
+      taskModel.clockOutAreaEn = geoFencingService?.clockInOutAreaNameEn;
+      taskModel.clockOutAreaTh = geoFencingService?.clockInOutAreaNameTh;
+      taskModel.driverFinishAt = Timestamp.fromDate(serverTimeNow);
+      taskModel.status = TaskStatus.Done;
+
+      var canCheckTask = finishDate.compareTo(serverTimeNow);
+      if (canCheckTask == 0) {
+        taskModel.clock_out_status = ClockStatus.Same;
+      } else if (canCheckTask < 0) {
+        taskModel.clock_out_status = ClockStatus.Late;
+      } else {
+        taskModel.clock_out_status = ClockStatus.Early;
+        await taskStatusReportService
+            .increaseEarlyFinishTaskByDocID(taskStatusReportDocId);
+      }
+
+      await _tasksService
+          .updateTaskStatusByTaskId(taskModel.taskId, taskModel.toJson(false))
+          .then((res) async => {
+                if (res.status == "S")
+                  {
+                    await taskStatusReportService
+                        .increaseCompletedTaskByDocID(taskStatusReportDocId),
+                    await createClockInOutNewFeedsFunc(
+                        taskModel, TaskStatus.Done, ClockInOutEvent.ClockOut),
+                    if (userIsInGeofencing?.data != [])
+                      {
+                        showToastMessage(
+                            context,
+                            "${userIsInGeofencing?.message} : ${geoFencingService?.clockInOutAreaNameEn}",
+                            Theme.of(context).colorScheme.background),
+                      }
+                    else
+                      {
+                        showToastMessage(
+                            context,
+                            "${userIsInGeofencing?.message} ",
+                            Theme.of(context).colorScheme.onBackground),
+                      },
+                    if (type == "fromCalendar") {Navigator.of(context).pop()}
+                  },
+              });
     } else {
-      taskModel.clock_out_status = ClockStatus.Early;
-      await taskStatusReportService
-          .increaseEarlyFinishTaskByDocID(taskStatusReportDocId);
+      showToastMessage(context, "${userIsInGeofencing?.message}",
+          Theme.of(context).colorScheme.onBackground);
     }
 
-    await _tasksService
-        .updateTaskStatusByTaskId(taskModel.taskId, taskModel.toJson(false))
-        .then((res) async => {
-              if (res.status == "S")
-                {
-                  await taskStatusReportService
-                      .increaseCompletedTaskByDocID(taskStatusReportDocId),
-                  await createClockInOutNewFeedsFunc(
-                      taskModel, TaskStatus.Done, ClockInOutEvent.ClockOut),
-                  showToastMessage(context, "Successful Clock Out!",
-                      Theme.of(context).colorScheme.primary),
-                  if (type == "fromCalendar") {Navigator.of(context).pop()}
-                },
-            });
     LoadingOverlay.of(context).hide();
     Navigator.pop(context);
   }
@@ -494,53 +533,62 @@ class TodayTaskController extends ControllerMVC {
   Future<void> onClockInPressed(
       BuildContext context, TaskModel? taskModel, String? type) async {
     // Map<String, dynamic> taskData = <String, dynamic>{};
-
+    var theme = Theme.of(context);
     TextEditingController clockInCommand = TextEditingController();
 
-    await geoFencingService?.getGeofencingAreaByOrganizationId();
+    var geofenceResult =
+        await geoFencingService?.getGeofencingAreaByOrganizationId();
+    if (geofenceResult?.status == 'S') {
+      await determinePosition(context).then((position) async => {
+            setState(() {
+              onClockInOrClockOutPress = false;
+            }),
+            notifyListeners(),
+            geoFencingService?.geoAreadList = [],
+            geoFencingService?.clockInOutAreaNameEn = [],
+            geoFencingService?.clockInOutAreaNameTh = [],
 
-    await determinePosition(context).then((position) async => {
-          LoadingOverlay.of(context).show(),
-          setState(() {
-            onClockInOrClockOutPress = false;
-          }),
-          notifyListeners(),
-          geoFencingService?.geoAreadList = [],
-          geoFencingService?.clockInOutAreaNameEn = [],
-          geoFencingService?.clockInOutAreaNameTh = [],
-          await geoFencingService?.confirmInGeofencingArea(
-              LatLng(position?.latitude ?? 0, position?.longitude ?? 0)),
-          LoadingOverlay.of(context).hide(),
-          taskModel?.clock_in_location =
-              GeoPoint(position?.latitude ?? 0, position?.longitude ?? 0),
-          modelConfirmWidgetFunc(
-            context,
-            translate("text_header.confirm_location"),
-            Column(
-              children: [
-                const SizedBox(
-                  height: 0,
-                ),
-                ButtonWidget(
-                  enable: true,
-                  fullStyle: true,
-                  color: geoFencingService!.isHasGeofence
-                      ? geoFencingService?.geoAreadList.length != 0
-                          ? Theme.of(context).colorScheme.primary
-                          : Theme.of(context).colorScheme.onBackground
-                      : Theme.of(context).colorScheme.primary,
-                  onPressed: () => {
-                    onClockInConfirmPressed(context, taskModel, type,
-                        clockInCommand.text, taskStatusReportDocId)
-                  },
-                  title: translate('button.confirm'),
-                ),
-              ],
+            //show clock in model;
+            modelConfirmWidgetFunc(
+              context,
+              translate("text_header.confirm_location"),
+              Column(
+                children: [
+                  ButtonWidget(
+                    enable: true,
+                    fullStyle: true,
+                    color: Theme.of(context).colorScheme.primary,
+                    onPressed: () => {
+                      onClockInConfirmPressed(context, taskModel, type,
+                          clockInCommand.text, taskStatusReportDocId)
+                    },
+                    title: translate('button.confirm'),
+                  ),
+                ],
+              ),
+              position,
+              clockInCommand,
             ),
-            position,
-            clockInCommand,
-          )
-        });
+
+            if (position?.latitude == 0 && position?.longitude == 0)
+              {
+                showToastMessage(
+                    context,
+                    translate('task_checkIn.position_0_content'),
+                    theme.colorScheme.onBackground)
+              }
+            else if (position?.latitude == null && position?.longitude == null)
+              {
+                showToastMessage(
+                    context,
+                    translate('task_checkIn.position_null_content'),
+                    theme.colorScheme.onBackground),
+              }
+          });
+    } else {
+      showToastMessage(context, "Server Not Respone : Get list geofence error!",
+          theme.colorScheme.onBackground);
+    }
   }
 
   Future<void> onClockInConfirmPressed(
@@ -552,39 +600,60 @@ class TodayTaskController extends ControllerMVC {
     LoadingOverlay.of(context).show();
     DateTime serverTimeNow = await NTP.now();
 
-    var startDate = DateTime.fromMicrosecondsSinceEpoch(
-        taskModel!.start_date!.microsecondsSinceEpoch);
+    var currentUserPosition = await determinePosition(context);
 
-    taskModel.clockInCommand = clockInCommand;
-    taskModel.clockInAreaEn = geoFencingService?.clockInOutAreaNameEn;
-    taskModel.clockInAreaTh = geoFencingService?.clockInOutAreaNameTh;
-    taskModel.status = TaskStatus.Start;
+    //check if user in geofencing area;
+    var userIsInGeofencing = await geoFencingService?.confirmInGeofencingArea(
+        LatLng(currentUserPosition?.latitude ?? 0,
+            currentUserPosition?.longitude ?? 0));
 
-    taskModel.driverStartAt = Timestamp.fromDate(serverTimeNow);
+    if (userIsInGeofencing?.status == 'S') {
+      taskModel?.clock_in_location = GeoPoint(
+          currentUserPosition?.latitude ?? 0,
+          currentUserPosition?.longitude ?? 0);
+      var startDate = DateTime.fromMicrosecondsSinceEpoch(
+          taskModel!.start_date!.microsecondsSinceEpoch);
 
-    var canCheckTask = startDate.compareTo(serverTimeNow);
-    if (canCheckTask < 0) {
-      taskModel.clock_in_status = ClockStatus.Late;
-      await taskStatusReportService
-          .increaseLateStartTaskByDocID(taskStatusReportDocId);
-    } else if (canCheckTask == 0) {
-      taskModel.clock_in_status = ClockStatus.Same;
+      taskModel.clockInCommand = clockInCommand;
+      taskModel.clockInAreaEn = geoFencingService?.clockInOutAreaNameEn;
+      taskModel.clockInAreaTh = geoFencingService?.clockInOutAreaNameTh;
+      taskModel.status = TaskStatus.Start;
+
+      taskModel.driverStartAt = Timestamp.fromDate(serverTimeNow);
+
+      var canCheckTask = startDate.compareTo(serverTimeNow);
+      if (canCheckTask < 0) {
+        taskModel.clock_in_status = ClockStatus.Late;
+        await taskStatusReportService
+            .increaseLateStartTaskByDocID(taskStatusReportDocId);
+      } else if (canCheckTask == 0) {
+        taskModel.clock_in_status = ClockStatus.Same;
+      } else {
+        taskModel.clock_in_status = ClockStatus.Early;
+      }
+
+      await _tasksService
+          .updateTaskStatusByTaskId(taskModel.taskId, taskModel.toJson(false))
+          .then((res) async => {
+                if (res.status == "S")
+                  {
+                    await createClockInOutNewFeedsFunc(
+                        taskModel, TaskStatus.Start, ClockInOutEvent.ClockIn),
+                    showToastMessage(
+                        context,
+                        userIsInGeofencing?.data != '[]'
+                            ? "${userIsInGeofencing?.message} : ${geoFencingService?.clockInOutAreaNameEn}"
+                            : "${userIsInGeofencing?.message}",
+                        userIsInGeofencing?.data != '[]'
+                            ? Theme.of(context).colorScheme.background
+                            : Theme.of(context).colorScheme.onBackground),
+                    if (type == "fromCalendar") {Navigator.of(context).pop()}
+                  },
+              });
     } else {
-      taskModel.clock_in_status = ClockStatus.Early;
+      showToastMessage(context, "${userIsInGeofencing?.message}",
+          Theme.of(context).colorScheme.onBackground);
     }
-
-    await _tasksService
-        .updateTaskStatusByTaskId(taskModel.taskId, taskModel.toJson(false))
-        .then((res) async => {
-              if (res.status == "S")
-                {
-                  await createClockInOutNewFeedsFunc(
-                      taskModel, TaskStatus.Start, ClockInOutEvent.ClockIn),
-                  showToastMessage(context, "Successful Clock In!",
-                      Theme.of(context).colorScheme.primary),
-                  if (type == "fromCalendar") {Navigator.of(context).pop()}
-                },
-            });
 
     LoadingOverlay.of(context).hide();
     Navigator.pop(context);
@@ -773,39 +842,40 @@ class TodayTaskController extends ControllerMVC {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          geoFencingService!.isHasGeofence
-                              ? geoFencingService?.geoAreadList.length != 0
-                                  ? Row(
-                                      children: [
-                                        Text(
-                                          translate(
-                                              "task_checkIn.geo_location_message"),
-                                          style: theme.textTheme.bodySmall,
-                                        ),
-                                        Column(
-                                          children: List.generate(
-                                              geoFencingService
-                                                      ?.geoAreadList.length ??
-                                                  0,
-                                              (index) => Text(
-                                                    "${geoFencingService?.geoAreadList[index].name_th}",
-                                                    style: theme
-                                                        .textTheme.bodySmall,
-                                                  )),
-                                        ),
-                                      ],
-                                    )
-                                  : Center(
-                                      child: Text(
-                                        translate(
-                                            "task_checkIn.geo_check_message"),
-                                        style: theme.textTheme.bodySmall?.merge(
-                                            TextStyle(
-                                                color: theme
-                                                    .colorScheme.onBackground)),
-                                      ),
-                                    )
-                              : SizedBox.shrink(),
+                          // geoFencingService!.isHasGeofence
+                          //     ? geoFencingService?.geoAreadList.length != 0
+                          //         ? Row(
+                          //             children: [
+                          //               Text(
+                          //                 translate(
+                          //                     "task_checkIn.geo_location_message"),
+                          //                 style: theme.textTheme.bodySmall,
+                          //               ),
+                          //               Column(
+                          //                 children: List.generate(
+                          //                     geoFencingService
+                          //                             ?.geoAreadList.length ??
+                          //                         0,
+                          //                     (index) => Text(
+                          //                           "${geoFencingService?.geoAreadList[index].name_th}",
+                          //                           style: theme
+                          //                               .textTheme.bodySmall,
+                          //                         )),
+                          //               ),
+                          //             ],
+                          //           )
+                          //         : Center(
+                          //             child: Text(
+                          //               translate(
+                          //                   "task_checkIn.geo_check_message"),
+                          //               style: theme.textTheme.bodySmall?.merge(
+                          //                   TextStyle(
+                          //                       color: theme
+                          //                           .colorScheme.onBackground)),
+                          //             ),
+                          //           )
+                          //     : SizedBox.shrink(),
+
                           confirmBtn
                         ],
                       ),

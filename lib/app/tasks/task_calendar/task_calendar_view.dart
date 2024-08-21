@@ -34,14 +34,6 @@ class _TaskCalendarViewState extends StateMVC<TaskCalendarView> {
     con = controller as TaskCalendarController;
   }
 
-  @override
-  void initState() {
-    setState(() {
-      con.userId = widget.userId;
-    });
-    super.initState();
-  }
-
   Widget timeComponent(String title, Widget? widget) {
     var theme = Theme.of(context);
     return Row(children: <Widget>[
