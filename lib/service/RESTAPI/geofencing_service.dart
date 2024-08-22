@@ -6,6 +6,7 @@ import 'package:asm_wt/models/geo_area_model.dart';
 import 'package:asm_wt/models/geofence_model.dart';
 import 'package:asm_wt/service/base_service.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:get_it/get_it.dart';
 
 import 'package:http/http.dart' as http;
@@ -56,9 +57,11 @@ class GeoFencingService extends ChangeNotifier {
           notifyListeners();
         }
 
-        return BaseService('S', 'You are in : ', result.body);
+        return BaseService(
+            'S', translate('task_checkIn.geo_location_message'), result.body);
       } else {
-        return BaseService('S', 'Out of Geofencing', result.body);
+        return BaseService(
+            'S', translate('task_checkIn.geo_check_message'), null);
       }
     } else {
       return BaseService('E',

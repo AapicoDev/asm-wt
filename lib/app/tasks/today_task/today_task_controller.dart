@@ -4,6 +4,7 @@ import 'dart:math';
 
 import 'package:asm_wt/models/settings_model.dart';
 import 'package:asm_wt/service/RESTAPI/geofencing_service.dart';
+import 'package:asm_wt/service/base_service.dart';
 import 'package:asm_wt/service/settings_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -111,7 +112,7 @@ class TodayTaskController extends ControllerMVC {
     }
   }
 
-  void showActionConfirmFunc(
+  void showActionConfirmSkipFunc(
       context, title, content, TaskModel taskModel, String fromWhere) {
     skipTaskReasonCon.text = "";
     var theme = Theme.of(context);
@@ -456,14 +457,60 @@ class TodayTaskController extends ControllerMVC {
     }
   }
 
+  Future<void> clockOutProcess(BuildContext context, TaskModel? taskModel,
+      String? type, BaseService? userIsInGeofencing) async {
+    LoadingOverlay.of(context).show();
+    DateTime serverTimeNow = await NTP.now();
+
+    var finishDate = DateTime.fromMicrosecondsSinceEpoch(
+        taskModel!.finish_date!.microsecondsSinceEpoch);
+
+    taskModel.clockOutAreaEn = geoFencingService?.clockInOutAreaNameEn;
+    taskModel.clockOutAreaTh = geoFencingService?.clockInOutAreaNameTh;
+    taskModel.driverFinishAt = Timestamp.fromDate(serverTimeNow);
+    taskModel.status = TaskStatus.Done;
+
+    var canCheckTask = finishDate.compareTo(serverTimeNow);
+    if (canCheckTask == 0) {
+      taskModel.clock_out_status = ClockStatus.Same;
+    } else if (canCheckTask < 0) {
+      taskModel.clock_out_status = ClockStatus.Late;
+    } else {
+      taskModel.clock_out_status = ClockStatus.Early;
+      await taskStatusReportService
+          .increaseEarlyFinishTaskByDocID(taskStatusReportDocId);
+    }
+
+    await _tasksService
+        .updateTaskStatusByTaskId(taskModel.taskId, taskModel.toJson(false))
+        .then((res) async => {
+              if (res.status == "S")
+                {
+                  await taskStatusReportService
+                      .increaseCompletedTaskByDocID(taskStatusReportDocId),
+                  await createClockInOutNewFeedsFunc(
+                      taskModel, TaskStatus.Done, ClockInOutEvent.ClockOut),
+                  showToastMessage(
+                      context,
+                      userIsInGeofencing?.data != null
+                          ? "${userIsInGeofencing?.message} : ${geoFencingService?.clockInOutAreaNameEn}"
+                          : "${userIsInGeofencing?.message}",
+                      userIsInGeofencing?.data != null
+                          ? Theme.of(context).colorScheme.background
+                          : Theme.of(context).colorScheme.onBackground),
+                  if (type == "fromCalendar") {Navigator.of(context).pop()}
+                },
+            });
+
+    LoadingOverlay.of(context).hide();
+  }
+
   Future<void> onClockOutConfirmPressed(
       BuildContext context,
       TaskModel? taskModel,
       String? type,
       String? clockOutCommand,
       String? taskStatusReportDocId) async {
-    LoadingOverlay.of(context).show();
-
     var currentUserPosition = await determinePosition(context);
 
     var userIsInGeofencing = await geoFencingService?.confirmInGeofencingArea(
@@ -471,63 +518,32 @@ class TodayTaskController extends ControllerMVC {
             currentUserPosition?.longitude ?? 0));
 
     if (userIsInGeofencing?.status == 'S') {
+      taskModel?.clockOutCommand = clockOutCommand;
+
       taskModel?.clock_out_location = GeoPoint(
           currentUserPosition?.latitude ?? 0,
           currentUserPosition?.longitude ?? 0);
-      taskModel?.clockOutCommand = clockOutCommand;
-      var finishDate = DateTime.fromMicrosecondsSinceEpoch(
-          taskModel!.finish_date!.microsecondsSinceEpoch);
-      DateTime serverTimeNow = await NTP.now();
 
-      taskModel.clockOutAreaEn = geoFencingService?.clockInOutAreaNameEn;
-      taskModel.clockOutAreaTh = geoFencingService?.clockInOutAreaNameTh;
-      taskModel.driverFinishAt = Timestamp.fromDate(serverTimeNow);
-      taskModel.status = TaskStatus.Done;
-
-      var canCheckTask = finishDate.compareTo(serverTimeNow);
-      if (canCheckTask == 0) {
-        taskModel.clock_out_status = ClockStatus.Same;
-      } else if (canCheckTask < 0) {
-        taskModel.clock_out_status = ClockStatus.Late;
+      if (userIsInGeofencing?.data != null) {
+        await clockOutProcess(context, taskModel, type, userIsInGeofencing)
+            .then((v) => Navigator.pop(context));
       } else {
-        taskModel.clock_out_status = ClockStatus.Early;
-        await taskStatusReportService
-            .increaseEarlyFinishTaskByDocID(taskStatusReportDocId);
+        showActionConfirmFunc(
+            context,
+            translate('button.confirm'),
+            "${userIsInGeofencing?.message}",
+            Theme.of(context).colorScheme.onBackground,
+            () async => await clockOutProcess(
+                        context, taskModel, type, userIsInGeofencing)
+                    .then((v) {
+                  Navigator.pop(context);
+                  Navigator.pop(context);
+                }));
       }
-
-      await _tasksService
-          .updateTaskStatusByTaskId(taskModel.taskId, taskModel.toJson(false))
-          .then((res) async => {
-                if (res.status == "S")
-                  {
-                    await taskStatusReportService
-                        .increaseCompletedTaskByDocID(taskStatusReportDocId),
-                    await createClockInOutNewFeedsFunc(
-                        taskModel, TaskStatus.Done, ClockInOutEvent.ClockOut),
-                    if (userIsInGeofencing?.data != [])
-                      {
-                        showToastMessage(
-                            context,
-                            "${userIsInGeofencing?.message} : ${geoFencingService?.clockInOutAreaNameEn}",
-                            Theme.of(context).colorScheme.background),
-                      }
-                    else
-                      {
-                        showToastMessage(
-                            context,
-                            "${userIsInGeofencing?.message} ",
-                            Theme.of(context).colorScheme.onBackground),
-                      },
-                    if (type == "fromCalendar") {Navigator.of(context).pop()}
-                  },
-              });
     } else {
       showToastMessage(context, "${userIsInGeofencing?.message}",
           Theme.of(context).colorScheme.onBackground);
     }
-
-    LoadingOverlay.of(context).hide();
-    Navigator.pop(context);
   }
 
   Future<void> onClockInPressed(
@@ -591,15 +607,59 @@ class TodayTaskController extends ControllerMVC {
     }
   }
 
+  Future<void> clockInProcess(BuildContext context, TaskModel? taskModel,
+      String? type, BaseService? userIsInGeofencing) async {
+    LoadingOverlay.of(context).show();
+    DateTime serverTimeNow = await NTP.now();
+
+    var startDate = DateTime.fromMicrosecondsSinceEpoch(
+        taskModel!.start_date!.microsecondsSinceEpoch);
+
+    taskModel.clockInAreaEn = geoFencingService?.clockInOutAreaNameEn;
+    taskModel.clockInAreaTh = geoFencingService?.clockInOutAreaNameTh;
+    taskModel.status = TaskStatus.Start;
+
+    taskModel.driverStartAt = Timestamp.fromDate(serverTimeNow);
+
+    var canCheckTask = startDate.compareTo(serverTimeNow);
+    if (canCheckTask < 0) {
+      taskModel.clock_in_status = ClockStatus.Late;
+      await taskStatusReportService
+          .increaseLateStartTaskByDocID(taskStatusReportDocId);
+    } else if (canCheckTask == 0) {
+      taskModel.clock_in_status = ClockStatus.Same;
+    } else {
+      taskModel.clock_in_status = ClockStatus.Early;
+    }
+
+    await _tasksService
+        .updateTaskStatusByTaskId(taskModel.taskId, taskModel.toJson(false))
+        .then((res) async => {
+              if (res.status == "S")
+                {
+                  await createClockInOutNewFeedsFunc(
+                      taskModel, TaskStatus.Start, ClockInOutEvent.ClockIn),
+                  showToastMessage(
+                      context,
+                      userIsInGeofencing?.data != null
+                          ? "${userIsInGeofencing?.message} : ${geoFencingService?.clockInOutAreaNameEn}"
+                          : "${userIsInGeofencing?.message}",
+                      userIsInGeofencing?.data != null
+                          ? Theme.of(context).colorScheme.background
+                          : Theme.of(context).colorScheme.onBackground),
+                  if (type == "fromCalendar") {Navigator.of(context).pop()}
+                },
+            });
+
+    LoadingOverlay.of(context).hide();
+  }
+
   Future<void> onClockInConfirmPressed(
       BuildContext context,
       TaskModel? taskModel,
       String? type,
       String? clockInCommand,
       String? taskStatusReportDocId) async {
-    LoadingOverlay.of(context).show();
-    DateTime serverTimeNow = await NTP.now();
-
     var currentUserPosition = await determinePosition(context);
 
     //check if user in geofencing area;
@@ -611,52 +671,31 @@ class TodayTaskController extends ControllerMVC {
       taskModel?.clock_in_location = GeoPoint(
           currentUserPosition?.latitude ?? 0,
           currentUserPosition?.longitude ?? 0);
-      var startDate = DateTime.fromMicrosecondsSinceEpoch(
-          taskModel!.start_date!.microsecondsSinceEpoch);
+      taskModel?.clockInCommand = clockInCommand;
 
-      taskModel.clockInCommand = clockInCommand;
-      taskModel.clockInAreaEn = geoFencingService?.clockInOutAreaNameEn;
-      taskModel.clockInAreaTh = geoFencingService?.clockInOutAreaNameTh;
-      taskModel.status = TaskStatus.Start;
-
-      taskModel.driverStartAt = Timestamp.fromDate(serverTimeNow);
-
-      var canCheckTask = startDate.compareTo(serverTimeNow);
-      if (canCheckTask < 0) {
-        taskModel.clock_in_status = ClockStatus.Late;
-        await taskStatusReportService
-            .increaseLateStartTaskByDocID(taskStatusReportDocId);
-      } else if (canCheckTask == 0) {
-        taskModel.clock_in_status = ClockStatus.Same;
+      if (userIsInGeofencing?.data != null) {
+        await clockInProcess(context, taskModel, type, userIsInGeofencing)
+            .then((v) => Navigator.pop(context));
       } else {
-        taskModel.clock_in_status = ClockStatus.Early;
+        showActionConfirmFunc(
+            context,
+            translate('button.confirm'),
+            "${userIsInGeofencing?.message}",
+            Theme.of(context).colorScheme.onBackground,
+            () async => await clockInProcess(
+                        context, taskModel, type, userIsInGeofencing)
+                    .then((v) {
+                  Navigator.pop(context);
+                  Navigator.pop(context);
+                }));
       }
-
-      await _tasksService
-          .updateTaskStatusByTaskId(taskModel.taskId, taskModel.toJson(false))
-          .then((res) async => {
-                if (res.status == "S")
-                  {
-                    await createClockInOutNewFeedsFunc(
-                        taskModel, TaskStatus.Start, ClockInOutEvent.ClockIn),
-                    showToastMessage(
-                        context,
-                        userIsInGeofencing?.data != '[]'
-                            ? "${userIsInGeofencing?.message} : ${geoFencingService?.clockInOutAreaNameEn}"
-                            : "${userIsInGeofencing?.message}",
-                        userIsInGeofencing?.data != '[]'
-                            ? Theme.of(context).colorScheme.background
-                            : Theme.of(context).colorScheme.onBackground),
-                    if (type == "fromCalendar") {Navigator.of(context).pop()}
-                  },
-              });
     } else {
       showToastMessage(context, "${userIsInGeofencing?.message}",
           Theme.of(context).colorScheme.onBackground);
     }
 
-    LoadingOverlay.of(context).hide();
-    Navigator.pop(context);
+    // LoadingOverlay.of(context).hide();
+    // Navigator.pop(context);
   }
 
 //Map area code;

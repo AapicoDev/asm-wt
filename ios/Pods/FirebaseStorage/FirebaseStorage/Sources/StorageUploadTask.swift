@@ -87,10 +87,10 @@ import Foundation
         chunkSize: self.reference.storage.uploadChunkSizeBytes,
         fetcherService: self.fetcherService
       )
-      if let uploadData {
-        uploadFetcher.uploadData = uploadData
+      if let data = self.uploadData {
+        uploadFetcher.uploadData = data
         uploadFetcher.comment = "Data UploadTask"
-      } else if let fileURL {
+      } else if let fileURL = self.fileURL {
         uploadFetcher.uploadFileURL = fileURL
         uploadFetcher.comment = "File UploadTask"
 
@@ -120,7 +120,7 @@ import Foundation
         self.fire(for: .progress, snapshot: self.snapshot)
 
         // Handle potential issues with upload
-        if let error {
+        if let error = error {
           self.state = .failed
           self.error = StorageErrorCode.error(withServerError: error, ref: self.reference)
           self.metadata = self.uploadMetadata

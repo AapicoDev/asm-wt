@@ -188,9 +188,14 @@ class _STaskDetailWidgetState extends State<TaskDetailWidget> {
                           ),
                         ),
                         GestureDetector(
-                          onTap: () async => await Clipboard.setData(
-                              ClipboardData(
-                                  text: "${widget.taskModel.taskId}")),
+                          onTap: () async => {
+                            await Clipboard.setData(ClipboardData(
+                                text: "${widget.taskModel.taskId}")),
+                            showToastMessage(
+                                context,
+                                translate('message.successful_copy'),
+                                theme.colorScheme.background)
+                          },
                           child: Icon(
                             Icons.content_copy,
                             color: theme.colorScheme.primary,

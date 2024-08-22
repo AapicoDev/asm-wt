@@ -116,7 +116,7 @@ open class StorageDownloadTask: StorageObservableTask, StorageTaskManagement {
       request.url = components?.url
 
       var fetcher: GTMSessionFetcher
-      if let resumeData {
+      if let resumeData = resumeData {
         fetcher = GTMSessionFetcher(downloadResumeData: resumeData)
         fetcher.comment = "Resuming DownloadTask"
       } else {
@@ -125,7 +125,7 @@ open class StorageDownloadTask: StorageObservableTask, StorageTaskManagement {
       }
       fetcher.maxRetryInterval = self.reference.storage.maxDownloadRetryInterval
 
-      if let fileURL {
+      if let fileURL = self.fileURL {
         // Handle file downloads
         fetcher.destinationFileURL = fileURL
         fetcher.downloadProgressBlock = { [weak self] (bytesWritten: Int64,
@@ -163,7 +163,7 @@ open class StorageDownloadTask: StorageObservableTask, StorageTaskManagement {
         self.fire(for: .progress, snapshot: self.snapshot)
 
         // Handle potential issues with download
-        if let error {
+        if let error = error {
           self.state = .failed
           self.error = StorageErrorCode.error(withServerError: error, ref: self.reference)
           self.fire(for: .failure, snapshot: self.snapshot)
@@ -171,7 +171,7 @@ open class StorageDownloadTask: StorageObservableTask, StorageTaskManagement {
         }
         // Download completed successfully, fire completion callbacks
         self.state = .success
-        if let data {
+        if let data = data {
           self.downloadData = data
         }
         self.fire(for: .success, snapshot: self.snapshot)

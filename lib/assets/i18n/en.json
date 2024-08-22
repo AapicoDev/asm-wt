@@ -209,7 +209,8 @@
 		"done_task" : "This task is already done.",
 		"before_approved_msg" : "Status : Waiting to approved ",
 		"approved_msg" : "This request is already approved.",
-		"dont_permit_to_delete" : "You aren't allowed to edit this item."
+		"dont_permit_to_delete" : "You aren't allowed to edit this item.",
+		"successful_copy" : "Successful Copy to Clip board"
 
 		
 	},

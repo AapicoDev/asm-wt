@@ -412,7 +412,8 @@ void showActionDiscardFunc(context) {
   );
 }
 
-void showActionConfirmFunc(context, title, content, VoidCallback? onPressed) {
+void showActionConfirmFunc(
+    context, title, content, Color color, VoidCallback? onPressed) {
   var theme = Theme.of(context);
   showDialog<void>(
     context: context,
@@ -425,7 +426,7 @@ void showActionConfirmFunc(context, title, content, VoidCallback? onPressed) {
         contentTextStyle: theme.textTheme.bodyMedium,
         titlePadding: const EdgeInsets.all(0),
         title: Container(
-          color: theme.colorScheme.primary,
+          color: color,
           alignment: Alignment.center,
           child: Padding(
             padding: const EdgeInsets.only(
@@ -448,8 +449,7 @@ void showActionConfirmFunc(context, title, content, VoidCallback? onPressed) {
               TextButton(
                 onPressed: onPressed,
                 style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(
-                        Theme.of(context).colorScheme.primary)),
+                    backgroundColor: MaterialStateProperty.all(color)),
                 child: Text(translate('button.confirm'),
                     style: Theme.of(context).textTheme.headlineSmall?.merge(
                         TextStyle(

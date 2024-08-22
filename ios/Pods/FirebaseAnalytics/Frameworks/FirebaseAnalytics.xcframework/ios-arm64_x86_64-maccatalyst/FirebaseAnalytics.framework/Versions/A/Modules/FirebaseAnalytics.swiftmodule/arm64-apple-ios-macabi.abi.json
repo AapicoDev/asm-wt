@@ -224,14 +224,14 @@
     {
       "filePath": "\/Volumes\/google\/src\/cloud\/pdchen\/firebaserelease\/google3\/googlemac\/iPhone\/Firebase\/Analytics\/Sources\/Swift\/Analytics+SwiftUI.swift",
       "kind": "StringLiteral",
-      "offset": 2654,
+      "offset": 2555,
       "length": 6,
       "value": "\"View\""
     },
     {
       "filePath": "\/Volumes\/google\/src\/cloud\/pdchen\/firebaserelease\/google3\/googlemac\/iPhone\/Firebase\/Analytics\/Sources\/Swift\/Analytics+SwiftUI.swift",
       "kind": "Dictionary",
-      "offset": 2701,
+      "offset": 2602,
       "length": 3,
       "value": "[]"
     }

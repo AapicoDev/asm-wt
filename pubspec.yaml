@@ -55,14 +55,14 @@ dependencies:
     sdk: flutter
   intl: ^0.19.0
   jiffy: ^6.2.0
-  firebase_core: ^3.1.0
-  firebase_auth: ^5.1.0
-  firebase_messaging: ^15.0.1
-  firebase_auth_platform_interface: ^7.4.0
+  firebase_core: ^2.32.0
+  firebase_auth: ^4.20.0
+  firebase_messaging: ^14.9.4
+  firebase_auth_platform_interface: ^7.2.7
   overlay_support: ^2.1.0
   flutter_local_notifications: ^17.1.2
-  cloud_firestore: ^5.0.1
-  firebase_storage: ^12.0.1
+  cloud_firestore: ^4.17.5
+  firebase_storage: ^11.7.7
   dbcrypt: ^2.0.0
   rive: ^0.13.9
   path: ^1.8.2
@@ -83,9 +83,9 @@ dependencies:
   fl_chart: ^0.66.0
   ntp: ^2.0.0
   maplibre_gl: ^0.20.0
-  firebase_app_check: ^0.3.0+1
-  firebase_crashlytics: ^4.0.3
-  firebase_analytics: ^11.2.0
+  firebase_app_check: ^0.2.2+7
+  firebase_crashlytics: ^3.5.7
+  firebase_analytics: ^10.10.7
   web: ^0.5.1
 
 flutter_native_splash:

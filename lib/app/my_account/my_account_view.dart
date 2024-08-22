@@ -537,6 +537,7 @@ class _MyAccountViewState extends StateMVC<MyAccountView> {
                               context,
                               translate("text_header.log_out_title"),
                               translate("contents.log_out_content"),
+                              theme.colorScheme.primary,
                               () => con.onSignOutPressed(context));
                         }, hasArrow: false),
                       ],
