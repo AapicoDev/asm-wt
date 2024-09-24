@@ -39,6 +39,7 @@
 		"staff_id_message": "You can create account only with our partner",
 		"phone_number": "Phone Number",
 		"account_not_found": "Account Not Found!",
+		"employee_not_allow": "Employee not allow to use this device",
 		"password": "Password",
 		"staff_id": "Staff ID",
 		"confirm_password": "Confirm Password",

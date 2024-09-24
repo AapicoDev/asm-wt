@@ -4,6 +4,7 @@ import 'package:asm_wt/app/app_service.dart';
 import 'package:asm_wt/app/authentication/register_step2/register_step2_controller.dart';
 import 'package:asm_wt/router/router_name.dart';
 import 'package:asm_wt/widget/network_error_widget.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -22,7 +23,6 @@ import 'dart:async';
 
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 
 class LoginController extends ControllerMVC {
   late AppStateMVC appState;
@@ -70,6 +70,24 @@ class LoginController extends ControllerMVC {
     // AppKeys.formLoginKeys[0].currentState?.reset();
   }
 
+  Future<DocumentSnapshot<Object?>?> queryDataFromFirestore(device_id) async {
+    try {
+      // Reference to Firestore collection
+      CollectionReference pos_devices =
+          FirebaseFirestore.instance.collection('pos');
+
+      // Query example: Get all users where age > 20
+      QuerySnapshot querySnapshot =
+          await pos_devices.where('device_id', isEqualTo: device_id).get();
+
+      // Iterating through the documents
+      return querySnapshot.docs[0];
+    } catch (e) {
+      print('Error querying data: $e');
+      return null;
+    }
+  }
+
   Future<void> initConnectivity() async {
     late List<ConnectivityResult> results;
     // Platform messages may fail, so we use a try/catch PlatformException.
@@ -99,32 +117,25 @@ class LoginController extends ControllerMVC {
     });
   }
 
-
   SharedPreferences prefs = GetIt.instance<SharedPreferences>();
-  Future<void> LoginByEmail(
-      BuildContext context, emailAddress, password) async {
-    await prefs.setString('userId', employeeModel.staffId ?? '');
-    await prefs.setString(
-        'organizationId', employeeModel.organization_id ?? '');
-    await prefs.setString('username', employeeModel.username ?? '');
-    await prefs.setBool('tracking', true);
-    await prefs.setBool('bioScan', false);
-    Provider.of<AppService>(context, listen: false).bioAuth = true;
-    Provider.of<AppService>(context, listen: false).loginState = true;
-
-    try {
-      final credential = await FirebaseAuth.instance
-          .signInWithEmailAndPassword(email: emailAddress, password: password);
-
+  Future<void> LoginByEmail(BuildContext context, posDeviceData, res) async {
+    var data = posDeviceData.data()?["phone"];
+    debugPrint("phone------------${data} ${res.phoneNumber}");
+    if (data.contains(res.phoneNumber)) {
+      await prefs.setString('userId', res.staffId ?? '');
+      await prefs.setString(
+          'organizationId', res.organization_id ?? '');
+      await prefs.setString('username', res.username ?? '');
+      await prefs.setBool('tracking', true);
+      await prefs.setBool('bioScan', false);
+      Provider.of<AppService>(context, listen: false).bioAuth = true;
+      Provider.of<AppService>(context, listen: false).loginState = true;
       context.pushReplacementNamed(RouteNames.todayTask);
-      LoadingOverlay.of(context).hide();
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'user-not-found') {
-        print('No user found for that email.');
-      } else if (e.code == 'wrong-password') {
-        print('Wrong password provided for that user.');
-      }
+    } else {
+      showToastMessage(context, translate("authentication.employee_not_allow"),
+          Theme.of(context).colorScheme.onBackground);
     }
+    LoadingOverlay.of(context).hide();
   }
 
   Future<void> onSignInPressed(BuildContext context) async {
@@ -159,41 +170,40 @@ class LoginController extends ControllerMVC {
             androidInfo = await deviceInfo.androidInfo;
             print("------_${androidInfo.id}");
           }
+          var isPOSDevice = await queryDataFromFirestore(
+              identifier != null ? identifier : androidInfo?.id);
+          print("POS Device -------------- ${isPOSDevice?.data().toString()}");
+
+          // LoadingOverlay.of(context).hide();
+          // return;
 
           await usersService
               .checkPhoneNumberIsExist(phoneNumber.text)
               .then((res) async => {
+                    print('Device ----------------${androidInfo}'),
                     if (res != null)
                       {
                         if (res.isActivated == true)
                           {
-                            // TODO ==== compare clode ID vs device ID
-                            if (res.deviceID ==
+                            // TODO ==== compare cloud ID vs device ID
+                            if (isPOSDevice != null)
+                              {
+                                LoginByEmail(context, isPOSDevice, res),
+                              }
+                            else if (res.deviceID ==
                                     (Platform.isIOS
                                         ? identifier
                                         : androidInfo?.id) ||
                                 phoneNumber.text == '+66646666666' ||
-                                phoneNumber.text == '+66647777777' ||
-                                androidInfo == 'O11019')
+                                phoneNumber.text == '+66647777777') // 'O11019'
                               {
-                                if (androidInfo == 'O11019' &&
-                                    ['+66625462087', '+66830764410']
-                                        .contains(phoneNumber.text))
-                                  {
-                                    // login by email
-                                    LoginByEmail(
-                                        context, 'O11019@asm.com', '12345678')
-                                  }
-                                else
-                                  {
-                                    employeeModel.username = res.username,
-                                    employeeModel.organization_id =
-                                        res.organization_id,
-                                    employeeModel.staffId = res.staffId,
-                                    employeeModel.phoneNumber = res.phoneNumber,
-                                    await _registerStep2Controller.verifyPhone(
-                                        context, employeeModel, 'login', false)
-                                  }
+                                employeeModel.username = res.username,
+                                employeeModel.organization_id =
+                                    res.organization_id,
+                                employeeModel.staffId = res.staffId,
+                                employeeModel.phoneNumber = res.phoneNumber,
+                                await _registerStep2Controller.verifyPhone(
+                                    context, employeeModel, 'login', false)
                               }
                             else
                               {
