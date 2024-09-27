@@ -117,7 +117,9 @@ class _LoginViewState extends StateMVC<LoginView> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      Text(translate('authentication.login_title'),
+                      Text(
+                          translate('authentication.login_title') +
+                              "[POS Version]",
                           style: theme.textTheme.titleLarge?.merge(TextStyle(
                               fontSize: 25,
                               color: theme.colorScheme.secondary))),

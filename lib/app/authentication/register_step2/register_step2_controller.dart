@@ -176,6 +176,7 @@ class RegisterStep2Controller extends ControllerMVC {
           .checkPhoneNumberIsExist(employeeModel?.phoneNumber)
           .then(
             (res) async => {
+              debugPrint('${res}'),
               if (res != null && res.isActivated == true)
                 {
                   showToastMessage(context, translate("message.exist_phon_num"),

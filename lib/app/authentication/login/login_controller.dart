@@ -188,6 +188,8 @@ class LoginController extends ControllerMVC {
                             // TODO ==== compare cloud ID vs device ID
                             if (isPOSDevice != null)
                               {
+                                
+                                await auth.signInAnonymously(),
                                 LoginByEmail(context, isPOSDevice, res),
                               }
                             else if (res.deviceID ==
