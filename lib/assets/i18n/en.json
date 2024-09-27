@@ -50,8 +50,8 @@
 		"account_info" : "Basic Information",
 		"phone_verify" : "Phone Number Verified",
 		"create_password" : "Create Your Password",
-		"log_out" : "Log Out"
-
+		"log_out": "Log Out",
+		"please_register": "Please register your account first"
 	},
 	"button": 
 	{

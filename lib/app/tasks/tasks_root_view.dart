@@ -80,9 +80,17 @@ class _TasksRootView extends StateMVC<TasksRootView> {
           if ((employee.deviceID != (androidInfo?.id ?? identifier)) &&
               employee.phoneNumber != '+66646666666' &&
               employee.phoneNumber != '+66647777777') {
+            debugPrint("signout 1");
+            showToastMessage(
+                context,
+                translate("authentication.unrecognise_device"),
+                Theme.of(context).colorScheme.onBackground);
             myAccountController.onSignOutPressed(context);
           }
         } else {
+          debugPrint("signout 2");
+          showToastMessage(context, translate("authentication.please_register"),
+              Theme.of(context).colorScheme.onBackground);
           myAccountController.onSignOutPressed(context);
         }
       }

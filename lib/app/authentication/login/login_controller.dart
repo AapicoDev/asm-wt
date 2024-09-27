@@ -122,9 +122,9 @@ class LoginController extends ControllerMVC {
     var data = posDeviceData.data()?["phone"];
     debugPrint("phone------------${data} ${res.phoneNumber}");
     if (data.contains(res.phoneNumber)) {
+      debugPrint("condition ok");
       await prefs.setString('userId', res.staffId ?? '');
-      await prefs.setString(
-          'organizationId', res.organization_id ?? '');
+      await prefs.setString('organizationId', res.organization_id ?? '');
       await prefs.setString('username', res.username ?? '');
       await prefs.setBool('tracking', true);
       await prefs.setBool('bioScan', false);
