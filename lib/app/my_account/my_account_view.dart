@@ -1,3 +1,4 @@
+import 'package:asm_wt/util/get_unique_id.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:go_router/go_router.dart';
 import 'package:asm_wt/app/my_account/my_account_controller.dart';
@@ -23,9 +24,25 @@ class MyAccountView extends StatefulWidget {
 
 class _MyAccountViewState extends StateMVC<MyAccountView> {
   late MyAccountController con;
+  late String? identifier;
 
   _MyAccountViewState() : super(MyAccountController()) {
     con = controller as MyAccountController;
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    fetchDeviceId();
+  }
+
+  // This function calls the getDeviceId function and updates the state
+  Future<void> fetchDeviceId() async {
+    String? id = await getDeviceId(); // Get the device ID
+    setState(() {
+      identifier = id; // Store the result and refresh the UI
+    });
   }
 
   @override
@@ -540,6 +557,10 @@ class _MyAccountViewState extends StateMVC<MyAccountView> {
                               theme.colorScheme.primary,
                               () => con.onSignOutPressed(context));
                         }, hasArrow: false),
+                        SizedBox(
+                          height: 5,
+                        ),
+                        Text('  Device ID: ${identifier}')
                       ],
                     ),
                   )),

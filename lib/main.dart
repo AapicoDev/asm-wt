@@ -1,3 +1,4 @@
+import 'package:asm_wt/app/tasks/task_manual/task_manual_controller.dart';
 import 'package:asm_wt/app/tasks/today_task/today_task_controller.dart';
 import 'package:asm_wt/service/RESTAPI/geofencing_service.dart';
 import 'package:asm_wt/service/RESTAPI/task_management_service.dart';
@@ -410,6 +411,7 @@ class _MyAppState extends AppStateMVC<MyApp> with TickerProviderStateMixin {
           ChangeNotifierProvider<AppService>(create: (_) => appService),
           ChangeNotifierProvider(create: (_) => GeoFencingService()),
           ChangeNotifierProvider(create: (_) => TaskManagementService()),
+          ChangeNotifierProvider(create: (_) => TaskManualProvider()),
           Provider<AppRouter>(create: (_) => AppRouter(appService)),
         ],
         child: Builder(builder: (context) {

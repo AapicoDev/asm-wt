@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:asm_wt/app/app_service.dart';
 import 'package:asm_wt/app/authentication/register_step2/register_step2_controller.dart';
 import 'package:asm_wt/router/router_name.dart';
+import 'package:asm_wt/util/get_unique_id.dart';
 import 'package:asm_wt/widget/network_error_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -103,9 +104,9 @@ class LoginController extends ControllerMVC {
   Future<void> getConnectivity() async =>
       subscription = Connectivity().onConnectivityChanged.listen(
         (List<ConnectivityResult> result) async {
-          setState(() {
-            connectivityResult = result;
-          });
+          // setState(() {
+          connectivityResult = result;
+          // });
         },
       );
 
@@ -156,22 +157,9 @@ class LoginController extends ControllerMVC {
         RegExpMatch? phonenumberReg =
             ifStartWithZero.firstMatch(phoneNumber.text);
         if (phonenumberReg?[0] != null) {
-          AndroidDeviceInfo? androidInfo;
           String? identifier;
-
-          if (Platform.isIOS) {
-            final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
-            var data = await deviceInfoPlugin.iosInfo;
-            identifier = "${data.name}-v${data.systemName}";
-
-            print("----------$identifier");
-          } else if (Platform.isAndroid) {
-            DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-            androidInfo = await deviceInfo.androidInfo;
-            print("------_${androidInfo.id}");
-          }
-          var isPOSDevice = await queryDataFromFirestore(
-              identifier != null ? identifier : androidInfo?.id);
+          identifier = await getDeviceId();
+          var isPOSDevice = await queryDataFromFirestore(identifier);
           print("POS Device -------------- ${isPOSDevice?.data().toString()}");
 
           // LoadingOverlay.of(context).hide();
@@ -180,49 +168,32 @@ class LoginController extends ControllerMVC {
           await usersService
               .checkPhoneNumberIsExist(phoneNumber.text)
               .then((res) async => {
-                    print('Device ----------------${androidInfo}'),
+                    print('Device ----------------${res}'),
                     if (res != null)
                       {
-                        if (res.isActivated == true)
+                        // TODO ==== compare cloud ID vs device ID
+                        if (isPOSDevice != null)
                           {
-                            // TODO ==== compare cloud ID vs device ID
-                            if (isPOSDevice != null)
-                              {
-                                
-                                await auth.signInAnonymously(),
-                                LoginByEmail(context, isPOSDevice, res),
-                              }
-                            else if (res.deviceID ==
-                                    (Platform.isIOS
-                                        ? identifier
-                                        : androidInfo?.id) ||
-                                phoneNumber.text == '+66646666666' ||
-                                phoneNumber.text == '+66647777777') // 'O11019'
-                              {
-                                employeeModel.username = res.username,
-                                employeeModel.organization_id =
-                                    res.organization_id,
-                                employeeModel.staffId = res.staffId,
-                                employeeModel.phoneNumber = res.phoneNumber,
-                                await _registerStep2Controller.verifyPhone(
-                                    context, employeeModel, 'login', false)
-                              }
-                            else
-                              {
-                                LoadingOverlay.of(context).hide(),
-                                showToastMessage(
-                                    context,
-                                    translate(
-                                        "authentication.unrecognise_device"),
-                                    Theme.of(context).colorScheme.onBackground),
-                              }
+                            debugPrint("-------"),
+                            await auth.signInAnonymously(),
+                            LoginByEmail(context, isPOSDevice, res),
+                          }
+                        else if (phoneNumber.text == '+66646666666' ||
+                            phoneNumber.text == '+66647777777') // 'O11019'
+                          {
+                            employeeModel.username = res.username,
+                            employeeModel.organization_id = res.organization_id,
+                            employeeModel.staffId = res.staffId,
+                            employeeModel.phoneNumber = res.phoneNumber,
+                            await _registerStep2Controller.verifyPhone(
+                                context, employeeModel, 'login', false)
                           }
                         else
                           {
                             LoadingOverlay.of(context).hide(),
                             showToastMessage(
                                 context,
-                                "Please Reactivated Your Account.",
+                                translate("authentication.unrecognise_device"),
                                 Theme.of(context).colorScheme.onBackground),
                           }
                       }

@@ -1,4 +1,5 @@
 import 'package:asm_wt/router/router_name.dart';
+import 'package:asm_wt/util/get_unique_id.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:asm_wt/app/app_key.dart';
@@ -20,6 +21,7 @@ class LoginView extends StatefulWidget {
 
 class _LoginViewState extends StateMVC<LoginView> {
   late LoginController con;
+  String? deviceId;
 
   _LoginViewState() : super(LoginController()) {
     con = controller as LoginController;
@@ -41,6 +43,15 @@ class _LoginViewState extends StateMVC<LoginView> {
   @override
   void initState() {
     super.initState();
+    fetchDeviceId();
+  }
+
+  // This function calls the getDeviceId function and updates the state
+  Future<void> fetchDeviceId() async {
+    String? id = await getDeviceId(); // Get the device ID
+    setState(() {
+      deviceId = id; // Store the result and refresh the UI
+    });
   }
 
   @override
@@ -118,8 +129,10 @@ class _LoginViewState extends StateMVC<LoginView> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       Text(
+                          textAlign: TextAlign.center,
                           translate('authentication.login_title') +
-                              "[POS Version]",
+                              "\n[POS Version]\n" +
+                              "${deviceId}",
                           style: theme.textTheme.titleLarge?.merge(TextStyle(
                               fontSize: 25,
                               color: theme.colorScheme.secondary))),

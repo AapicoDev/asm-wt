@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:asm_wt/app/tasks/task_manual/task_manual_view.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:device_info_plus/device_info_plus.dart';
@@ -108,6 +109,9 @@ class _TasksRootView extends StateMVC<TasksRootView> {
       TaskCalendarView(
         userId: con.userId ?? '',
       ),
+      TaskManualView(
+        userId: con.userId ?? '',
+      ),
       // const LiveMapView(),
       MyAccountView(
         userId: con.userId ?? '',
@@ -135,8 +139,10 @@ class _TasksRootView extends StateMVC<TasksRootView> {
                         : widget.appService.navNum == 1
                             ? translate('app_bar.task_calendar')
                             : widget.appService.navNum == 2
-                                ? translate('app_bar.my_account')
-                                : '',
+                                ? translate('app_bar.task_manual')
+                                : widget.appService.navNum == 3
+                                    ? translate('app_bar.my_account')
+                                    : '',
                     leadingBack: false,
                     // leadingBack: widget.appService.navNum != 2 ? true : false,
 
@@ -206,6 +212,17 @@ class _TasksRootView extends StateMVC<TasksRootView> {
                               label: translate('app_bar.task_calendar'),
                               selectedIcon: Icon(
                                 Icons.calendar_month,
+                                color: theme.colorScheme.primary,
+                              ),
+                            ),
+                            NavigationDestination(
+                              icon: Icon(
+                                Icons.lock_clock,
+                                color: theme.colorScheme.onTertiary,
+                              ),
+                              label: translate('app_bar.task_manual'),
+                              selectedIcon: Icon(
+                                Icons.lock_clock,
                                 color: theme.colorScheme.primary,
                               ),
                             ),
