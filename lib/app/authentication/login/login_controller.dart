@@ -178,24 +178,32 @@ class LoginController extends ControllerMVC {
                             await auth.signInAnonymously(),
                             LoginByEmail(context, isPOSDevice, res),
                           }
-                        else if (phoneNumber.text == '+66646666666' ||
-                            phoneNumber.text == '+66647777777') // 'O11019'
-                          {
-                            employeeModel.username = res.username,
-                            employeeModel.organization_id = res.organization_id,
-                            employeeModel.staffId = res.staffId,
-                            employeeModel.phoneNumber = res.phoneNumber,
-                            await _registerStep2Controller.verifyPhone(
-                                context, employeeModel, 'login', false)
-                          }
                         else
                           {
-                            LoadingOverlay.of(context).hide(),
-                            showToastMessage(
-                                context,
-                                translate("authentication.unrecognise_device"),
-                                Theme.of(context).colorScheme.onBackground),
+                            ScaffoldMessenger.of(context)
+                                .showSnackBar(const SnackBar(
+                              content: Text('Unkown POS Device'),
+                              duration: Duration(seconds: 2),
+                            )),
                           }
+                        // else if (phoneNumber.text == '+66646666666' ||
+                        //     phoneNumber.text == '+66647777777') // 'O11019'
+                        //   {
+                        //     employeeModel.username = res.username,
+                        //     employeeModel.organization_id = res.organization_id,
+                        //     employeeModel.staffId = res.staffId,
+                        //     employeeModel.phoneNumber = res.phoneNumber,
+                        //     await _registerStep2Controller.verifyPhone(
+                        //         context, employeeModel, 'login', false)
+                        //   }
+                        // else
+                        //   {
+                        //     LoadingOverlay.of(context).hide(),
+                        //     showToastMessage(
+                        //         context,
+                        //         translate("authentication.unrecognise_device"),
+                        //         Theme.of(context).colorScheme.onBackground),
+                        //   }
                       }
                     else
                       {

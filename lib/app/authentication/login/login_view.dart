@@ -131,8 +131,7 @@ class _LoginViewState extends StateMVC<LoginView> {
                       Text(
                           textAlign: TextAlign.center,
                           translate('authentication.login_title') +
-                              "\n[POS Version]\n" +
-                              "${deviceId}",
+                              "\n[POS Version]\n",
                           style: theme.textTheme.titleLarge?.merge(TextStyle(
                               fontSize: 25,
                               color: theme.colorScheme.secondary))),
@@ -221,6 +220,7 @@ class _LoginViewState extends StateMVC<LoginView> {
                               onPressed: () => con.onSignInPressed(context)
                               // onPressed: () => context.pushNamed(RouteNames.myTasks)
                               ),
+                          Text("${deviceId}"),
                           const SizedBox(
                             height: 10,
                           ),

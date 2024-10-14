@@ -1,11 +1,16 @@
+import 'package:asm_wt/app/tasks/task_manual/image_upload.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart'; // Import geolocator for fetching user's location
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 class ConfirmationSheetWithMap extends StatefulWidget {
   final String action;
+  final Function(Position?, List<ImageUploadModel>?) onConfirm;
 
-  ConfirmationSheetWithMap(this.action);
+  ConfirmationSheetWithMap({
+    required this.action,
+    required this.onConfirm, // Add this callback
+  });
 
   @override
   _ConfirmationSheetWithMapState createState() =>
@@ -15,6 +20,7 @@ class ConfirmationSheetWithMap extends StatefulWidget {
 class _ConfirmationSheetWithMapState extends State<ConfirmationSheetWithMap> {
   MapLibreMapController? mapController;
   Position? _currentPosition;
+  List<ImageUploadModel> images = [];
 
   @override
   void initState() {
@@ -46,9 +52,6 @@ class _ConfirmationSheetWithMapState extends State<ConfirmationSheetWithMap> {
       return;
     }
 
-    // Print whether the service is enabled
-    debugPrint('Service enabled: $serviceEnabled');
-
     try {
       // Get current location
       _currentPosition = await Geolocator.getCurrentPosition();
@@ -76,7 +79,7 @@ class _ConfirmationSheetWithMapState extends State<ConfirmationSheetWithMap> {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
-      height: 400, // Adjust the height for map display
+      height: 600, // Adjust the height for map display
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -96,7 +99,7 @@ class _ConfirmationSheetWithMapState extends State<ConfirmationSheetWithMap> {
                   height: 200, // Map height
                   child: MapLibreMap(
                     styleString:
-                        "https://demotiles.maplibre.org/style.json", // MapLibre style URL
+                        "https://maps.powermap.live/api/v2/map/vtile/styles?name=thailand_th&access_token=b378c575291af30a29f59919fd7e7e4c012d45c4", // MapLibre style URL
                     onMapCreated: _onMapCreated,
                     initialCameraPosition: CameraPosition(
                       target: LatLng(_currentPosition!.latitude,
@@ -108,7 +111,27 @@ class _ConfirmationSheetWithMapState extends State<ConfirmationSheetWithMap> {
                   ),
                 )
               : const CircularProgressIndicator(), // Show loading until location is fetched
-          const SizedBox(height: 20),
+
+          Text(
+              'Lat/Lng: ${_currentPosition?.latitude ?? "-"}/${_currentPosition?.longitude ?? "-"}'),
+          Text(''),
+          SingleImageUpload(
+            labels: ["Profile Photo", "Others"],
+            imageCount: 2,
+            onImagesUpdated: (List<ImageUploadModel> updatedImages) {
+              // Handle the updated images here
+              setState(() {
+                images = updatedImages;
+              });
+            },
+          ),
+          SizedBox(
+            height: 20,
+          ),
+          const Divider(),
+          SizedBox(
+            height: 20,
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
@@ -123,6 +146,8 @@ class _ConfirmationSheetWithMapState extends State<ConfirmationSheetWithMap> {
               ),
               ElevatedButton(
                 onPressed: () {
+                  // Pass data (e.g., current position and images) to the parent using the callback
+                  widget.onConfirm(_currentPosition, images);
                   Navigator.of(context).pop(true); // Confirm action
                 },
                 style: ElevatedButton.styleFrom(

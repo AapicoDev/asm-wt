@@ -1,7 +1,10 @@
 import 'package:appwrite/models.dart';
 import 'package:asm_wt/app/tasks/task_manual/bottomsheet_with_map.dart';
+import 'package:asm_wt/app/tasks/task_manual/image_upload.dart';
 import 'package:asm_wt/app/tasks/task_manual/task_manual_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import 'package:mvc_pattern/mvc_pattern.dart';
 import 'package:provider/provider.dart';
@@ -125,7 +128,7 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
                 Container(
                   margin: EdgeInsets.all(15),
                   height: MediaQuery.of(context).size.height *
-                      0.325, // Set height to 30%
+                      0.3, // Set height to 30%
                   width: MediaQuery.of(context).size.width,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.all(Radius.circular(20)),
@@ -192,7 +195,8 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
         ElevatedButton(
           onPressed: () async {
             // Show bottom sheet confirmation with map before clock-in
-            bool? confirm = await showModalBottomSheet<bool>(
+            // bool? confirm =
+            await showModalBottomSheet<bool>(
               context: context,
               isScrollControlled:
                   true, // Allows flexible height for bottom sheet with map
@@ -200,19 +204,49 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
                 borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
               ),
               builder: (BuildContext context) {
-                return ConfirmationSheetWithMap('Clock-in');
+                return ConfirmationSheetWithMap(
+                  action: "confirm clock-in",
+                  onConfirm: (Position? position,
+                      List<ImageUploadModel>? images) async {
+                    // Handle the data received from the confirmation sheet
+                    if (position != null) {
+                      debugPrint(
+                          'User position: Lat: ${position.latitude}, Lng: ${position.longitude}');
+                    }
+                    if (images != null && images.isNotEmpty) {
+                      debugPrint('User uploaded ${images.length} images.');
+                    }
+
+                    if (images!.length == 0) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('No mage found!'),
+                          duration: Duration(seconds: 2),
+                        ),
+                      );
+                    }
+
+                    await _saveClockInTime(); // Save clock-in time
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Clock-in successful!'),
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+                  },
+                );
               },
             );
 
-            if (confirm == true) {
-              await _saveClockInTime(); // Save clock-in time
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Clock-in successful!'),
-                  duration: Duration(seconds: 2),
-                ),
-              );
-            }
+            // if (confirm == true) {
+            //   await _saveClockInTime(); // Save clock-in time
+            //   ScaffoldMessenger.of(context).showSnackBar(
+            //     const SnackBar(
+            //       content: Text('Clock-in successful!'),
+            //       duration: Duration(seconds: 2),
+            //     ),
+            //   );
+            // }
           },
           child: const Text('Clock-in'),
           style: ElevatedButton.styleFrom(
@@ -229,26 +263,48 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
                 }
               : () async {
                   // Show bottom sheet confirmation before clock-out
-                  bool? confirm = await showModalBottomSheet<bool>(
+                  // bool? confirm =
+                  await showModalBottomSheet<bool>(
                     context: context,
                     shape: const RoundedRectangleBorder(
                       borderRadius:
                           BorderRadius.vertical(top: Radius.circular(20)),
                     ),
                     builder: (BuildContext context) {
-                      return ConfirmationSheetWithMap('Clock-out');
+                      return ConfirmationSheetWithMap(
+                        action: "Clock-Out",
+                        onConfirm: (Position? position,
+                            List<ImageUploadModel>? images) async {
+                          // Handle the data received from the confirmation sheet
+                          if (position != null) {
+                            debugPrint(
+                                'User position: Lat: ${position.latitude}, Lng: ${position.longitude}');
+                          }
+                          if (images != null && images.isNotEmpty) {
+                            debugPrint(
+                                'User uploaded ${images.length} images.');
+                          }
+                          await _clockOut(); // Clock-out and save data
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Clock-out successful!'),
+                              duration: Duration(seconds: 2),
+                            ),
+                          );
+                        },
+                      );
                     },
                   );
 
-                  if (confirm == true) {
-                    await _clockOut(); // Clock-out and save data
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Clock-out successful!'),
-                        duration: Duration(seconds: 2),
-                      ),
-                    );
-                  }
+                  // if (confirm == true) {
+                  //   await _clockOut(); // Clock-out and save data
+                  //   ScaffoldMessenger.of(context).showSnackBar(
+                  //     const SnackBar(
+                  //       content: Text('Clock-out successful!'),
+                  //       duration: Duration(seconds: 2),
+                  //     ),
+                  //   );
+                  // }
                 },
           child: const Text('Clock-out'),
           style: ElevatedButton.styleFrom(
@@ -261,7 +317,6 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
       ],
     );
   }
-
 
   Widget _buildTodayEntry() {
     return Container(
