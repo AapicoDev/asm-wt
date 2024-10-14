@@ -1,4 +1,5 @@
 import 'package:appwrite/models.dart';
+import 'package:asm_wt/app/tasks/task_manual/bottomsheet_with_map.dart';
 import 'package:asm_wt/app/tasks/task_manual/task_manual_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -148,7 +149,7 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
                           SizedBox(height: 20),
                           _buildClockDisplay(), // Use data from Appwrite
                           SizedBox(height: 20),
-                          _buildClockButtons(),
+                          _buildClockButtons(context),
                           SizedBox(height: 20),
                           _buildTodayEntry(),
                           SizedBox(height: 20),
@@ -183,36 +184,44 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
     );
   }
 
-  Widget _buildClockButtons() {
+  Widget _buildClockButtons(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
+        // Clock-in button
         ElevatedButton(
           onPressed: () async {
-            // Show bottom sheet confirmation before clock-in
+            // Show bottom sheet confirmation with map before clock-in
             bool? confirm = await showModalBottomSheet<bool>(
               context: context,
+              isScrollControlled:
+                  true, // Allows flexible height for bottom sheet with map
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+              ),
               builder: (BuildContext context) {
-                return _buildConfirmationSheet('Clock-in');
+                return ConfirmationSheetWithMap('Clock-in');
               },
             );
 
             if (confirm == true) {
               await _saveClockInTime(); // Save clock-in time
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
+                const SnackBar(
                   content: Text('Clock-in successful!'),
                   duration: Duration(seconds: 2),
                 ),
               );
             }
           },
-          child: Text('Clock-in'),
+          child: const Text('Clock-in'),
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.green[200],
-            minimumSize: Size(150, 50),
+            minimumSize: const Size(150, 50),
           ),
         ),
+
+        // Clock-out button
         ElevatedButton(
           onPressed: _clockInTime == null
               ? () {
@@ -222,79 +231,37 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
                   // Show bottom sheet confirmation before clock-out
                   bool? confirm = await showModalBottomSheet<bool>(
                     context: context,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.vertical(top: Radius.circular(20)),
+                    ),
                     builder: (BuildContext context) {
-                      return _buildConfirmationSheet('Clock-out');
+                      return ConfirmationSheetWithMap('Clock-out');
                     },
                   );
 
                   if (confirm == true) {
                     await _clockOut(); // Clock-out and save data
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
+                      const SnackBar(
                         content: Text('Clock-out successful!'),
                         duration: Duration(seconds: 2),
                       ),
                     );
                   }
                 },
-          child: Text('Clock-out'),
+          child: const Text('Clock-out'),
           style: ElevatedButton.styleFrom(
             backgroundColor: _clockInTime != null
                 ? Colors.green[200]
                 : Colors.grey, // Disable if not clocked-in
-            minimumSize: Size(150, 50),
+            minimumSize: const Size(150, 50),
           ),
         ),
       ],
     );
   }
 
-// Reusable confirmation bottom sheet widget
-  Widget _buildConfirmationSheet(String action) {
-    return Container(
-      padding: EdgeInsets.all(16),
-      height: 200,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            'Confirm $action',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          Divider(),
-          SizedBox(height: 10),
-          Text('Are you sure you want to $action?'),
-          SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).pop(false); // Cancel action
-                },
-                child: Text('Cancel'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.grey,
-                ),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).pop(true); // Confirm action
-                },
-                child: Text('Confirm'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green[200],
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _buildTodayEntry() {
     return Container(
@@ -384,7 +351,7 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
           ),
           if (_isHistoryVisible)
             SizedBox(
-              height: MediaQuery.of(context).size.height * 0.36,
+              height: MediaQuery.of(context).size.height * 0.35,
               child: taskData.isEmpty
                   ? Center(
                       child: Text(
