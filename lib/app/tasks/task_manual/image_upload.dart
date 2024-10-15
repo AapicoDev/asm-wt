@@ -115,7 +115,7 @@ class _SingleImageUploadState extends State<SingleImageUpload> {
   }
 
   Future<void> _onAddImageClick(int index) async {
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    final XFile? image = await _picker.pickImage(source: ImageSource.camera);
     if (image != null) {
       setState(() {
         images[index] = ImageUploadModel(imageFile: File(image.path));
