@@ -1,13 +1,14 @@
 // import 'package:appwrite/models.dart';
-import 'dart:io';
 
+import 'dart:ffi' as ui;
+
+import 'package:asm_wt/app/tasks/task_manual/bottomsheet_view_clocking.dart';
 import 'package:asm_wt/app/tasks/task_manual/bottomsheet_with_map.dart';
 import 'package:asm_wt/app/tasks/task_manual/image_upload.dart';
 import 'package:asm_wt/app/tasks/task_manual/task_manual_controller.dart';
 import 'package:asm_wt/service/appwrite_service.dart';
-import 'package:cross_file/src/types/interface.dart';
+import 'package:asm_wt/util/top_snackbar.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import 'package:mvc_pattern/mvc_pattern.dart';
@@ -40,6 +41,43 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
     });
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Update the state when the widget is revisited
+    updateState();
+  }
+
+  void updateState() async {
+    // Logic to update the state
+    print("State updated on revisit");
+    var prevClockIn = await _getClockInTime();
+    setState(() {
+      // Update your state here
+      _clockInTime = prevClockIn;
+    });
+  }
+
+  void _showSuccessDialog(BuildContext context, String content) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Success'),
+          content: Text(content),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   void _updateTime() {
     setState(() {
       _time = DateFormat('HH:mm').format(DateTime.now());
@@ -63,7 +101,7 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
   }
 
   // Method to save clock-in time locally
-  Future<void> _saveClockInTime() async {
+  Future<void> _saveClockInTime(imagesList, position) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String formattedTime =
         DateFormat('yyyy-MM-ddTHH:mm:ss').format(DateTime.now());
@@ -71,7 +109,18 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
     setState(() {
       _clockInTime = formattedTime; // Update local clock-in time
     });
-    debugPrint('formattedTime ---- ${formattedTime}');
+    // save to server and save the id
+
+    debugPrint('clockOutTime ------ ${formattedTime}${imagesList}${position}');
+    final taskProvider =
+        Provider.of<TaskManualProvider>(context, listen: false);
+    var clockInId = await taskProvider.saveClockInData(widget.userId, {
+      "clock_in": formattedTime,
+      "clock_in_location": [position.latitude, position.longitude],
+      "clock_in_image": imagesList
+    });
+    _showSuccessDialog(context, "Clock in save successfully");
+    await prefs.setString('clockInId', clockInId);
   }
 
   // Method to get clock-in time from local storage
@@ -80,33 +129,44 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
     return prefs.getString('clockInTime');
   }
 
+  // Method to get clock-in time from local storage
+  Future<String?> _getClockInId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString('clockInId');
+  }
+
   // Method to clear clock-in time from local storage
   Future<void> _clearClockInTime() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('clockInTime');
+    await prefs.remove('clockInId');
     setState(() {
       _clockInTime = null;
     });
   }
 
   // Method to handle Clock-out action
-  Future<void> _clockOut() async {
+  Future<void> _clockOut(imagesList, position) async {
+    String? clockInId = await _getClockInId();
     String? clockInTime = await _getClockInTime();
     String clockOutTime =
         DateFormat('yyyy-MM-ddTHH:mm:ss').format(DateTime.now());
 
-    debugPrint('clockOutTime ------ ${clockInTime}${clockOutTime}');
+    debugPrint(
+        'clockOutTime ------ ${clockInTime}${clockOutTime}${imagesList}${position}');
     // Save data to Appwrite using your TaskManualController
     final taskProvider =
         Provider.of<TaskManualProvider>(context, listen: false);
-    await taskProvider.saveClockInData(widget.userId, {
-      "clock_in": clockInTime,
+    await taskProvider.updateClockInData(clockInId!, {
       "clock_out": clockOutTime,
+      "clock_out_image": imagesList,
+      "clock_out_location": [position.latitude, position.longitude]
     });
 
     await taskProvider.fetchTaskData(widget.userId);
     taskHistory = taskProvider.taskData?.documents ?? [];
 
+    _showSuccessDialog(context, "Clock in save successfully");
     // Clear local storage
     await _clearClockInTime();
   }
@@ -213,90 +273,37 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
                   onConfirm: (Position? position,
                       List<ImageUploadModel>? images) async {
                     // Handle the data received from the confirmation sheet
-                    if (position != null) {
-                      debugPrint(
-                          'User position: Lat: ${position.latitude}, Lng: ${position.longitude}');
-                      return;
-                    }
-
-                    if (images != null && images.isNotEmpty) {
-                      debugPrint('User uploaded ${images.length} images.');
-
-                      // Create an instance of the Appwrite service
-                      final AppwriteService _appwriteService =
-                          AppwriteService();
-
-                      for (var image in images) {
-                        final fileName =
-                            'clock_in_${widget.userId}_${_clockInTime}';
-                        try {
-                          // Upload the image using the Appwrite service, passing the file's path and name
-                          final fileId = await _appwriteService.uploadImage(
-                            image.imageFile!,
-                            fileName,
-                          );
-
-                          // Log success or show a message
-                          debugPrint('Image uploaded successfully: $fileId');
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content:
-                                  Text('Image File uploaded successfully.'),
-                              duration: const Duration(seconds: 2),
-                            ),
-                          );
-                        } catch (e) {
-                          // Handle upload failure
-                          debugPrint(
-                              'Failed to upload image: ${fileName}, Error: $e');
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content:
-                                  Text('Failed to upload image: ${fileName}'),
-                              duration: const Duration(seconds: 2),
-                            ),
-                          );
-                        }
+                    var imagesList = [];
+                    // Create an instance of the Appwrite service
+                    final AppwriteService _appwriteService = AppwriteService();
+                    for (var image in images!) {
+                      String formattedTime =
+                          DateFormat('yyyyMMddTHHmmss').format(DateTime.now());
+                      final fileName =
+                          'clock_in_${widget.userId}_${formattedTime}';
+                      try {
+                        // Upload the image using the Appwrite service, passing the file's path and name
+                        final fileId = await _appwriteService.uploadImage(
+                          image.imageFile!,
+                          fileName,
+                        );
+                        imagesList.add(fileId);
+                        // Log success or show a message
+                        debugPrint('Image uploaded successfully: $fileId');
+                      } catch (e) {
+                        // Handle upload failure
+                        debugPrint(
+                            'Failed to upload image: ${fileName}, Error: $e');
                       }
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('No image found!'),
-                          duration: Duration(seconds: 2),
-                        ),
-                      );
                     }
 
-                    if (images!.length == 0) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('No mage found!'),
-                          duration: Duration(seconds: 2),
-                        ),
-                      );
-                    }
-
-                    await _saveClockInTime(); // Save clock-in time
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Clock-in successful!'),
-                        duration: Duration(seconds: 2),
-                      ),
-                    );
+                    await _saveClockInTime(
+                        imagesList, position // Save clock-in time
+                        );
                   },
                 );
               },
             );
-
-            // if (confirm == true) {
-            //   await _saveClockInTime(); // Save clock-in time
-            //   ScaffoldMessenger.of(context).showSnackBar(
-            //     const SnackBar(
-            //       content: Text('Clock-in successful!'),
-            //       duration: Duration(seconds: 2),
-            //     ),
-            //   );
-            // }
           },
           child: const Text('Clock-in'),
           style: ElevatedButton.styleFrom(
@@ -316,6 +323,8 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
                   // bool? confirm =
                   await showModalBottomSheet<bool>(
                     context: context,
+                    isScrollControlled:
+                        true, // Allows flexible height for bottom sheet with map
                     shape: const RoundedRectangleBorder(
                       borderRadius:
                           BorderRadius.vertical(top: Radius.circular(20)),
@@ -326,35 +335,37 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
                         onConfirm: (Position? position,
                             List<ImageUploadModel>? images) async {
                           // Handle the data received from the confirmation sheet
-                          if (position != null) {
-                            debugPrint(
-                                'User position: Lat: ${position.latitude}, Lng: ${position.longitude}');
+                          var imagesList = [];
+                          // Create an instance of the Appwrite service
+                          final AppwriteService _appwriteService =
+                              AppwriteService();
+                          for (var image in images!) {
+                            String formattedTime = DateFormat('yyyyMMddTHHmmss')
+                                .format(DateTime.now());
+                            final fileName =
+                                'clock_in_${widget.userId}_${formattedTime}';
+                            try {
+                              // Upload the image using the Appwrite service, passing the file's path and name
+                              final fileId = await _appwriteService.uploadImage(
+                                image.imageFile!,
+                                fileName,
+                              );
+                              imagesList.add(fileId);
+                              // Log success or show a message
+                              debugPrint(
+                                  'Image uploaded successfully: $fileId');
+                            } catch (e) {
+                              // Handle upload failure
+                              debugPrint(
+                                  'Failed to upload image: ${fileName}, Error: $e');
+                            }
                           }
-                          if (images != null && images.isNotEmpty) {
-                            debugPrint(
-                                'User uploaded ${images.length} images.');
-                          }
-                          await _clockOut(); // Clock-out and save data
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Clock-out successful!'),
-                              duration: Duration(seconds: 2),
-                            ),
-                          );
+                          await _clockOut(
+                              imagesList, position); // Clock-out and save data
                         },
                       );
                     },
                   );
-
-                  // if (confirm == true) {
-                  //   await _clockOut(); // Clock-out and save data
-                  //   ScaffoldMessenger.of(context).showSnackBar(
-                  //     const SnackBar(
-                  //       content: Text('Clock-out successful!'),
-                  //       duration: Duration(seconds: 2),
-                  //     ),
-                  //   );
-                  // }
                 },
           child: const Text('Clock-out'),
           style: ElevatedButton.styleFrom(
@@ -397,11 +408,18 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
     );
   }
 
-  Widget _buildHistoryEntry(String date, String clockIn, String clockOut,
-      {bool lateEntry = false, bool absent = false}) {
+  Widget _buildHistoryEntry(
+    String date,
+    String clockIn,
+    String clockOut,
+    List<double> clock_in_location,
+    List<double> clock_out_location,
+    List<String> clock_in_image,
+    List<String> clock_out_image,
+  ) {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      color: absent ? Colors.red[50] : Colors.grey[200],
+      color: Colors.grey[200],
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -409,14 +427,40 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
           SizedBox(height: 4),
           Row(
             children: [
-              Icon(lateEntry ? Icons.error : Icons.check_circle,
-                  color: lateEntry ? Colors.orange : Colors.green, size: 16),
               SizedBox(width: 4),
               Text(clockIn),
               SizedBox(width: 16),
               Icon(Icons.check_circle, color: Colors.green, size: 16),
               SizedBox(width: 4),
               Text(clockOut),
+              SizedBox(
+                width: 16,
+              ),
+              GestureDetector(
+                  onTap: () {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      builder: (BuildContext context) {
+                        return Container(
+                          height: 600,
+                          padding: EdgeInsets.all(16),
+                          child: ConfirmationSheetViewClocking(
+                            clockIn,
+                            clockOut,
+                            clock_in_location,
+                            clock_out_location,
+                            clock_in_image,
+                            clock_out_image,
+                          ),
+                        );
+                      },
+                    );
+                  },
+                  child: Icon(
+                    Icons.visibility,
+                    color: Colors.green,
+                  ))
             ],
           ),
         ],
@@ -469,11 +513,32 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
                         final task = taskData[index];
                         final clockInTime = task.data['clock_in'];
                         final clockOutTime = task.data['clock_out'];
+                        // Safely convert the lists from dynamic to double
+                        List<double> clockInLocation = List<double>.from(
+                            (task.data["clock_in_location"] as List).map(
+                                (item) => item is double
+                                    ? item
+                                    : (item as num).toDouble()));
 
+                        List<double> clockOutLocation = List<double>.from(
+                            (task.data["clock_out_location"] as List).map(
+                                (item) => item is double
+                                    ? item
+                                    : (item as num).toDouble()));
+                        final List<String> clockInImages = List<String>.from(
+                            (task.data["clock_in_image"] as List)
+                                .map((item) => item.toString()));
+                        final List<String> clockOutImages = List<String>.from(
+                            (task.data["clock_out_image"] as List)
+                                .map((item) => item.toString()));
                         return _buildHistoryEntry(
                           formatDate(task.data['clock_in']),
                           formatTime(clockInTime),
                           formatTime(clockOutTime),
+                          clockInLocation,
+                          clockOutLocation,
+                          clockInImages,
+                          clockOutImages,
                         );
                       },
                     ),

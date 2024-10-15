@@ -1,7 +1,9 @@
 import 'package:asm_wt/app/tasks/task_manual/image_upload.dart';
+import 'package:asm_wt/util/top_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart'; // Import geolocator for fetching user's location
 import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:path/path.dart';
 
 class ConfirmationSheetWithMap extends StatefulWidget {
   final String action;
@@ -126,11 +128,11 @@ class _ConfirmationSheetWithMapState extends State<ConfirmationSheetWithMap> {
             },
           ),
           SizedBox(
-            height: 20,
+            height: 10,
           ),
           const Divider(),
           SizedBox(
-            height: 20,
+            height: 10,
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -147,8 +149,18 @@ class _ConfirmationSheetWithMapState extends State<ConfirmationSheetWithMap> {
               ElevatedButton(
                 onPressed: () {
                   // Pass data (e.g., current position and images) to the parent using the callback
+
+                  if (_currentPosition == null) {
+                    showTopSnackBar(context, 'No Location Found');
+                    return;
+                  }
+
+                  if (images.isEmpty) {
+                    showTopSnackBar(context, 'No Image Found');
+                    return;
+                  }
+                  Navigator.of(context).pop(true); // Cancel action
                   widget.onConfirm(_currentPosition, images);
-                  Navigator.of(context).pop(true); // Confirm action
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green[200],
