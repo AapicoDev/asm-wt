@@ -1,7 +1,11 @@
-import 'package:appwrite/models.dart';
+// import 'package:appwrite/models.dart';
+import 'dart:io';
+
 import 'package:asm_wt/app/tasks/task_manual/bottomsheet_with_map.dart';
 import 'package:asm_wt/app/tasks/task_manual/image_upload.dart';
 import 'package:asm_wt/app/tasks/task_manual/task_manual_controller.dart';
+import 'package:asm_wt/service/appwrite_service.dart';
+import 'package:cross_file/src/types/interface.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:geolocator/geolocator.dart';
@@ -212,9 +216,55 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
                     if (position != null) {
                       debugPrint(
                           'User position: Lat: ${position.latitude}, Lng: ${position.longitude}');
+                      return;
                     }
+
                     if (images != null && images.isNotEmpty) {
                       debugPrint('User uploaded ${images.length} images.');
+
+                      // Create an instance of the Appwrite service
+                      final AppwriteService _appwriteService =
+                          AppwriteService();
+
+                      for (var image in images) {
+                        final fileName =
+                            'clock_in_${widget.userId}_${_clockInTime}';
+                        try {
+                          // Upload the image using the Appwrite service, passing the file's path and name
+                          final fileId = await _appwriteService.uploadImage(
+                            image.imageFile!,
+                            fileName,
+                          );
+
+                          // Log success or show a message
+                          debugPrint('Image uploaded successfully: $fileId');
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content:
+                                  Text('Image File uploaded successfully.'),
+                              duration: const Duration(seconds: 2),
+                            ),
+                          );
+                        } catch (e) {
+                          // Handle upload failure
+                          debugPrint(
+                              'Failed to upload image: ${fileName}, Error: $e');
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content:
+                                  Text('Failed to upload image: ${fileName}'),
+                              duration: const Duration(seconds: 2),
+                            ),
+                          );
+                        }
+                      }
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('No image found!'),
+                          duration: Duration(seconds: 2),
+                        ),
+                      );
                     }
 
                     if (images!.length == 0) {

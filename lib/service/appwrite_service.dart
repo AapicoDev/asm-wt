@@ -1,10 +1,14 @@
+import 'dart:io';
+
 import 'package:appwrite/appwrite.dart';
-import 'package:appwrite/models.dart';
+import 'package:appwrite/models.dart' as models;
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class AppwriteService {
   late Client _client;
   late Databases _databases;
+  late Storage _storage;
 
   AppwriteService() {
     _client = Client()
@@ -13,9 +17,10 @@ class AppwriteService {
         .setProject('65670e27c14fdec05c4c'); // Replace with your project ID
 
     _databases = Databases(_client);
+    _storage = Storage(_client);
   }
 
-  Future<DocumentList> getTaskData(String userId) async {
+  Future<models.DocumentList> getTaskData(String userId) async {
     try {
       final result = await _databases.listDocuments(
         databaseId: '65670ea113c13e0c876d', // Replace with your database ID
@@ -31,7 +36,7 @@ class AppwriteService {
     }
   }
 
-  Future<Document> saveClockIn(data) async {
+  Future<models.Document> saveClockIn(data) async {
     debugPrint('data ${data}');
     try {
       final result = await _databases.createDocument(
@@ -43,6 +48,23 @@ class AppwriteService {
       return result;
     } catch (e) {
       throw Exception('Failed to get task data: $e');
+    }
+  }
+
+  // Upload image file
+  Future<String> uploadImage(File imageFile, String filename) async {
+    try {
+      final result = await _storage.createFile(
+        bucketId: '670decdd0001995ed51a', // Replace with your storage bucket ID
+        fileId: 'unique()',
+        file: InputFile.fromPath(
+          path: imageFile.path,
+          filename: filename, // Use the provided filename
+        ),
+      );
+      return result.$id; // Returns the file ID
+    } catch (e) {
+      throw Exception('Failed to upload image: $e');
     }
   }
 }

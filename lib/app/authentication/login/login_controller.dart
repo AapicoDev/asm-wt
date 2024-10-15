@@ -180,6 +180,7 @@ class LoginController extends ControllerMVC {
                           }
                         else
                           {
+                            LoadingOverlay.of(context).hide(),
                             ScaffoldMessenger.of(context)
                                 .showSnackBar(const SnackBar(
                               content: Text('Unkown POS Device'),
