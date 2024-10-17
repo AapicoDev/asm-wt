@@ -28,6 +28,7 @@ class AppwriteService {
         queries: [
           Query.equal("emp_id", userId),
           Query.orderDesc('\$createdAt'),
+          Query.isNotNull('clock_out'),
         ], // Assuming `userId` is the document ID
       );
       return result;
@@ -51,6 +52,21 @@ class AppwriteService {
     }
   }
 
+  Future<models.Document> updateClockIn(id, data) async {
+    debugPrint('data ${data}');
+    try {
+      final result = await _databases.updateDocument(
+        databaseId: '65670ea113c13e0c876d', // Replace with your database ID
+        collectionId: '670bdb1400031a7afc84', // Replace with your collection ID
+        documentId: id,
+        data: data,
+      );
+      return result;
+    } catch (e) {
+      throw Exception('Failed to get task data: $e');
+    }
+  }
+
   // Upload image file
   Future<String> uploadImage(File imageFile, String filename) async {
     try {
@@ -62,7 +78,10 @@ class AppwriteService {
           filename: filename, // Use the provided filename
         ),
       );
-      return result.$id; // Returns the file ID
+
+      String fileUrl =
+          'https://baas.powermap.live/v1/storage/buckets/670decdd0001995ed51a/files/${result.$id}/view?project=65670e27c14fdec05c4c';
+      return fileUrl; // Returns the URL to access the file
     } catch (e) {
       throw Exception('Failed to upload image: $e');
     }

@@ -209,7 +209,7 @@ class _LoginViewState extends StateMVC<LoginView> {
                         ],
                       ),
                       SizedBox(
-                        height: height * 0.15,
+                        height: height * 0.12,
                       ),
                       Column(
                         children: [
