@@ -131,7 +131,7 @@ class _LoginViewState extends StateMVC<LoginView> {
                       Text(
                           textAlign: TextAlign.center,
                           translate('authentication.login_title') +
-                              "\n[POS Version]\n",
+                              "\n[POS Version-1.0]\n",
                           style: theme.textTheme.titleLarge?.merge(TextStyle(
                               fontSize: 25,
                               color: theme.colorScheme.secondary))),

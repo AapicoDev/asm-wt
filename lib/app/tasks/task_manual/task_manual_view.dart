@@ -114,13 +114,13 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
     debugPrint('clockOutTime ------ ${formattedTime}${imagesList}${position}');
     final taskProvider =
         Provider.of<TaskManualProvider>(context, listen: false);
-    var clockInId = await taskProvider.saveClockInData(widget.userId, {
+    var clockInID = await taskProvider.saveClockInData(widget.userId, {
       "clock_in": formattedTime,
       "clock_in_location": [position.latitude, position.longitude],
       "clock_in_image": imagesList
     });
+    await prefs.setString('clockInId', clockInID);
     _showSuccessDialog(context, "Clock in save successfully");
-    await prefs.setString('clockInId', clockInId);
   }
 
   // Method to get clock-in time from local storage

@@ -1,6 +1,8 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:image/image.dart' as img;
 
 class ImageUploadModel {
   File? imageFile;
@@ -117,11 +119,38 @@ class _SingleImageUploadState extends State<SingleImageUpload> {
   Future<void> _onAddImageClick(int index) async {
     final XFile? image = await _picker.pickImage(source: ImageSource.camera);
     if (image != null) {
+      // Optimize the image before setting it
+      File optimizedImage = await _optimizeImage(File(image.path));
       setState(() {
-        images[index] = ImageUploadModel(imageFile: File(image.path));
+        images[index] = ImageUploadModel(imageFile: optimizedImage);
         _updateImages();
       });
     }
+  }
+
+  // Optimize image by resizing and compressing it
+  Future<File> _optimizeImage(File imageFile) async {
+    final Uint8List imageBytes = await imageFile.readAsBytes();
+    img.Image? decodedImage = img.decodeImage(imageBytes);
+
+    if (decodedImage != null) {
+      // Resize the image to a maximum width/height (e.g., 800px)
+      img.Image resizedImage = img.copyResize(decodedImage, width: 800);
+
+      // Encode the image to reduce file size (jpeg quality 85)
+      Uint8List optimizedBytes =
+          Uint8List.fromList(img.encodeJpg(resizedImage, quality: 85));
+
+      // Save the optimized image to a temporary file
+      final String tempPath =
+          '${imageFile.parent.path}/optimized_${imageFile.path.split('/').last}';
+      final File optimizedFile =
+          await File(tempPath).writeAsBytes(optimizedBytes);
+
+      return optimizedFile;
+    }
+
+    return imageFile;
   }
 
   void _updateImages() {

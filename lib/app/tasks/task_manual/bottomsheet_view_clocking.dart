@@ -123,67 +123,83 @@ class _ConfirmationSheetViewClockingState
           SizedBox(
             height: 10,
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              if (widget.clock_in_image.isNotEmpty) ...[
-                Column(children: [
-                  Text('Clock in image'),
-                  ...widget.clock_in_image.map((imageUrl) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 5.0),
-                      child: Image.network(
-                        imageUrl,
-                        width: 100, // Set a fixed width
-                        height: 100, // Set a fixed height
-                        fit: BoxFit.cover, // Cover to maintain aspect ratio
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            color: Colors.grey[300], // Placeholder color
-                            width: 150,
-                            height: 100,
-                            child: const Center(
-                                child: Text('Image not available')),
-                          );
-                        },
-                      ),
-                    );
-                  }).toList(),
-                ]),
-              ] else ...[
-                const Text('No clock-in images available.'),
-              ],
-              if (widget.clock_out_image.isNotEmpty) ...[
-                // Fixed to clock_out_image
-                Column(
-                  children: [
-                    Text('Clock out image'),
-                    ...widget.clock_out_image.map((imageUrl) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 5.0),
-                        child: Image.network(
-                          imageUrl,
-                          width: 100, // Set a fixed width
-                          height: 100, // Set a fixed height
-                          fit: BoxFit.cover, // Cover to maintain aspect ratio
-                          errorBuilder: (context, error, stackTrace) {
-                            return Container(
-                              color: Colors.grey[300], // Placeholder color
-                              width: 150,
-                              height: 100,
-                              child: const Center(
-                                  child: Text('Image not available')),
-                            );
-                          },
-                        ),
-                      );
-                    }).toList()
-                  ],
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                if (widget.clock_in_image.isNotEmpty) ...[
+                  Column(children: [
+                    Text('Clock in image'),
+                    Row(children: [
+                      ...widget.clock_in_image.map((imageUrl) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 5.0, horizontal: 5),
+                          child: Image.network(
+                            imageUrl,
+                            width: 100, // Set a fixed width
+                            height: 100, // Set a fixed height
+                            fit: BoxFit.cover, // Cover to maintain aspect ratio
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                color: Colors.grey[300], // Placeholder color
+                                width: 150,
+                                height: 100,
+                                child: const Center(
+                                    child: Text('Image not available')),
+                              );
+                            },
+                          ),
+                        );
+                      }).toList()
+                    ]),
+                  ]),
+                ] else ...[
+                  const Text('No clock-in images available.'),
+                ],
+                SizedBox(
+                  width: 10,
                 ),
-              ] else ...[
-                const Text('No clock-out images available.'),
+                if (widget.clock_out_image.isNotEmpty) ...[
+                  // Fixed to clock_out_image
+                  Column(
+                    children: [
+                      Text('Clock out image'),
+                      Row(
+                        children: [
+                          ...widget.clock_out_image.map((imageUrl) {
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 5.0, horizontal: 5.0),
+                              child: Image.network(
+                                imageUrl,
+                                width: 100, // Set a fixed width
+                                height: 100, // Set a fixed height
+                                fit: BoxFit
+                                    .cover, // Cover to maintain aspect ratio
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    color:
+                                        Colors.grey[300], // Placeholder color
+                                    width: 150,
+                                    height: 100,
+                                    child: const Center(
+                                        child: Text('Image not available')),
+                                  );
+                                },
+                              ),
+                            );
+                          }).toList(),
+                        ],
+                      ),
+                    ],
+                  ),
+                ] else ...[
+                  const Text('No clock-out images available.'),
+                ],
               ],
-            ],
+            ),
           ),
           SizedBox(
             height: 10,
