@@ -163,7 +163,7 @@ continuebottomSheet(BuildContext context) {
                       style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
-                          fontFamily: 'Gilroy Normal',
+                          fontFamily: 'Kanit Normal',
                           color: theme.colorScheme.primary),
                     ),
                   ],
@@ -185,7 +185,7 @@ continuebottomSheet(BuildContext context) {
                         SizedBox(width: width / 5),
                         Text("CONTINUE",
                             style: TextStyle(
-                                fontFamily: 'Gilroy Medium',
+                                fontFamily: 'Kanit Medium',
                                 color: Colors.white,
                                 fontSize: 15,
                                 fontWeight: FontWeight.w600)),

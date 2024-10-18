@@ -70,7 +70,10 @@ class _TodayTaskViewState extends StateMVC<TodayTaskView> {
                 child: Center(child: CircularProgressIndicator()));
           }
 
-          List<DocumentSnapshot>? documents = snapshot.data!.docs;
+          List<DocumentSnapshot>? allDocuments = snapshot.data!.docs;
+          List<DocumentSnapshot> documents = allDocuments.where((doc) {
+            return doc['status'] != 'deleted';
+          }).toList();
 
           if (documents.isNotEmpty) {
             for (var doc in documents) {

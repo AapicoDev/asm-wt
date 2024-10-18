@@ -332,5 +332,13 @@
   },
   "task_manage": {
     "task_id": "Task ID"
+  },
+  "manual_clocking": {
+    "clock_in": "Clock-in",
+    "clock_out": "Clock-out",
+    "today": "Clock-out",
+    "attendance_history": "Attendance History",
+    "click_in_success": "Clock in save successfully",
+    "click_out_success": "Clock out save successfully"
   }
 }

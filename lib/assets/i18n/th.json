@@ -3,7 +3,7 @@
     "dashboard": "แดชบอร์ด",
     "my_task": "งานของฉัน",
     "today_task": "งานวันนี้",
-    "task_manual": "ลงเวลารทำงาน",
+    "task_manual": "ลงเวลาร",
     "my_request": "คำขอของฉัน",
     "my_account": "บัญชีของฉัน",
 
@@ -339,5 +339,13 @@
   },
   "task_manage": {
     "task_id": "รหัสงาน"
+  },
+  "manual_clocking": {
+    "clock_in": "ลงเวลาทำงาน",
+    "clock_out": "ลงเวลาเลิกงาน",
+    "today": "วันนี้",
+    "attendance_history": "ประวัติการลงเวลาทำงาน/เลิกงาน",
+    "click_in_success": "บันทึกการลงเวลาทำงานสำเร็จ",
+    "click_out_success": "บันทึกการลงเวลาเลิกงานสำเร็จ"
   }
 }

@@ -1,11 +1,7 @@
 import 'dart:io';
 
-import 'package:asm_wt/app/app_service.dart';
 import 'package:asm_wt/app/authentication/register_step2/register_step2_controller.dart';
-import 'package:asm_wt/router/router_name.dart';
-import 'package:asm_wt/util/get_unique_id.dart';
 import 'package:asm_wt/widget/network_error_widget.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -16,14 +12,9 @@ import 'package:asm_wt/models/employee_model.dart';
 import 'package:asm_wt/service/user_service.dart';
 import 'package:asm_wt/util/custom_func.dart';
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
-import 'package:go_router/go_router.dart';
 import 'package:mvc_pattern/mvc_pattern.dart';
 import 'package:asm_wt/widget/loading_overlay_widget.dart';
 import 'dart:async';
-
-import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginController extends ControllerMVC {
   late AppStateMVC appState;
@@ -71,24 +62,6 @@ class LoginController extends ControllerMVC {
     // AppKeys.formLoginKeys[0].currentState?.reset();
   }
 
-  Future<DocumentSnapshot<Object?>?> queryDataFromFirestore(device_id) async {
-    try {
-      // Reference to Firestore collection
-      CollectionReference pos_devices =
-          FirebaseFirestore.instance.collection('pos');
-
-      // Query example: Get all users where age > 20
-      QuerySnapshot querySnapshot =
-          await pos_devices.where('device_id', isEqualTo: device_id).get();
-
-      // Iterating through the documents
-      return querySnapshot.docs[0];
-    } catch (e) {
-      print('Error querying data: $e');
-      return null;
-    }
-  }
-
   Future<void> initConnectivity() async {
     late List<ConnectivityResult> results;
     // Platform messages may fail, so we use a try/catch PlatformException.
@@ -104,9 +77,9 @@ class LoginController extends ControllerMVC {
   Future<void> getConnectivity() async =>
       subscription = Connectivity().onConnectivityChanged.listen(
         (List<ConnectivityResult> result) async {
-          // setState(() {
-          connectivityResult = result;
-          // });
+          setState(() {
+            connectivityResult = result;
+          });
         },
       );
 
@@ -116,27 +89,6 @@ class LoginController extends ControllerMVC {
     setState(() {
       boolSuffixIcon = !boolSuffixIcon;
     });
-  }
-
-  SharedPreferences prefs = GetIt.instance<SharedPreferences>();
-  Future<void> LoginByEmail(BuildContext context, posDeviceData, res) async {
-    var data = posDeviceData.data()?["phone"];
-    debugPrint("phone------------${data} ${res.phoneNumber}");
-    if (data.contains(res.phoneNumber)) {
-      debugPrint("condition ok");
-      await prefs.setString('userId', res.staffId ?? '');
-      await prefs.setString('organizationId', res.organization_id ?? '');
-      await prefs.setString('username', res.username ?? '');
-      await prefs.setBool('tracking', true);
-      await prefs.setBool('bioScan', false);
-      Provider.of<AppService>(context, listen: false).bioAuth = true;
-      Provider.of<AppService>(context, listen: false).loginState = true;
-      context.pushReplacementNamed(RouteNames.todayTask);
-    } else {
-      showToastMessage(context, translate("authentication.employee_not_allow"),
-          Theme.of(context).colorScheme.onBackground);
-    }
-    LoadingOverlay.of(context).hide();
   }
 
   Future<void> onSignInPressed(BuildContext context) async {
@@ -157,54 +109,59 @@ class LoginController extends ControllerMVC {
         RegExpMatch? phonenumberReg =
             ifStartWithZero.firstMatch(phoneNumber.text);
         if (phonenumberReg?[0] != null) {
+          AndroidDeviceInfo? androidInfo;
           String? identifier;
-          identifier = await getDeviceId();
-          var isPOSDevice = await queryDataFromFirestore(identifier);
-          print("POS Device -------------- ${isPOSDevice?.data().toString()}");
 
-          // LoadingOverlay.of(context).hide();
-          // return;
+          if (Platform.isIOS) {
+            final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
+            var data = await deviceInfoPlugin.iosInfo;
+            identifier = "${data.name}-v${data.systemName}";
+
+            print("----------$identifier");
+          } else if (Platform.isAndroid) {
+            DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+            androidInfo = await deviceInfo.androidInfo;
+            print("------_${androidInfo.id}");
+          }
 
           await usersService
               .checkPhoneNumberIsExist(phoneNumber.text)
               .then((res) async => {
-                    print('Device ----------------${res}'),
                     if (res != null)
                       {
-                        // TODO ==== compare cloud ID vs device ID
-                        if (isPOSDevice != null)
+                        if (res.isActivated == true)
                           {
-                            debugPrint("-------"),
-                            await auth.signInAnonymously(),
-                            LoginByEmail(context, isPOSDevice, res),
+                            // if (res.deviceID ==
+                            //         (Platform.isIOS
+                            //             ? identifier
+                            //             : androidInfo?.id) ||
+                            //     res.deviceID == null)
+                            //   {
+                            employeeModel.username = res.username,
+                            employeeModel.organization_id = res.organization_id,
+                            employeeModel.staffId = res.staffId,
+                            employeeModel.phoneNumber = res.phoneNumber,
+                            await _registerStep2Controller.verifyPhone(
+                                context, employeeModel, 'login', false)
+                            //   }
+                            // else
+                            //   {
+                            //     LoadingOverlay.of(context).hide(),
+                            //     showToastMessage(
+                            //         context,
+                            //         translate(
+                            //             "authentication.unrecognise_device"),
+                            //         Theme.of(context).colorScheme.onBackground),
+                            //   }
                           }
                         else
                           {
                             LoadingOverlay.of(context).hide(),
-                            ScaffoldMessenger.of(context)
-                                .showSnackBar(const SnackBar(
-                              content: Text('Unkown POS Device'),
-                              duration: Duration(seconds: 2),
-                            )),
+                            showToastMessage(
+                                context,
+                                "Please Reactivated Your Account.",
+                                Theme.of(context).colorScheme.onBackground),
                           }
-                        // else if (phoneNumber.text == '+66646666666' ||
-                        //     phoneNumber.text == '+66647777777') // 'O11019'
-                        //   {
-                        //     employeeModel.username = res.username,
-                        //     employeeModel.organization_id = res.organization_id,
-                        //     employeeModel.staffId = res.staffId,
-                        //     employeeModel.phoneNumber = res.phoneNumber,
-                        //     await _registerStep2Controller.verifyPhone(
-                        //         context, employeeModel, 'login', false)
-                        //   }
-                        // else
-                        //   {
-                        //     LoadingOverlay.of(context).hide(),
-                        //     showToastMessage(
-                        //         context,
-                        //         translate("authentication.unrecognise_device"),
-                        //         Theme.of(context).colorScheme.onBackground),
-                        //   }
                       }
                     else
                       {

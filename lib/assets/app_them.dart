@@ -35,32 +35,32 @@ ThemeData _asthaTutorialTheme() {
 TextTheme _asthaTutorialTextTheme(TextTheme base) => base.copyWith(
 // This'll be our appbars title
       titleLarge: base.titleLarge!.copyWith(
-          fontFamily: "Gilroy Heavy",
+          fontFamily: "Kanit Heavy",
           fontSize: 20,
           color: Color.fromARGB(255, 0, 0, 0)),
 // for widgets heading/title
       headlineLarge: base.headlineLarge!.copyWith(
-        fontFamily: "Gilroy Bold",
+        fontFamily: "Kanit",
         fontSize: 18,
         color: Color.fromARGB(255, 0, 0, 0),
       ),
 // for sub-widgets heading/title
       headlineMedium: base.headlineMedium!.copyWith(
-        fontFamily: "Gilroy Bold",
+        fontFamily: "Kanit",
         fontSize: 16,
         color: Colors.black,
       ),
       headlineSmall: base.headlineSmall!.copyWith(
-        fontFamily: "Gilroy Bold",
+        fontFamily: "Kanit",
         fontSize: 14,
         color: Colors.black,
       ),
 // for widgets contents/paragraph
       bodyMedium: base.bodyMedium!.copyWith(
-          fontFamily: "Gilroy Light", fontSize: 14, color: Colors.black),
+          fontFamily: "Kanit Light", fontSize: 14, color: Colors.black),
 // for sub-widgets contents/paragraph
       bodySmall: base.bodySmall!.copyWith(
-          fontFamily: "Gilroy Light", fontSize: 11, color: Colors.black),
+          fontFamily: "Kanit Light", fontSize: 11, color: Colors.black),
     );
 
 ElevatedButtonThemeData _elevatedButtonTheme(ElevatedButtonThemeData base) =>

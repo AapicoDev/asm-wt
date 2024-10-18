@@ -1,5 +1,4 @@
 import 'package:asm_wt/router/router_name.dart';
-import 'package:asm_wt/util/get_unique_id.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:asm_wt/app/app_key.dart';
@@ -21,7 +20,6 @@ class LoginView extends StatefulWidget {
 
 class _LoginViewState extends StateMVC<LoginView> {
   late LoginController con;
-  String? deviceId;
 
   _LoginViewState() : super(LoginController()) {
     con = controller as LoginController;
@@ -43,15 +41,6 @@ class _LoginViewState extends StateMVC<LoginView> {
   @override
   void initState() {
     super.initState();
-    fetchDeviceId();
-  }
-
-  // This function calls the getDeviceId function and updates the state
-  Future<void> fetchDeviceId() async {
-    String? id = await getDeviceId(); // Get the device ID
-    setState(() {
-      deviceId = id; // Store the result and refresh the UI
-    });
   }
 
   @override
@@ -128,10 +117,7 @@ class _LoginViewState extends StateMVC<LoginView> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      Text(
-                          textAlign: TextAlign.center,
-                          translate('authentication.login_title') +
-                              "\n[POS Version-1.0]\n",
+                      Text(translate('authentication.login_title'),
                           style: theme.textTheme.titleLarge?.merge(TextStyle(
                               fontSize: 25,
                               color: theme.colorScheme.secondary))),
@@ -209,7 +195,7 @@ class _LoginViewState extends StateMVC<LoginView> {
                         ],
                       ),
                       SizedBox(
-                        height: height * 0.12,
+                        height: height * 0.15,
                       ),
                       Column(
                         children: [
@@ -220,7 +206,6 @@ class _LoginViewState extends StateMVC<LoginView> {
                               onPressed: () => con.onSignInPressed(context)
                               // onPressed: () => context.pushNamed(RouteNames.myTasks)
                               ),
-                          Text("${deviceId}"),
                           const SizedBox(
                             height: 10,
                           ),

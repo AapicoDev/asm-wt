@@ -408,7 +408,7 @@ class _TaskCalendarViewState extends StateMVC<TaskCalendarView> {
                           rowHeight: 40,
                           calendarStyle: CalendarStyle(
                               defaultTextStyle: const TextStyle(
-                                  fontSize: 14, fontFamily: "Gilroy Light"),
+                                  fontSize: 14, fontFamily: "Kanit Light"),
                               weekendTextStyle: TextStyle(
                                   color: theme.colorScheme.onBackground,
                                   fontSize: 14),
@@ -416,12 +416,12 @@ class _TaskCalendarViewState extends StateMVC<TaskCalendarView> {
                               todayTextStyle: const TextStyle(
                                   color: Colors.black,
                                   fontSize: 14,
-                                  fontFamily: "Gilroy Light",
+                                  fontFamily: "Kanit Light",
                                   fontWeight: FontWeight.bold),
                               selectedTextStyle: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 14,
-                                  fontFamily: "Gilroy Light",
+                                  fontFamily: "Kanit Light",
                                   fontWeight: FontWeight.bold),
                               selectedDecoration: BoxDecoration(
                                   color: theme.colorScheme.secondary,
@@ -434,7 +434,7 @@ class _TaskCalendarViewState extends StateMVC<TaskCalendarView> {
                               titleCentered: true,
                               titleTextStyle: TextStyle(
                                   fontSize: 16,
-                                  fontFamily: "Gilroy Bold",
+                                  fontFamily: "Kanit",
                                   fontWeight: FontWeight.bold)),
                           calendarFormat: con.calendarFormat,
                           availableGestures: AvailableGestures.all,

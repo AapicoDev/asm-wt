@@ -9,6 +9,7 @@ import 'package:asm_wt/app/tasks/task_manual/task_manual_controller.dart';
 import 'package:asm_wt/service/appwrite_service.dart';
 import 'package:asm_wt/util/top_snackbar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import 'package:mvc_pattern/mvc_pattern.dart';
@@ -166,7 +167,7 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
     await taskProvider.fetchTaskData(widget.userId);
     taskHistory = taskProvider.taskData?.documents ?? [];
 
-    _showSuccessDialog(context, "Clock in save successfully");
+    _showSuccessDialog(context, "Clock out save successfully");
     // Clear local storage
     await _clearClockInTime();
   }
@@ -215,7 +216,7 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
                         children: [
                           SizedBox(height: 20),
                           _buildClockDisplay(), // Use data from Appwrite
-                          SizedBox(height: 20),
+                          SizedBox(height: 5),
                           _buildClockButtons(context),
                           SizedBox(height: 20),
                           _buildTodayEntry(),
@@ -305,7 +306,10 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
               },
             );
           },
-          child: const Text('Clock-in'),
+          child: Text(
+            translate('manual_clocking.clock_in'),
+            style: TextStyle(fontFamily: "Kanit Light"),
+          ),
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.green[200],
             minimumSize: const Size(150, 50),
@@ -367,7 +371,10 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
                     },
                   );
                 },
-          child: const Text('Clock-out'),
+          child: Text(
+            translate('manual_clocking.clock_out'),
+            style: TextStyle(fontFamily: "Kanit Light"),
+          ),
           style: ElevatedButton.styleFrom(
             backgroundColor: _clockInTime != null
                 ? Colors.green[200]
@@ -389,7 +396,8 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Today', style: TextStyle(color: Colors.blue)),
+          Text(translate('manual_clocking.today'),
+              style: TextStyle(color: Colors.blue)),
           Text(_date, style: TextStyle(fontWeight: FontWeight.bold)),
           SizedBox(height: 8),
           Row(
@@ -421,21 +429,33 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
       padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       color: Colors.grey[200],
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          Text(date, style: TextStyle(fontWeight: FontWeight.bold)),
-          SizedBox(height: 4),
+          // SizedBox(height: 4), // Divider added after each item
           Row(
             children: [
-              SizedBox(width: 4),
-              Text(clockIn),
-              SizedBox(width: 16),
-              Icon(Icons.check_circle, color: Colors.green, size: 16),
-              SizedBox(width: 4),
-              Text(clockOut),
-              SizedBox(
-                width: 16,
+              Text(
+                date,
+                style: TextStyle(fontWeight: FontWeight.bold),
+                textAlign: TextAlign.end,
               ),
+              SizedBox(width: 10),
+              Container(
+                width: 170,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Icon(Icons.check_circle, color: Colors.green, size: 16),
+                    SizedBox(width: 4),
+                    Text(clockIn),
+                    SizedBox(width: 10),
+                    Icon(Icons.check_circle, color: Colors.blue, size: 16),
+                    SizedBox(width: 4),
+                    Text(clockOut),
+                  ],
+                ),
+              ),
+              Spacer(),
               GestureDetector(
                   onTap: () {
                     showModalBottomSheet(
@@ -463,6 +483,11 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
                   ))
             ],
           ),
+
+          Divider(
+            color: Colors.grey, // Customize divider color
+            thickness: 1, // Customize divider thickness
+          ),
         ],
       ),
     );
@@ -484,7 +509,10 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
       child: Column(
         children: [
           ListTile(
-            title: Text('Attendance History'),
+            title: Text(
+              translate("manual_clocking.attendance_history"),
+              style: TextStyle(fontFamily: "Kanit Light"),
+            ),
             trailing: IconButton(
               icon: Icon(
                 _isHistoryVisible
