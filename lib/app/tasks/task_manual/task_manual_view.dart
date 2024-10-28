@@ -2,15 +2,19 @@
 
 import 'dart:ffi' as ui;
 
+import 'package:asm_wt/app/my_account/my_account_controller.dart';
 import 'package:asm_wt/app/tasks/task_manual/bottomsheet_view_clocking.dart';
 import 'package:asm_wt/app/tasks/task_manual/bottomsheet_with_map.dart';
 import 'package:asm_wt/app/tasks/task_manual/image_upload.dart';
 import 'package:asm_wt/app/tasks/task_manual/task_manual_controller.dart';
+import 'package:asm_wt/models/location_model.dart';
 import 'package:asm_wt/service/appwrite_service.dart';
+import 'package:asm_wt/util/top_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
+import 'package:location/location.dart';
 import 'package:mvc_pattern/mvc_pattern.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -24,6 +28,11 @@ class TaskManualView extends StatefulWidget {
 }
 
 class _TaskManualViewState extends StateMVC<TaskManualView> {
+  MyAccountController? con;
+  _TaskManualViewState() : super(MyAccountController()) {
+    con = controller as MyAccountController;
+  }
+
   String _time = "00:00";
   String _date = "";
   List<dynamic> taskHistory = [];
@@ -101,7 +110,8 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
   }
 
   // Method to save clock-in time locally
-  Future<void> _saveClockInTime(imagesList, position) async {
+  Future<void> _saveClockInTime(
+      imagesList, position, locationdata, userData) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String formattedTime =
         DateFormat('yyyy-MM-ddTHH:mm:ss').format(DateTime.now());
@@ -117,7 +127,14 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
     var clockInID = await taskProvider.saveClockInData(widget.userId, {
       "clock_in": formattedTime,
       "clock_in_location": [position.latitude, position.longitude],
-      "clock_in_image": imagesList
+      "clock_in_image": imagesList,
+      "clock_in_area_th": locationdata.nameTh,
+      "clock_in_area_en": locationdata.nameEn,
+      "site_th": userData?.siteTH,
+      "site_en": userData?.siteEN,
+      "section_code": userData?.sectionCode,
+      "section_th": userData?.sectionTH,
+      "section_en": userData?.sectionEN
     });
     await prefs.setString('clockInId', clockInID);
     _showSuccessDialog(context, "Clock in save successfully");
@@ -146,7 +163,7 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
   }
 
   // Method to handle Clock-out action
-  Future<void> _clockOut(imagesList, position) async {
+  Future<void> _clockOut(imagesList, position, locationdata, userData) async {
     String? clockInId = await _getClockInId();
     String? clockInTime = await _getClockInTime();
     String clockOutTime =
@@ -160,7 +177,14 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
     await taskProvider.updateClockInData(clockInId!, {
       "clock_out": clockOutTime,
       "clock_out_image": imagesList,
-      "clock_out_location": [position.latitude, position.longitude]
+      "clock_out_location": [position.latitude, position.longitude],
+      "clock_out_area_th": locationdata.nameTh,
+      "clock_out_area_en": locationdata.nameEn,
+      "site_th": userData?.siteTH,
+      "site_en": userData?.siteEN,
+      "section_code": userData?.sectionCode,
+      "section_th": userData?.sectionTH,
+      "section_en": userData?.sectionEN
     });
 
     await taskProvider.fetchTaskData(widget.userId);
@@ -173,6 +197,7 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint('user detail ${con?.userModel?.toJson()}');
     return Scaffold(
       body: Consumer<TaskManualProvider>(
         builder: (context, taskProvider, child) {
@@ -180,10 +205,10 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
             return Center(child: CircularProgressIndicator());
           }
 
-          final taskData = taskProvider.taskData;
-          if (taskData == null) {
-            return Center(child: Text('No task data available.'));
-          }
+          // final taskData = taskProvider.taskData;
+          // if (taskData == null) {
+          //   return Center(child: Text('No task data available.'));
+          // }
 
           return SingleChildScrollView(
             child: Stack(
@@ -269,9 +294,10 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
               ),
               builder: (BuildContext context) {
                 return ConfirmationSheetWithMap(
-                  action: "confirm clock-in",
+                  action: translate("manual_clocking.confirm_clocking"),
                   onConfirm: (Position? position,
-                      List<ImageUploadModel>? images) async {
+                      List<ImageUploadModel>? images,
+                      LocationModel? locationdata) async {
                     // Handle the data received from the confirmation sheet
                     var imagesList = [];
                     // Create an instance of the Appwrite service
@@ -298,7 +324,8 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
                     }
 
                     await _saveClockInTime(
-                        imagesList, position // Save clock-in time
+                        imagesList, position, locationdata,
+                        con?.userModel // Save clock-in time
                         );
                   },
                 );
@@ -336,7 +363,8 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
                       return ConfirmationSheetWithMap(
                         action: "Clock-Out",
                         onConfirm: (Position? position,
-                            List<ImageUploadModel>? images) async {
+                            List<ImageUploadModel>? images,
+                            locationdata) async {
                           // Handle the data received from the confirmation sheet
                           var imagesList = [];
                           // Create an instance of the Appwrite service
@@ -363,8 +391,8 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
                                   'Failed to upload image: ${fileName}, Error: $e');
                             }
                           }
-                          await _clockOut(
-                              imagesList, position); // Clock-out and save data
+                          await _clockOut(imagesList, position, locationdata,
+                              con?.userModel); // Clock-out and save data                        },
                         },
                       );
                     },

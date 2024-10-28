@@ -1,7 +1,11 @@
+import 'dart:convert';
+
+import 'package:asm_wt/models/location_model.dart';
 import 'package:asm_wt/service/appwrite_service.dart';
 import 'package:flutter/material.dart';
 import 'package:appwrite/models.dart';
 import 'package:intl/intl.dart';
+import 'package:dio/dio.dart';
 
 class TaskManualProvider extends ChangeNotifier {
   final AppwriteService _appwriteService = AppwriteService();
@@ -53,5 +57,32 @@ class TaskManualProvider extends ChangeNotifier {
 
     _isLoading = false;
     notifyListeners();
+  }
+
+  Future<LocationModel?> getAreaName(lat, lng) async {
+    try {
+      var dio = Dio();
+      var response = await dio.request(
+        'https://api.powermap.live/api/geofence/geofencing-checkpoint?lat=${lat}&lng=${lng}&organization=asm',
+        options: Options(
+          method: 'GET',
+        ),
+      );
+
+      print(response.statusCode);
+      print(response.data);
+      if (response.statusCode == 200) {
+        if (jsonEncode(response.data).length > 0) {
+          return LocationModel.fromJson(response.data[0]);
+        } else {
+          return null;
+        }
+      } else {
+        print(response.statusMessage);
+        return null;
+      }
+    } catch (e) {
+      return null;
+    }
   }
 }

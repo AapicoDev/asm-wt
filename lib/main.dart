@@ -3,6 +3,7 @@ import 'package:asm_wt/app/tasks/today_task/today_task_controller.dart';
 import 'package:asm_wt/service/RESTAPI/geofencing_service.dart';
 import 'package:asm_wt/service/RESTAPI/task_management_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dio/io.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -43,7 +44,8 @@ import 'dart:async';
 import 'package:geolocator/geolocator.dart';
 // import 'package:permission_handler/permission_handler.dart';
 
-import 'dart:io' show Platform, exit;
+import 'dart:io';
+
 
 FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
@@ -57,6 +59,14 @@ final FirestoreService _firestoreService = FirestoreServiceImpl();
 @pragma('vm:entry-point')
 Future<void> _firebasMessagingBackgroundHandler(RemoteMessage message) async {
   print("----message backgroud handling${message.messageId}");
+}
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+  }
 }
 
 Future<void> main() async {
@@ -185,6 +195,7 @@ Future<void> main() async {
   ///Set preferred orientation to portrait
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
+  HttpOverrides.global = MyHttpOverrides();
   runApp(
     LocalizedApp(delegate, MyApp(sharedPreferences: sharedPreferences)),
     // LocalizedApp(delegate, const MyApp()),

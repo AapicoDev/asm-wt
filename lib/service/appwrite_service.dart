@@ -14,7 +14,8 @@ class AppwriteService {
     _client = Client()
         .setEndpoint(
             'https://baas.powermap.live/v1') // Replace with your Appwrite endpoint
-        .setProject('65670e27c14fdec05c4c'); // Replace with your project ID
+        .setProject('65670e27c14fdec05c4c')
+        .setSelfSigned(status: true); // Replace with your project ID
 
     _databases = Databases(_client);
     _storage = Storage(_client);
