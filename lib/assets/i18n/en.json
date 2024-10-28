@@ -339,6 +339,9 @@
     "today": "Clock-out",
     "attendance_history": "Attendance History",
     "click_in_success": "Clock in save successfully",
-    "click_out_success": "Clock out save successfully"
+    "click_out_success": "Clock out save successfully",
+    "proile_image": "Profile Photo",
+    "other_image": "Other Photo",
+    "confirm_clocking": "Are you sure you want to"
   }
 }

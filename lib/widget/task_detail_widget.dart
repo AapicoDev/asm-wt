@@ -74,10 +74,11 @@ class _STaskDetailWidgetState extends State<TaskDetailWidget> {
 
   Future<void> getEmployeeData() async {
     var employeeData = await widget.taskModel.employeeModelRefData?.get();
-
-    setState(() {
-      employeeModel = EmployeeModel.fromDocumentSnapshot(employeeData!);
-    });
+    if (employeeData != null) {
+      setState(() {
+        employeeModel = EmployeeModel.fromDocumentSnapshot(employeeData);
+      });
+    }
   }
 
   @override

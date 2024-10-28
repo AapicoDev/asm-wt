@@ -1,6 +1,7 @@
 import 'package:asm_wt/app/tasks/task_manual/image_upload.dart';
 import 'package:asm_wt/util/top_snackbar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:geolocator/geolocator.dart'; // Import geolocator for fetching user's location
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:path/path.dart';
@@ -94,7 +95,7 @@ class _ConfirmationSheetWithMapState extends State<ConfirmationSheetWithMap> {
           ),
           const Divider(),
           const SizedBox(height: 10),
-          Text('Are you sure you want to ${widget.action}?'),
+          Text('${translate('confirm_clocking')} ${widget.action}?'),
           const SizedBox(height: 20),
           _currentPosition != null
               ? Container(
@@ -118,7 +119,7 @@ class _ConfirmationSheetWithMapState extends State<ConfirmationSheetWithMap> {
               'Lat/Lng: ${_currentPosition?.latitude ?? "-"}/${_currentPosition?.longitude ?? "-"}'),
           Text(''),
           SingleImageUpload(
-            labels: ["Profile Photo", "Others"],
+            labels: [translate("profile_image"), translate("other_image")],
             imageCount: 2,
             onImagesUpdated: (List<ImageUploadModel> updatedImages) {
               // Handle the updated images here
@@ -151,12 +152,12 @@ class _ConfirmationSheetWithMapState extends State<ConfirmationSheetWithMap> {
                   // Pass data (e.g., current position and images) to the parent using the callback
 
                   if (_currentPosition == null) {
-                    showTopSnackBar(context, 'No Location Found');
+                    showTopSnackBar(context, 'ไม่พบสถานที่');
                     return;
                   }
 
                   if (images.isEmpty) {
-                    showTopSnackBar(context, 'No Image Found');
+                    showTopSnackBar(context, 'ไม่พบภาพ');
                     return;
                   }
                   Navigator.of(context).pop(true); // Cancel action

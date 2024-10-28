@@ -124,32 +124,32 @@ class _AccountSettingViewState extends StateMVC<AccountSettingView> {
                 ),
               ),
             ),
-            accountListWidget(
-              context,
-              tital: translate("text_header.bio_scan"),
-              icon: Icons.fingerprint,
-              hasArrow: false,
-              widget: Transform.scale(
-                scale: 0.7,
-                child: CupertinoSwitch(
-                    activeColor: theme.colorScheme.secondary,
-                    value: con.isBioScanEnable ?? false,
-                    onChanged: con.canCheckBiometrics &&
-                            supportState == _SupportState.supported
-                        ? (val) {
-                            setState(() {
-                              con.isBioScanEnable = val;
-                            });
-                            con.prefs.setBool("bioScan", val);
-                          }
-                        : (val) {
-                            showToastMessage(
-                                context,
-                                translate("bio_scan.message"),
-                                theme.colorScheme.primary);
-                          }),
-              ),
-            ),
+            // accountListWidget(
+            //   context,
+            //   tital: translate("text_header.bio_scan"),
+            //   icon: Icons.fingerprint,
+            //   hasArrow: false,
+            //   widget: Transform.scale(
+            //     scale: 0.7,
+            //     child: CupertinoSwitch(
+            //         activeColor: theme.colorScheme.secondary,
+            //         value: con.isBioScanEnable ?? false,
+            //         onChanged: con.canCheckBiometrics &&
+            //                 supportState == _SupportState.supported
+            //             ? (val) {
+            //                 setState(() {
+            //                   con.isBioScanEnable = val;
+            //                 });
+            //                 con.prefs.setBool("bioScan", val);
+            //               }
+            //             : (val) {
+            //                 showToastMessage(
+            //                     context,
+            //                     translate("bio_scan.message"),
+            //                     theme.colorScheme.primary);
+            //               }),
+            //   ),
+            // ),
             accountListWidget(context,
                 tital: translate("button.change_language"),
                 icon: Icons.language,

@@ -1,3 +1,4 @@
+import 'package:asm_wt/app/app_controller.dart';
 import 'package:asm_wt/router/router_name.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
@@ -20,9 +21,11 @@ class LoginView extends StatefulWidget {
 
 class _LoginViewState extends StateMVC<LoginView> {
   late LoginController con;
+  late AppController appCon;
 
   _LoginViewState() : super(LoginController()) {
     con = controller as LoginController;
+    appCon = AppController(); // Initializing the second controller
   }
 
   bool? isCheckbox = true;
@@ -199,6 +202,9 @@ class _LoginViewState extends StateMVC<LoginView> {
                       ),
                       Column(
                         children: [
+                          Text(
+                            '${translate('my_account.app_version')}${appCon.appVersion}',
+                          ),
                           ButtonWidget(
                               enable: true,
                               fullStyle: true,
@@ -227,7 +233,7 @@ class _LoginViewState extends StateMVC<LoginView> {
                                 ),
                               ),
                             ],
-                          )
+                          ),
                         ],
                       )
                     ],

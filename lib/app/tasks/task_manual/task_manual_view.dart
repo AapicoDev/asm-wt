@@ -7,7 +7,6 @@ import 'package:asm_wt/app/tasks/task_manual/bottomsheet_with_map.dart';
 import 'package:asm_wt/app/tasks/task_manual/image_upload.dart';
 import 'package:asm_wt/app/tasks/task_manual/task_manual_controller.dart';
 import 'package:asm_wt/service/appwrite_service.dart';
-import 'package:asm_wt/util/top_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:geolocator/geolocator.dart';

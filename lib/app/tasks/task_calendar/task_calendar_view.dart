@@ -353,7 +353,7 @@ class _TaskCalendarViewState extends StateMVC<TaskCalendarView> {
                     List<DocumentSnapshot>? documents = snapshot.data!.docs;
                     for (var doc in documents) {
                       var task = TaskModel.fromDocumentSnapshot(doc);
-                      if (task.type != StatusType.delete) {
+                      if (task.status != TaskStatus.Delete) {
                         taskModels.add(task);
                       }
                     }
