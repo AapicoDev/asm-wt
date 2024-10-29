@@ -1,14 +1,18 @@
 import 'package:asm_wt/app/tasks/task_manual/image_upload.dart';
+import 'package:asm_wt/app/tasks/task_manual/task_manual_controller.dart';
+import 'package:asm_wt/models/location_model.dart';
 import 'package:asm_wt/util/top_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:geolocator/geolocator.dart'; // Import geolocator for fetching user's location
+import 'package:location/location.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:path/path.dart';
+import 'package:provider/provider.dart';
 
 class ConfirmationSheetWithMap extends StatefulWidget {
   final String action;
-  final Function(Position?, List<ImageUploadModel>?) onConfirm;
+  final Function(Position?, List<ImageUploadModel>?, LocationModel?) onConfirm;
 
   ConfirmationSheetWithMap({
     required this.action,
@@ -87,15 +91,15 @@ class _ConfirmationSheetWithMapState extends State<ConfirmationSheetWithMap> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            'Confirm ${widget.action}',
+            '${widget.action} บันทึกเวลา',
             style: const TextStyle(
-              fontSize: 18,
+              fontSize: 16,
               fontWeight: FontWeight.bold,
             ),
           ),
           const Divider(),
           const SizedBox(height: 10),
-          Text('${translate('confirm_clocking')} ${widget.action}?'),
+          Text('${widget.action} บันทึกเวลา?'),
           const SizedBox(height: 20),
           _currentPosition != null
               ? Container(
@@ -119,7 +123,10 @@ class _ConfirmationSheetWithMapState extends State<ConfirmationSheetWithMap> {
               'Lat/Lng: ${_currentPosition?.latitude ?? "-"}/${_currentPosition?.longitude ?? "-"}'),
           Text(''),
           SingleImageUpload(
-            labels: [translate("profile_image"), translate("other_image")],
+            labels: [
+              translate('manual_clocking.profile_image'),
+              translate('manual_clocking.other_image')
+            ],
             imageCount: 2,
             onImagesUpdated: (List<ImageUploadModel> updatedImages) {
               // Handle the updated images here
@@ -145,10 +152,10 @@ class _ConfirmationSheetWithMapState extends State<ConfirmationSheetWithMap> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.grey,
                 ),
-                child: const Text('Cancel'),
+                child: Text(translate('button.cancel')),
               ),
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   // Pass data (e.g., current position and images) to the parent using the callback
 
                   if (_currentPosition == null) {
@@ -160,13 +167,26 @@ class _ConfirmationSheetWithMapState extends State<ConfirmationSheetWithMap> {
                     showTopSnackBar(context, 'ไม่พบภาพ');
                     return;
                   }
+                  // check location's name
+                  final taskProvider =
+                      Provider.of<TaskManualProvider>(context, listen: false);
+                  LocationModel? locationdata = await taskProvider.getAreaName(
+                      _currentPosition?.latitude, _currentPosition?.longitude);
+
+                  if (locationdata != null) {
+                    showTopSnackBar(
+                        context, 'บันทึกเวลาเข้างาน @ ${locationdata.nameEn}');
+                  }
+
                   Navigator.of(context).pop(true); // Cancel action
-                  widget.onConfirm(_currentPosition, images);
+                  widget.onConfirm(_currentPosition, images, locationdata);
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green[200],
                 ),
-                child: const Text('Confirm'),
+                child: Text(
+                  translate('button.confirm'),
+                ),
               ),
             ],
           ),
