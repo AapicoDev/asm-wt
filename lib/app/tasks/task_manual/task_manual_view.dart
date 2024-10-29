@@ -112,15 +112,10 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
   // Method to save clock-in time locally
   Future<void> _saveClockInTime(
       imagesList, position, locationdata, userData) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String formattedTime =
-        DateFormat('yyyy-MM-ddTHH:mm:ss').format(DateTime.now());
-    await prefs.setString('clockInTime', formattedTime);
-    setState(() {
-      _clockInTime = formattedTime; // Update local clock-in time
-    });
     // save to server and save the id
 
+    String formattedTime =
+        DateFormat('yyyy-MM-ddTHH:mm:ss').format(DateTime.now());
     debugPrint('clockOutTime ------ ${formattedTime}${imagesList}${position}');
     final taskProvider =
         Provider.of<TaskManualProvider>(context, listen: false);
@@ -128,16 +123,25 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
       "clock_in": formattedTime,
       "clock_in_location": [position.latitude, position.longitude],
       "clock_in_image": imagesList,
-      "clock_in_area_th": locationdata.nameTh,
-      "clock_in_area_en": locationdata.nameEn,
+      "clock_in_area_th": locationdata?.nameTh,
+      "clock_in_area_en": locationdata?.nameEn,
       "site_th": userData?.siteTH,
       "site_en": userData?.siteEN,
       "section_code": userData?.sectionCode,
       "section_th": userData?.sectionTH,
       "section_en": userData?.sectionEN
     });
-    await prefs.setString('clockInId', clockInID);
-    _showSuccessDialog(context, "Clock in save successfully");
+    if (clockInID != null) {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString('clockInTime', formattedTime);
+      setState(() {
+        _clockInTime = formattedTime; // Update local clock-in time
+      });
+      await prefs.setString('clockInId', clockInID);
+      _showSuccessDialog(context, "บันทึกเวลาเข้าได้สำเร็จ");
+    } else {
+      _showSuccessDialog(context, "บันทึกเวลาเข้าผิดพลาด");
+    }
   }
 
   // Method to get clock-in time from local storage
@@ -169,30 +173,37 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
     String clockOutTime =
         DateFormat('yyyy-MM-ddTHH:mm:ss').format(DateTime.now());
 
+    if (clockInId == null) {
+      showTopSnackBar(context, "No clock-in data");
+    }
     debugPrint(
         'clockOutTime ------ ${clockInTime}${clockOutTime}${imagesList}${position}');
     // Save data to Appwrite using your TaskManualController
     final taskProvider =
         Provider.of<TaskManualProvider>(context, listen: false);
-    await taskProvider.updateClockInData(clockInId!, {
+    var clockOutID = await taskProvider.updateClockInData(clockInId!, {
       "clock_out": clockOutTime,
       "clock_out_image": imagesList,
       "clock_out_location": [position.latitude, position.longitude],
-      "clock_out_area_th": locationdata.nameTh,
-      "clock_out_area_en": locationdata.nameEn,
+      "clock_out_area_th": locationdata?.nameTh,
+      "clock_out_area_en": locationdata?.nameEn,
       "site_th": userData?.siteTH,
       "site_en": userData?.siteEN,
       "section_code": userData?.sectionCode,
       "section_th": userData?.sectionTH,
       "section_en": userData?.sectionEN
     });
+    if (clockOutID != null) {
 
     await taskProvider.fetchTaskData(widget.userId);
-    taskHistory = taskProvider.taskData?.documents ?? [];
+      taskHistory = taskProvider.taskData?.documents ?? [];
+      // Clear local storage
+      await _clearClockInTime();
+      _showSuccessDialog(context, "บันทึกเวลาออกได้สำเร็จ");
+    } else {
+      _showSuccessDialog(context, "บันทึกเวลาออกได้สำเร็จ");
+    }
 
-    _showSuccessDialog(context, "Clock out save successfully");
-    // Clear local storage
-    await _clearClockInTime();
   }
 
   @override
@@ -323,8 +334,7 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
                       }
                     }
 
-                    await _saveClockInTime(
-                        imagesList, position, locationdata,
+                    await _saveClockInTime(imagesList, position, locationdata,
                         con?.userModel // Save clock-in time
                         );
                   },

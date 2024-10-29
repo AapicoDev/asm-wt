@@ -16,7 +16,7 @@ class TaskManualProvider extends ChangeNotifier {
   DocumentList? get taskData => _taskData;
   bool get isLoading => _isLoading;
 
-  Future<String> saveClockInData(
+  Future<String?> saveClockInData(
       String userId, Map<String, dynamic> clockInData) async {
     try {
       // Replace 'your_collection_id' with your actual collection ID
@@ -27,11 +27,12 @@ class TaskManualProvider extends ChangeNotifier {
       notifyListeners();
       return saveData.$id;
     } catch (error) {
-      throw Exception('Failed to save clock-in data: $error');
+      debugPrint('Failed to save clock-in data: $error');
+      return null;
     }
   }
 
-  Future<String> updateClockInData(
+  Future<String?> updateClockInData(
       String clockInId, Map<String, dynamic> clockInData) async {
     try {
       // Replace 'your_collection_id' with your actual collection ID
@@ -41,7 +42,8 @@ class TaskManualProvider extends ChangeNotifier {
       notifyListeners();
       return saveData.$id;
     } catch (error) {
-      throw Exception('Failed to save clock-in data: $error');
+      debugPrint('Failed to save clock-in data: $error');
+      return null;
     }
   }
 
