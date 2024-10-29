@@ -322,25 +322,25 @@ class _TaskCalendarViewState extends StateMVC<TaskCalendarView> {
         return false;
       },
       child: Scaffold(
-        floatingActionButton: InkWell(
-          onTap: () {
-            onCreateNotePressed(context, translate("text_header.create_task"),
-                translate("contents.create_task"));
-          },
-          child: Container(
-            width: 56,
-            height: 56,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: theme.colorScheme.primary,
-            ),
-            child: Icon(
-              Icons.add,
-              color: theme.colorScheme.onPrimary,
-              size: 30,
-            ),
-          ),
-        ),
+        // floatingActionButton: InkWell(
+        //   onTap: () {
+        //     onCreateNotePressed(context, translate("text_header.create_task"),
+        //         translate("contents.create_task"));
+        //   },
+        //   child: Container(
+        //     width: 56,
+        //     height: 56,
+        //     decoration: BoxDecoration(
+        //       shape: BoxShape.circle,
+        //       color: theme.colorScheme.primary,
+        //     ),
+        //     child: Icon(
+        //       Icons.add,
+        //       color: theme.colorScheme.onPrimary,
+        //       size: 30,
+        //     ),
+        //   ),
+        // ),
         body: con.tasksLoading
             ? const SizedBox(child: Center(child: CircularProgressIndicator()))
             : StreamBuilder<QuerySnapshot>(

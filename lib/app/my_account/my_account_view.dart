@@ -24,7 +24,7 @@ class MyAccountView extends StatefulWidget {
 
 class _MyAccountViewState extends StateMVC<MyAccountView> {
   late MyAccountController con;
-  late String? identifier;
+  String? identifier;
 
   _MyAccountViewState() : super(MyAccountController()) {
     con = controller as MyAccountController;

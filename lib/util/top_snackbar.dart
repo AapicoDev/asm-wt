@@ -5,7 +5,7 @@ void showTopSnackBar(BuildContext context, String message) {
   final overlay = Overlay.of(context);
   final overlayEntry = OverlayEntry(
     builder: (context) => Positioned(
-      top: MediaQuery.of(context).viewInsets.top + 80,
+      bottom: MediaQuery.of(context).viewInsets.bottom + 80,
       left: 10,
       right: 10,
       child: Material(
