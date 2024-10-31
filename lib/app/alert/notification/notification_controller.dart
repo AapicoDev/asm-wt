@@ -103,7 +103,7 @@ class NotificationController extends ControllerMVC {
             .collection(TableName.dbNotificationsTable)
             .where('to_id', isEqualTo: userId)
             .orderBy('created_date', descending: true)
-            .limit(10)
+            .limit(5)
             .get();
       } else {
         querySnapshot = await FirebaseFirestore.instance

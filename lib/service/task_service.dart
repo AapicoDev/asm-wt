@@ -75,15 +75,33 @@ class TasksService {
         .snapshots();
   }
 
+  // Stream<QuerySnapshot<Map<String, dynamic>>> getTasksSnapshotByUserId(
+  //     String? userId) {
+  //   return FirebaseFirestore.instance
+  //       .collection(TableName.dbTasksTable)
+  //       .where('employee_id', isEqualTo: userId)
+  //       .orderBy('start_time')
+  //       .snapshots();
+  // }
+
   Stream<QuerySnapshot<Map<String, dynamic>>> getTasksSnapshotByUserId(
       String? userId) {
+    // Calculate the timestamps for 20 days ago and 10 days from now
+    DateTime startDate = DateTime.now().subtract(Duration(days: 20));
+    DateTime endDate = DateTime.now().add(Duration(days: 10));
+
     return FirebaseFirestore.instance
         .collection(TableName.dbTasksTable)
         .where('employee_id', isEqualTo: userId)
+        .where('status',
+            isNotEqualTo: TaskStatus.Delete) // Exclude deleted tasks
+        .where('start_time',
+            isGreaterThanOrEqualTo: startDate) // From 20 days ago
+        .where('start_time',
+            isLessThanOrEqualTo: endDate) // Up to 10 days from now
         .orderBy('start_time')
         .snapshots();
   }
-
   Stream<QuerySnapshot<Map<String, dynamic>>> getTodayTaskSnapshotByDriverId(
       String? driverId) {
     DateTime now = DateTime.now();
