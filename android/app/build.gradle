@@ -102,6 +102,7 @@ dependencies {
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation 'com.google.firebase:firebase-messaging'
     implementation 'com.android.support:multidex:2.0.1'
+    implementation 'androidx.appcompat:appcompat:1.4.1'  // Add this line
 }
 
 // This must appear at the bottom of the file

@@ -2,6 +2,7 @@ import 'package:asm_wt/app/tasks/task_manual/task_manual_controller.dart';
 import 'package:asm_wt/app/tasks/today_task/today_task_controller.dart';
 import 'package:asm_wt/service/RESTAPI/geofencing_service.dart';
 import 'package:asm_wt/service/RESTAPI/task_management_service.dart';
+import 'package:asm_wt/util/showExitConfirmationDialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/io.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
@@ -411,47 +412,49 @@ class _MyAppState extends AppStateMVC<MyApp> with TickerProviderStateMixin {
     super.didChangeDependencies();
   }
 
-  @override
+@override
   Widget buildChild(BuildContext context) {
     final Future<FirebaseApp> initializedApp = Firebase.initializeApp();
-
     var localizationDelegate = LocalizedApp.of(context).delegate;
 
     return MultiProvider(
-        providers: [
-          ChangeNotifierProvider<AppService>(create: (_) => appService),
-          ChangeNotifierProvider(create: (_) => GeoFencingService()),
-          ChangeNotifierProvider(create: (_) => TaskManagementService()),
-          ChangeNotifierProvider(create: (_) => TaskManualProvider()),
-          Provider<AppRouter>(create: (_) => AppRouter(appService)),
-        ],
-        child: Builder(builder: (context) {
+      providers: [
+        ChangeNotifierProvider<AppService>(create: (_) => appService),
+        ChangeNotifierProvider(create: (_) => GeoFencingService()),
+        ChangeNotifierProvider(create: (_) => TaskManagementService()),
+        ChangeNotifierProvider(create: (_) => TaskManualProvider()),
+        Provider<AppRouter>(create: (_) => AppRouter(appService)),
+      ],
+      child: Builder(
+        builder: (context) {
           final GoRouter goRouter =
               Provider.of<AppRouter>(context, listen: true).router;
           return FutureBuilder(
             future: initializedApp,
             builder: (context, snapshot) {
               return OverlaySupport.global(
-                  child: MaterialApp.router(
-                routeInformationParser: goRouter.routeInformationParser,
-                routerDelegate: goRouter.routerDelegate,
-                routeInformationProvider: goRouter.routeInformationProvider,
-                debugShowCheckedModeBanner: false,
-                title: 'ASM',
-                theme: asthaTutorialTheme,
-                localizationsDelegates: [
-                  GlobalMaterialLocalizations.delegate,
-                  GlobalWidgetsLocalizations.delegate,
-                  GlobalCupertinoLocalizations.delegate,
-                  // OverrideFormBuilderLocalizationsTh.delegate,
-                  FormBuilderLocalizations.delegate,
-                  localizationDelegate
-                ],
-                supportedLocales: localizationDelegate.supportedLocales,
-                locale: localizationDelegate.currentLocale,
-              ));
+                child: MaterialApp.router(
+                  routeInformationParser: goRouter.routeInformationParser,
+                  routerDelegate: goRouter.routerDelegate,
+                  routeInformationProvider: goRouter.routeInformationProvider,
+                  debugShowCheckedModeBanner: false,
+                  title: 'ASM',
+                  theme: asthaTutorialTheme,
+                  localizationsDelegates: [
+                    GlobalMaterialLocalizations.delegate,
+                    GlobalWidgetsLocalizations.delegate,
+                    GlobalCupertinoLocalizations.delegate,
+                    FormBuilderLocalizations.delegate,
+                    localizationDelegate
+                  ],
+                  supportedLocales: localizationDelegate.supportedLocales,
+                  locale: localizationDelegate.currentLocale,
+                ),
+              );
             },
           );
-        }));
+        },
+      ),
+    );
   }
 }

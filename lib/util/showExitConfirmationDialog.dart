@@ -1,24 +1,46 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
-Future<bool> showExitConfirmationDialog(BuildContext context) async {
-  return await showDialog<bool>(
+class ExitConfirmationHandler {
+  static DateTime? lastPressed;
+
+  static Future<bool> onWillPop(BuildContext context) async {
+    final now = DateTime.now();
+    if (lastPressed == null ||
+        now.difference(lastPressed!) > const Duration(seconds: 2)) {
+      lastPressed = now;
+
+      // Use rootNavigator to ensure dialog shows above all routes
+      final shouldExit = await showDialog<bool>(
         context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Confirm Exit'),
-            content: Text('Do you really want to exit the app?'),
-            actions: <Widget>[
+        useRootNavigator: true, // Important!
+        barrierDismissible: false, // Prevent dismissing by tapping outside
+        builder: (context) => WillPopScope(
+          onWillPop: () async => false, // Prevent dismissing by back button
+          child: AlertDialog(
+            title: const Text('Exit App'),
+            content: const Text('Do you want to exit the app?'),
+            actions: [
               TextButton(
-                onPressed: () => Navigator.of(context).pop(false), // No
-                child: Text('No'),
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text('No'),
               ),
               TextButton(
-                onPressed: () => Navigator.of(context).pop(true), // Yes
-                child: Text('Yes'),
+                onPressed: () => Navigator.of(context).pop(true),
+                child: const Text('Yes'),
               ),
             ],
-          );
-        },
-      ) ??
-      false; // Default to false if the dialog is dismissed
+          ),
+        ),
+      );
+
+      if (shouldExit ?? false) {
+        // Add a small delay before exiting
+        await Future.delayed(const Duration(milliseconds: 100));
+        SystemChannels.platform.invokeMethod('SystemNavigator.pop');
+        return true;
+      }
+    }
+    return false;
+  }
 }

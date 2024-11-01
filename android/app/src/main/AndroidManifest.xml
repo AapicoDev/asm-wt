@@ -8,19 +8,19 @@
     <uses-permission android:name="android.permission.USE_BIOMETRIC"/>
      <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
      <uses-permission android:name="com.google.android.gms.permission.AD_ID" tools:node="remove"/>
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
    <application
         android:label="ASM"
-        android:name="${applicationName}"
         android:usesCleartextTraffic="true"
-        android:enableOnBackInvokedCallback="true"
         android:requestLegacyExternalStorage="true"
         android:extractNativeLibs="true"
-        android:icon="@mipmap/launcher_icon">
+        android:icon="@mipmap/launcher_icon"
+       tools:ignore="Instantiatable,MissingClass">
         <activity
-            android:name=".MainActivity"
+            android:name="com.aapico.appname.MainActivity"
             android:exported="true"
             android:launchMode="singleTop"
-            android:theme="@style/LaunchTheme"
+            android:theme="@style/Theme.AppCompat.DayNight"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
             android:hardwareAccelerated="true"
             android:windowSoftInputMode="adjustResize">
