@@ -87,8 +87,8 @@ class TasksService {
   Stream<QuerySnapshot<Map<String, dynamic>>> getTasksSnapshotByUserId(
       String? userId) {
     // Calculate the timestamps for 20 days ago and 10 days from now
-    DateTime startDate = DateTime.now().subtract(Duration(days: 20));
-    DateTime endDate = DateTime.now().add(Duration(days: 10));
+    DateTime startDate = DateTime.now().subtract(Duration(days: 15));
+    DateTime endDate = DateTime.now().add(Duration(days: 5));
 
     return FirebaseFirestore.instance
         .collection(TableName.dbTasksTable)

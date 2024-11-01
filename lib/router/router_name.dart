@@ -1,5 +1,5 @@
 class RouteNames {
-  static const root = "root";
+  static const root = "/";
   static const register = "register";
   static const register2 = "register2";
   static const todayTask = "todayTask";

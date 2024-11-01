@@ -46,7 +46,6 @@ import 'package:geolocator/geolocator.dart';
 
 import 'dart:io';
 
-
 FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 final AuthService _authService = FirebaseAuthService();
@@ -60,6 +59,7 @@ final FirestoreService _firestoreService = FirestoreServiceImpl();
 Future<void> _firebasMessagingBackgroundHandler(RemoteMessage message) async {
   print("----message backgroud handling${message.messageId}");
 }
+
 class MyHttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {

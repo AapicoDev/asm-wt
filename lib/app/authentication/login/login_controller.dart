@@ -77,9 +77,7 @@ class LoginController extends ControllerMVC {
   Future<void> getConnectivity() async =>
       subscription = Connectivity().onConnectivityChanged.listen(
         (List<ConnectivityResult> result) async {
-          setState(() {
-            connectivityResult = result;
-          });
+          connectivityResult = result;
         },
       );
 

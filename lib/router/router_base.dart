@@ -222,6 +222,8 @@ class AppRouter {
 
       final isLogedIn = appService.loginState;
       final isInitialized = appService.initialized;
+
+      debugPrint("isLogedIn");
       // final isOnboarded = appService.onboarding;
 
       // final isGoingToLogin = state.subloc == loginLocation;
@@ -230,7 +232,6 @@ class AppRouter {
       // if (state.matchedLocation.startsWith('/${RouteNames.todayTask}')) {
       //   return null;
       // }
-
       if (state.matchedLocation.startsWith('/${RouteNames.todayTask}')) {
         return null;
       } else if (state.matchedLocation == '/${RouteNames.register}') {

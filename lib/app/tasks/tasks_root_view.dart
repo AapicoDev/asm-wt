@@ -122,6 +122,7 @@ class _TasksRootView extends StateMVC<TasksRootView> {
 
     return WillPopScope(
       onWillPop: () async {
+        debugPrint("back button click");
         return false;
       },
       child: widget.appService.bioAuth
