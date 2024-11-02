@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 
 class ExitConfirmationHandler {
   static DateTime? lastPressed;
 
-  static Future<bool> onWillPop(BuildContext context) async {
+  static Future<void> onWillPop(BuildContext context) async {
     final now = DateTime.now();
     if (lastPressed == null ||
         now.difference(lastPressed!) > const Duration(seconds: 2)) {
@@ -18,16 +19,22 @@ class ExitConfirmationHandler {
         builder: (context) => WillPopScope(
           onWillPop: () async => false, // Prevent dismissing by back button
           child: AlertDialog(
-            title: const Text('Exit App'),
-            content: const Text('Do you want to exit the app?'),
+            title: Text(translate("exit_app.exit_app")),
+            content: Text(translate("exit_app.confirm_content")),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(false),
-                child: const Text('No'),
+                child: Text(
+                  translate("exit_app.cancel"),
+                  style: TextStyle(fontFamily: 'kanit'),
+                ),
               ),
               TextButton(
                 onPressed: () => Navigator.of(context).pop(true),
-                child: const Text('Yes'),
+                child: Text(
+                  translate("exit_app.confirm"),
+                  style: TextStyle(fontFamily: 'kanit'),
+                ),
               ),
             ],
           ),
@@ -38,9 +45,7 @@ class ExitConfirmationHandler {
         // Add a small delay before exiting
         await Future.delayed(const Duration(milliseconds: 100));
         SystemChannels.platform.invokeMethod('SystemNavigator.pop');
-        return true;
       }
     }
-    return false;
   }
 }

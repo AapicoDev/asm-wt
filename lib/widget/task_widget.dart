@@ -96,7 +96,7 @@ class TaskCardWidget extends StatelessWidget {
       ),
       margin: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 5.0),
       child: SizedBox(
-        height: 65,
+        height: 75,
         child: ListTile(
             onTap: onPressed,
             contentPadding: const EdgeInsets.symmetric(horizontal: 10.0),

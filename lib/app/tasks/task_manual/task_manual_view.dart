@@ -79,7 +79,10 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
               onPressed: () {
                 Navigator.of(context).pop(); // Close the dialog
               },
-              child: Text('OK'),
+              child: Text(
+                'OK',
+                style: TextStyle(fontFamily: 'kanit'),
+              ),
             ),
           ],
         );
@@ -129,7 +132,15 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
       "site_en": userData?.siteEN,
       "section_code": userData?.sectionCode,
       "section_th": userData?.sectionTH,
-      "section_en": userData?.sectionEN
+      "section_en": userData?.sectionEN,
+      "job_code": userData?.jobCode,
+      "site_code": userData?.siteCode,
+      "job_th": userData?.jobTH,
+      "job_en": userData?.jobEN,
+      "firstname_th": userData?.firstnameTH,
+      "firstname_en": userData?.firstnameEN,
+      "lastname_th": userData?.lastnameTH,
+      "lastname_en": userData?.lastnameEN
     });
     if (clockInID != null) {
       SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -194,8 +205,7 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
       "section_en": userData?.sectionEN
     });
     if (clockOutID != null) {
-
-    await taskProvider.fetchTaskData(widget.userId);
+      await taskProvider.fetchTaskData(widget.userId);
       taskHistory = taskProvider.taskData?.documents ?? [];
       // Clear local storage
       await _clearClockInTime();
@@ -203,7 +213,6 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
     } else {
       _showSuccessDialog(context, "บันทึกเวลาออกได้สำเร็จ");
     }
-
   }
 
   @override
@@ -242,20 +251,19 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
                   ),
                 ),
                 Container(
-                  height: MediaQuery.of(context).size.height,
                   width: MediaQuery.of(context).size.width,
                   child: SafeArea(
                     child: Padding(
                       padding: EdgeInsets.all(16.0),
                       child: Column(
                         children: [
-                          SizedBox(height: 20),
+                          SizedBox(height: 25),
                           _buildClockDisplay(), // Use data from Appwrite
                           SizedBox(height: 5),
                           _buildClockButtons(context),
-                          SizedBox(height: 20),
+                          SizedBox(height: 15),
                           _buildTodayEntry(),
-                          SizedBox(height: 20),
+                          SizedBox(height: 5),
                           _buildAttendanceHistory(),
                         ],
                       ),
@@ -273,7 +281,7 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
   Widget _buildClockDisplay() {
     return Container(
       width: 200,
-      height: 200,
+      height: 160,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: Colors.white,
@@ -433,9 +441,16 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(translate('manual_clocking.today'),
-              style: TextStyle(color: Colors.blue)),
-          Text(_date, style: TextStyle(fontWeight: FontWeight.bold)),
+          Row(
+            children: [
+              Text(translate('manual_clocking.today'),
+                  style: TextStyle(color: Colors.blue)),
+              SizedBox(
+                width: 10,
+              ),
+              Text(_date, style: TextStyle(fontWeight: FontWeight.bold)),
+            ],
+          ),
           SizedBox(height: 8),
           Row(
             children: [
@@ -463,7 +478,7 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
     List<String> clock_out_image,
   ) {
     return Container(
-      padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      padding: EdgeInsets.symmetric(vertical: 2, horizontal: 16),
       color: Colors.grey[200],
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
@@ -473,7 +488,7 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
             children: [
               Text(
                 date,
-                style: TextStyle(fontWeight: FontWeight.bold),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                 textAlign: TextAlign.end,
               ),
               SizedBox(width: 10),
@@ -484,11 +499,17 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
                   children: [
                     Icon(Icons.check_circle, color: Colors.green, size: 16),
                     SizedBox(width: 4),
-                    Text(clockIn),
+                    Text(
+                      clockIn,
+                      style: TextStyle(fontSize: 12),
+                    ),
                     SizedBox(width: 10),
                     Icon(Icons.check_circle, color: Colors.blue, size: 16),
                     SizedBox(width: 4),
-                    Text(clockOut),
+                    Text(
+                      clockOut,
+                      style: TextStyle(fontSize: 12),
+                    ),
                   ],
                 ),
               ),
@@ -520,10 +541,9 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
                   ))
             ],
           ),
-
           Divider(
             color: Colors.grey, // Customize divider color
-            thickness: 1, // Customize divider thickness
+            thickness: 0.5, // Customize divider thickness
           ),
         ],
       ),
@@ -548,7 +568,7 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
           ListTile(
             title: Text(
               translate("manual_clocking.attendance_history"),
-              style: TextStyle(fontFamily: "Kanit Light"),
+              style: TextStyle(fontFamily: "Kanit", fontSize: 15),
             ),
             trailing: IconButton(
               icon: Icon(
@@ -564,8 +584,8 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
             ),
           ),
           if (_isHistoryVisible)
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.35,
+            Container(
+              height: MediaQuery.of(context).size.height * 0.30,
               child: taskData.isEmpty
                   ? Center(
                       child: Text(

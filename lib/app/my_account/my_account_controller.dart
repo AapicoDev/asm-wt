@@ -154,7 +154,10 @@ class MyAccountController extends ControllerMVC {
                 children: [
                   TextButton(
                     onPressed: () => Navigator.of(context).pop(),
-                    child: Text(translate('button.cancel')),
+                    child: Text(
+                      translate('button.cancel'),
+                      style: TextStyle(fontFamily: 'kanit'),
+                    ),
                   ),
                   TextButton(
                     onPressed: () async => {

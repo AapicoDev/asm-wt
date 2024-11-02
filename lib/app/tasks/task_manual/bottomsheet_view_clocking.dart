@@ -1,4 +1,6 @@
+import 'package:asm_wt/util/full_screen_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 class ConfirmationSheetViewClocking extends StatefulWidget {
@@ -41,8 +43,8 @@ class _ConfirmationSheetViewClockingState
     // Add markers for clock-in and clock-out locations
     // Delay adding circles
     Future.delayed(Duration(milliseconds: 500), () {
-      _addCircleOut(widget.clock_out_location);
-      _addCircleIn(widget.clock_in_location);
+      _addPinOut(widget.clock_out_location);
+      _addPinIn(widget.clock_in_location);
     });
 
     // Animate camera to the clock-in location
@@ -53,28 +55,44 @@ class _ConfirmationSheetViewClockingState
     );
   }
 
-  void _addCircleIn(List<double> location) {
+// Helper function to load the image from assets
+  Future<Uint8List> loadImageFromAsset(String path) async {
+    final ByteData data = await rootBundle.load(path);
+    return data.buffer.asUint8List();
+  }
+
+  void _addPinIn(List<double> location) async {
     if (mapController != null) {
-      mapController?.addCircle(
-        CircleOptions(
-          geometry: LatLng(location[0], location[1]),
-          circleRadius: 10.0, // Adjust the size of the circle
-          circleColor: "#FF0000", // Red color
-          circleOpacity: 1.0, // Full opacity
-        ),
+      // Ensure the custom icon is added to the map style before adding a symbol
+      await mapController!.addImage(
+        'custom-marker', // Identifier for the custom icon
+        await loadImageFromAsset('lib/assets/images/log-in.png'),
+      );
+
+      mapController?.addSymbol(
+        SymbolOptions(
+            geometry: LatLng(location[0], location[1]),
+            iconImage: 'custom-marker', // Use the custom icon
+            iconSize: 0.2, // Adjust size as needed
+            iconOffset: Offset(0, -100)),
       );
     }
   }
 
-  void _addCircleOut(List<double> location) {
+  void _addPinOut(List<double> location) async {
     if (mapController != null) {
-      mapController?.addCircle(
-        CircleOptions(
-          geometry: LatLng(location[0], location[1]),
-          circleRadius: 14.0, // Adjust the size of the circle
-          circleColor: "#000000", // Red color
-          circleOpacity: 1.0, // Full opacity
-        ),
+      // Ensure the custom icon is added to the map style before adding a symbol
+      await mapController!.addImage(
+        'out-marker', // Identifier for the custom icon
+        await loadImageFromAsset('lib/assets/images/log-out.png'),
+      );
+
+      mapController?.addSymbol(
+        SymbolOptions(
+            geometry: LatLng(location[0], location[1]),
+            iconImage: 'out-marker', // Use the custom icon
+            iconSize: 0.2, // Adjust size as needed
+            iconOffset: Offset(0, -100)),
       );
     }
   }
@@ -136,20 +154,26 @@ class _ConfirmationSheetViewClockingState
                         return Padding(
                           padding: const EdgeInsets.symmetric(
                               vertical: 5.0, horizontal: 5),
-                          child: Image.network(
-                            imageUrl,
-                            width: 100, // Set a fixed width
-                            height: 100, // Set a fixed height
-                            fit: BoxFit.cover, // Cover to maintain aspect ratio
-                            errorBuilder: (context, error, stackTrace) {
-                              return Container(
-                                color: Colors.grey[300], // Placeholder color
-                                width: 150,
-                                height: 100,
-                                child: const Center(
-                                    child: Text('Image not available')),
-                              );
+                          child: GestureDetector(
+                            onTap: () {
+                              FullscreenImageViewer.show(context, imageUrl);
                             },
+                            child: Image.network(
+                              imageUrl,
+                              width: 100, // Set a fixed width
+                              height: 100, // Set a fixed height
+                              fit: BoxFit
+                                  .cover, // Cover to maintain aspect ratio
+                              errorBuilder: (context, error, stackTrace) {
+                                return Container(
+                                  color: Colors.grey[300], // Placeholder color
+                                  width: 150,
+                                  height: 100,
+                                  child: const Center(
+                                      child: Text('Image not available')),
+                                );
+                              },
+                            ),
                           ),
                         );
                       }).toList()
@@ -172,22 +196,27 @@ class _ConfirmationSheetViewClockingState
                             return Padding(
                               padding: const EdgeInsets.symmetric(
                                   vertical: 5.0, horizontal: 5.0),
-                              child: Image.network(
-                                imageUrl,
-                                width: 100, // Set a fixed width
-                                height: 100, // Set a fixed height
-                                fit: BoxFit
-                                    .cover, // Cover to maintain aspect ratio
-                                errorBuilder: (context, error, stackTrace) {
-                                  return Container(
-                                    color:
-                                        Colors.grey[300], // Placeholder color
-                                    width: 150,
-                                    height: 100,
-                                    child: const Center(
-                                        child: Text('Image not available')),
-                                  );
+                              child: GestureDetector(
+                                onTap: () {
+                                  FullscreenImageViewer.show(context, imageUrl);
                                 },
+                                child: Image.network(
+                                  imageUrl,
+                                  width: 100, // Set a fixed width
+                                  height: 100, // Set a fixed height
+                                  fit: BoxFit
+                                      .cover, // Cover to maintain aspect ratio
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Container(
+                                      color:
+                                          Colors.grey[300], // Placeholder color
+                                      width: 150,
+                                      height: 100,
+                                      child: const Center(
+                                          child: Text('Image not available')),
+                                    );
+                                  },
+                                ),
                               ),
                             );
                           }).toList(),

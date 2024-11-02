@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:asm_wt/app/my_account/my_account_controller.dart';
 import 'package:asm_wt/service/RESTAPI/geofencing_service.dart';
 import 'package:asm_wt/widget/network_error_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -45,6 +46,7 @@ class _TodayTaskViewState extends StateMVC<TodayTaskView> {
   @override
   void initState() {
     super.initState();
+
     con.geoFencingService = context.read<GeoFencingService>();
     con.userId = widget.userId;
     con.taskStatusReportDocId =

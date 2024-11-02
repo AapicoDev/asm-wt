@@ -3,7 +3,7 @@
     "dashboard": "แดชบอร์ด",
     "my_task": "งานของฉัน",
     "today_task": "งานวันนี้",
-    "task_manual": "ลงเวลาร",
+    "task_manual": "ลงเวลา",
     "my_request": "คำขอของฉัน",
     "my_account": "บัญชีของฉัน",
 
@@ -350,5 +350,11 @@
     "profile_image": "ภาพถ่ายเซลฟี่",
     "other_image": "ภาพถ่ายอื่น ๆ",
     "confirm_clocking": "แน่ใจหรือว่าต้องการ"
+  },
+  "exit_app": {
+    "exit_app": "ออกจากแอพ",
+    "confirm_content": "คุณต้องการออกจากแอพหรือไม่?",
+    "confirm": "ยืนยัน",
+    "cancel": "ยกเลิก"
   }
 }

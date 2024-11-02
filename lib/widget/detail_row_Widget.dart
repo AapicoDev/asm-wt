@@ -43,24 +43,20 @@ class DetailRowWidget extends StatelessWidget {
                 child: const Text('.'),
               ),
             ),
-            Expanded(
-              flex: 1,
-              child: Container(
-                child: Text(
-                  title ?? "",
-                  style: theme.textTheme.headlineSmall,
-                ),
+            Container(
+              width: 120,
+              child: Text(
+                title ?? "",
+                style: theme.textTheme.headlineSmall,
               ),
             ),
             Expanded(
-              flex: flex,
               child: Row(children: [
                 Icon(
                   icon,
                   color: theme.colorScheme.onBackground,
                 ),
                 Expanded(
-                  flex: 1,
                   child: isBladge ?? false
                       ? Row(
                           mainAxisAlignment: MainAxisAlignment.start,

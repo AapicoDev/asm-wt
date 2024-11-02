@@ -343,5 +343,11 @@
     "profile_image": "Profile Photo",
     "other_image": "Other Photo",
     "confirm_clocking": "Are you sure you want to"
+  },
+  "exit_app": {
+    "exit_app": "Exit App",
+    "confirm_content": "Do you want to exit the app?",
+    "confirm": "Yes",
+    "cancel": "No"
   }
 }

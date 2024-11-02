@@ -1,3 +1,4 @@
+import 'package:asm_wt/app/my_account/my_account_controller.dart';
 import 'package:asm_wt/app/tasks/today_task/today_task_controller.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get_it/get_it.dart';
@@ -23,6 +24,7 @@ class TasksDetailController extends ControllerMVC {
   TaskModel taskModel = TaskModel();
   final SharedPreferences prefs = GetIt.instance<SharedPreferences>();
   TodayTaskController todayTaskController = TodayTaskController();
+  MyAccountController? conUser;
 
   factory TasksDetailController() => _this ??= TasksDetailController._();
   TasksDetailController._()
@@ -44,6 +46,10 @@ class TasksDetailController extends ControllerMVC {
     // setupToken();
     /// Retrieve the 'app level' State object
     appState = rootState!;
+
+    // Initialize any additional controllers if needed
+    conUser = MyAccountController();
+    debugPrint("userData ${conUser?.userModel?.toJson().toString()}");
 
     /// You're able to retrieve the Controller(s) from other State objects.
     var con = appState.controller;
@@ -84,6 +90,7 @@ class TasksDetailController extends ControllerMVC {
     LoadingOverlay.of(context).show();
     Map<String, dynamic> taskData = <String, dynamic>{};
     taskData['status'] = TaskStatus.Confirm;
+
     await _tasksService
         .updateTaskStatusByTaskId(taskModel?.taskId, taskData)
         .then((res) async => {

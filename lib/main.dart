@@ -412,7 +412,7 @@ class _MyAppState extends AppStateMVC<MyApp> with TickerProviderStateMixin {
     super.didChangeDependencies();
   }
 
-@override
+  @override
   Widget buildChild(BuildContext context) {
     final Future<FirebaseApp> initializedApp = Firebase.initializeApp();
     var localizationDelegate = LocalizedApp.of(context).delegate;

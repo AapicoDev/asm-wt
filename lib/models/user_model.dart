@@ -17,22 +17,39 @@ class UserModel {
   String? sectionTH;
   String? sectionEN;
 
-  UserModel(
-      {this.username,
-      this.email,
-      this.userId,
-      this.userStatus,
-      this.staffId,
-      this.deviceToken,
-      this.deviceId,
-      this.profileURL,
-      this.profileFileName,
+  String? jobCode;
+  String? siteCode;
+  String? jobTH;
+  String? jobEN;
+  String? firstnameEN;
+  String? firstnameTH;
+  String? lastnameEN;
+  String? lastnameTH;
+
+  UserModel({
+    this.username,
+    this.email,
+    this.userId,
+    this.userStatus,
+    this.staffId,
+    this.deviceToken,
+    this.deviceId,
+    this.profileURL,
+    this.profileFileName,
     this.phoneNumber,
     this.siteTH,
     this.siteEN,
     this.sectionCode,
     this.sectionTH,
     this.sectionEN,
+    this.jobCode,
+    this.siteCode,
+    this.jobTH,
+    this.jobEN,
+    this.firstnameEN,
+    this.firstnameTH,
+    this.lastnameEN,
+    this.lastnameTH,
   });
 
   factory UserModel.fromDocumentSnapshot(DocumentSnapshot snapshot) {
@@ -54,6 +71,14 @@ class UserModel {
       sectionCode: data['section_code'] ?? null,
       sectionTH: data['section_th'] ?? null,
       sectionEN: data['section_en'] ?? null,
+      jobCode: data['job_code'] ?? null,
+      siteCode: data['site_code'] ?? null,
+      jobTH: data['job_th'] ?? null,
+      jobEN: data['job_en'] ?? null,
+      firstnameTH: data['firstname_th'] ?? null,
+      firstnameEN: data['firstname_en'] ?? null,
+      lastnameTH: data['lastname_th'] ?? null,
+      lastnameEN: data['lastname_en'] ?? null,
     );
   }
 
@@ -72,6 +97,15 @@ class UserModel {
     data['sectionCode'] = sectionCode ?? null;
     data['sectionTH'] = sectionTH ?? null;
     data['sectionEN'] = sectionEN ?? null;
+
+    data['jobCode'] = jobCode ?? null;
+    data['siteCode'] = siteCode ?? null;
+    data['jobTH'] = jobTH ?? null;
+    data['jobEN'] = jobEN ?? null;
+    data['firstnameTH'] = firstnameTH ?? null;
+    data['firstnameEN'] = firstnameEN ?? null;
+    data['lastnameTH'] = lastnameTH ?? null;
+    data['lastnameEN'] = lastnameEN ?? null;
 
     return data;
   }

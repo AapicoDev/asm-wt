@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:asm_wt/app/tasks/task_manual/task_manual_view.dart';
+import 'package:asm_wt/util/showExitConfirmationDialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:device_info_plus/device_info_plus.dart';
@@ -120,16 +121,21 @@ class _TasksRootView extends StateMVC<TasksRootView> {
     final theme = Theme.of(context);
     LocalNotification.initialize();
 
-    return WillPopScope(
-      onWillPop: () async {
-        debugPrint("back button click");
-        return false;
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) {
+          return;
+        }
+        debugPrint("back button");
+        return ExitConfirmationHandler.onWillPop(context);
       },
       child: widget.appService.bioAuth
           ? UpgradeAlert(
               upgrader: Upgrader(
-                  debugDisplayAlways: false,
-                  minAppVersion: con.appController.appVersion),
+                debugDisplayAlways: false,
+                minAppVersion: con.appController.appVersion,
+              ),
               child: Scaffold(
                   appBar: AppBarWidget(
                     color: theme.colorScheme.primary,

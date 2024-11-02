@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:asm_wt/app/my_account/my_account_controller.dart';
 import 'package:asm_wt/models/settings_model.dart';
 import 'package:asm_wt/service/RESTAPI/geofencing_service.dart';
 import 'package:asm_wt/service/base_service.dart';
@@ -62,6 +63,8 @@ class TodayTaskController extends ControllerMVC {
   SettingsModel? settingsModel;
   String? taskStatusReportDocId;
 
+  MyAccountController? conUser;
+
   factory TodayTaskController() => _this ??= TodayTaskController._();
   TodayTaskController._()
       : taskModel = TaskModel(),
@@ -83,6 +86,11 @@ class TodayTaskController extends ControllerMVC {
     initConnectivity();
     getConnectivity();
     loadSettingDb();
+
+    // Initialize any additional controllers if needed
+    conUser = MyAccountController();
+
+    debugPrint("userData ${conUser?.userModel?.toJson().toString()}");
 
     onClockInOrClockOutPress = false;
   }
@@ -482,7 +490,7 @@ class TodayTaskController extends ControllerMVC {
     }
 
     await _tasksService
-        .updateTaskStatusByTaskId(taskModel.taskId, taskModel.toJson(false))
+        .updateTaskStatusByTaskId(taskModel.taskId, taskModel.toJson(false)) //
         .then((res) async => {
               if (res.status == "S")
                 {
