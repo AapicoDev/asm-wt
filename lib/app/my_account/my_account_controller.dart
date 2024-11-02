@@ -58,7 +58,6 @@ class MyAccountController extends ControllerMVC {
     initConnectivity();
     getConnectivity();
     userId = prefs.getString('userId');
-
     getUserDataByUserId();
   }
 

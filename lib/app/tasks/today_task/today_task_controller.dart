@@ -70,6 +70,7 @@ class TodayTaskController extends ControllerMVC {
       : taskModel = TaskModel(),
         tasksService = TasksService(),
         settingsService = SettingsService(),
+        conUser = MyAccountController(),
         super();
   static TodayTaskController? _this;
 
@@ -86,13 +87,8 @@ class TodayTaskController extends ControllerMVC {
     initConnectivity();
     getConnectivity();
     loadSettingDb();
-
-    // Initialize any additional controllers if needed
-    conUser = MyAccountController();
-
-    debugPrint("userData ${conUser?.userModel?.toJson().toString()}");
-
     onClockInOrClockOutPress = false;
+    debugPrint("Userdata ${conUser?.userModel?.toJson().toString()}");
   }
 
   Future<void> loadSettingDb() async {
@@ -640,24 +636,37 @@ class TodayTaskController extends ControllerMVC {
       taskModel.clock_in_status = ClockStatus.Early;
     }
 
-    await _tasksService
-        .updateTaskStatusByTaskId(taskModel.taskId, taskModel.toJson(false))
-        .then((res) async => {
-              if (res.status == "S")
-                {
-                  await createClockInOutNewFeedsFunc(
-                      taskModel, TaskStatus.Start, ClockInOutEvent.ClockIn),
-                  showToastMessage(
-                      context,
-                      userIsInGeofencing?.data != null
-                          ? "${userIsInGeofencing?.message} : ${geoFencingService?.clockInOutAreaNameEn}"
-                          : "${userIsInGeofencing?.message}",
-                      userIsInGeofencing?.data != null
-                          ? Theme.of(context).colorScheme.background
-                          : Theme.of(context).colorScheme.onBackground),
-                  if (type == "fromCalendar") {Navigator.of(context).pop()}
-                },
-            });
+    await _tasksService.updateTaskStatusByTaskId(taskModel.taskId, {
+      ...taskModel.toJson(false),
+      "site_th": conUser?.userModel?.siteTH,
+      "site_en": conUser?.userModel?.siteEN,
+      "section_code": conUser?.userModel?.sectionCode,
+      "section_th": conUser?.userModel?.sectionTH,
+      "section_en": conUser?.userModel?.sectionEN,
+      "job_code": conUser?.userModel?.jobCode,
+      "site_code": conUser?.userModel?.siteCode,
+      "job_th": conUser?.userModel?.jobTH,
+      "job_en": conUser?.userModel?.jobEN,
+      "firstname_th": conUser?.userModel?.firstnameTH,
+      "firstname_en": conUser?.userModel?.firstnameEN,
+      "lastname_th": conUser?.userModel?.lastnameTH,
+      "lastname_en": conUser?.userModel?.lastnameEN
+    }).then((res) async => {
+          if (res.status == "S")
+            {
+              await createClockInOutNewFeedsFunc(
+                  taskModel, TaskStatus.Start, ClockInOutEvent.ClockIn),
+              showToastMessage(
+                  context,
+                  userIsInGeofencing?.data != null
+                      ? "${userIsInGeofencing?.message} : ${geoFencingService?.clockInOutAreaNameEn}"
+                      : "${userIsInGeofencing?.message}",
+                  userIsInGeofencing?.data != null
+                      ? Theme.of(context).colorScheme.background
+                      : Theme.of(context).colorScheme.onBackground),
+              if (type == "fromCalendar") {Navigator.of(context).pop()}
+            },
+        });
 
     LoadingOverlay.of(context).hide();
   }
