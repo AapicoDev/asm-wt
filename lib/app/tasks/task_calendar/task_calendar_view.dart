@@ -343,10 +343,18 @@ class _TaskCalendarViewState extends StateMVC<TaskCalendarView> {
           : StreamBuilder<QuerySnapshot>(
               stream: con.tasksService.getTasksSnapshotByUserId(widget.userId),
               builder: (context, snapshot) {
-                taskModels = [];
-
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(
+                      child:
+                          CircularProgressIndicator()); // Show loading spinner
+                }
+                if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}'); // Handle error
+                }
                 if (snapshot.hasData) {
-                  List<DocumentSnapshot>? documents = snapshot.data!.docs;
+                  taskModels.clear(); // Clear previous data
+                  List<DocumentSnapshot> documents = snapshot.data!.docs;
+
                   for (var doc in documents) {
                     var task = TaskModel.fromDocumentSnapshot(doc);
                     if (task.status != TaskStatus.Delete) {
@@ -354,6 +362,7 @@ class _TaskCalendarViewState extends StateMVC<TaskCalendarView> {
                     }
                   }
                 }
+                ;
 
                 return SingleChildScrollView(
                   child: Column(
