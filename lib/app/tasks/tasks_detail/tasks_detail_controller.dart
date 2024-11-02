@@ -47,14 +47,12 @@ class TasksDetailController extends ControllerMVC {
     /// Retrieve the 'app level' State object
     appState = rootState!;
 
-    // Initialize any additional controllers if needed
-    conUser = MyAccountController();
-    debugPrint("userData ${conUser?.userModel?.toJson().toString()}");
-
     /// You're able to retrieve the Controller(s) from other State objects.
     var con = appState.controller;
     con = appState.controllerByType<AppController>();
     con = appState.controllerById(con?.keyId);
+    // Assuming MyAccountController has a method to load user data
+    conUser = appState.controllerByType<MyAccountController>()!;
   }
 
   Future<void> createNewFeedsFunc(String? typeId) async {
@@ -90,17 +88,33 @@ class TasksDetailController extends ControllerMVC {
     LoadingOverlay.of(context).show();
     Map<String, dynamic> taskData = <String, dynamic>{};
     taskData['status'] = TaskStatus.Confirm;
-
-    await _tasksService
-        .updateTaskStatusByTaskId(taskModel?.taskId, taskData)
-        .then((res) async => {
-              if (res.status == "S")
-                {
-                  await createNewFeedsFunc(taskModel?.taskId),
-                  await createNotification(taskModel, TaskStatus.Confirm),
-                  LoadingOverlay.of(context).hide(),
-                  Navigator.of(context).pop()
-                }
-            });
+    if (conUser?.userModel == null) {
+      await conUser?.getUserDataByUserId();
+    }
+    debugPrint("userData ${conUser?.userModel?.toJson().toString()}");
+    await _tasksService.updateTaskStatusByTaskId(taskModel?.taskId, {
+      ...taskData,
+      "site_th": conUser?.userModel?.siteTH,
+      "site_en": conUser?.userModel?.siteEN,
+      "section_code": conUser?.userModel?.sectionCode,
+      "section_th": conUser?.userModel?.sectionTH,
+      "section_en": conUser?.userModel?.sectionEN,
+      "job_code": conUser?.userModel?.jobCode,
+      "site_code": conUser?.userModel?.siteCode,
+      "job_th": conUser?.userModel?.jobTH,
+      "job_en": conUser?.userModel?.jobEN,
+      "firstname_th": conUser?.userModel?.firstnameTH,
+      "firstname_en": conUser?.userModel?.firstnameEN,
+      "lastname_th": conUser?.userModel?.lastnameTH,
+      "lastname_en": conUser?.userModel?.lastnameEN
+    }).then((res) async => {
+          if (res.status == "S")
+            {
+              await createNewFeedsFunc(taskModel?.taskId),
+              await createNotification(taskModel, TaskStatus.Confirm),
+              LoadingOverlay.of(context).hide(),
+              Navigator.of(context).pop()
+            }
+        });
   }
 }

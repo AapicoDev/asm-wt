@@ -1,3 +1,4 @@
+import 'package:asm_wt/app/my_account/my_account_controller.dart';
 import 'package:asm_wt/app/tasks/task_manual/task_manual_controller.dart';
 import 'package:asm_wt/app/tasks/today_task/today_task_controller.dart';
 import 'package:asm_wt/service/RESTAPI/geofencing_service.dart';
@@ -245,6 +246,7 @@ class _MyAppState extends AppStateMVC<MyApp> with TickerProviderStateMixin {
           controllers: [
             LoginController(),
             TasksRootController(),
+            MyAccountController()
           ],
 
           /// Demonstrate passing an 'object' down the Widget tree much like
