@@ -31,7 +31,6 @@ class TasksDetailController extends ControllerMVC {
       : newFeedsService = NewFeedsService(),
         _tasksService = TasksService(),
         _notificationService = NotificationService(),
-        conUser = MyAccountController(),
         super();
   static TasksDetailController? _this;
 
@@ -52,8 +51,8 @@ class TasksDetailController extends ControllerMVC {
     var con = appState.controller;
     con = appState.controllerByType<AppController>();
     con = appState.controllerById(con?.keyId);
-    conUser?.initState();
-    debugPrint("Userdata ${conUser?.userModel?.toJson().toString()}");
+    // Assuming MyAccountController has a method to load user data
+    conUser = appState.controllerByType<MyAccountController>()!;
   }
 
   Future<void> createNewFeedsFunc(String? typeId) async {
@@ -89,7 +88,9 @@ class TasksDetailController extends ControllerMVC {
     LoadingOverlay.of(context).show();
     Map<String, dynamic> taskData = <String, dynamic>{};
     taskData['status'] = TaskStatus.Confirm;
-
+    if (conUser?.userModel == null) {
+      await conUser?.getUserDataByUserId();
+    }
     debugPrint("userData ${conUser?.userModel?.toJson().toString()}");
     await _tasksService.updateTaskStatusByTaskId(taskModel?.taskId, {
       ...taskData,

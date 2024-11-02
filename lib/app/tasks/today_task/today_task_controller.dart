@@ -65,12 +65,12 @@ class TodayTaskController extends ControllerMVC {
 
   MyAccountController? conUser;
 
+
   factory TodayTaskController() => _this ??= TodayTaskController._();
   TodayTaskController._()
       : taskModel = TaskModel(),
         tasksService = TasksService(),
         settingsService = SettingsService(),
-        conUser = MyAccountController(),
         super();
   static TodayTaskController? _this;
 
@@ -88,7 +88,10 @@ class TodayTaskController extends ControllerMVC {
     getConnectivity();
     loadSettingDb();
     onClockInOrClockOutPress = false;
-    debugPrint("Userdata ${conUser?.userModel?.toJson().toString()}");
+
+    appState = rootState!;
+    // Assuming MyAccountController has a method to load user data
+    conUser = appState.controllerByType<MyAccountController>()!;
   }
 
   Future<void> loadSettingDb() async {
@@ -636,6 +639,7 @@ class TodayTaskController extends ControllerMVC {
       taskModel.clock_in_status = ClockStatus.Early;
     }
 
+    debugPrint("userData ${conUser?.userModel?.toJson().toString()}");
     await _tasksService.updateTaskStatusByTaskId(taskModel.taskId, {
       ...taskModel.toJson(false),
       "site_th": conUser?.userModel?.siteTH,

@@ -29,6 +29,7 @@ class MyAccountController extends ControllerMVC {
       _this ??= MyAccountController._(state);
   MyAccountController._(StateMVC? state) : super(state);
   static MyAccountController? _this;
+  
   final AuthService _authService = FirebaseAuthService();
   UsersService usersService = UsersService();
 
@@ -59,15 +60,17 @@ class MyAccountController extends ControllerMVC {
     getConnectivity();
     userId = prefs.getString('userId');
     getUserDataByUserId();
+
   }
 
   Future<void> getUserDataByUserId() async {
+    userId = prefs.getString('userId');
     await usersService.getUserByUserId(userId).then((res) => {
           if (res != null)
             {
-              setState(() {
-                userModel = res;
-              }),
+              debugPrint("Userdata call ${res}"),
+              userModel = res,
+              setState(() {}),
               notifyListeners()
             }
         });
