@@ -1,10 +1,14 @@
 import 'dart:io';
+import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:asm_wt/app/tasks/task_manual/task_manual_view.dart';
 import 'package:asm_wt/util/showExitConfirmationDialog.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:flutter/rendering.dart';
 import 'package:get_it/get_it.dart';
+import 'package:ionicons/ionicons.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:upgrader/upgrader.dart';
 import 'package:asm_wt/app/app_service.dart';
@@ -33,7 +37,8 @@ class TasksRootView extends StatefulWidget {
   State<StatefulWidget> createState() => _TasksRootView();
 }
 
-class _TasksRootView extends StateMVC<TasksRootView> {
+class _TasksRootView extends StateMVC<TasksRootView>
+    with TickerProviderStateMixin {
   late TasksRootController con;
   SharedPreferences prefs = GetIt.instance<SharedPreferences>();
   ConnectivityResult? connectivityResult;
@@ -41,6 +46,13 @@ class _TasksRootView extends StateMVC<TasksRootView> {
   MyAccountController myAccountController = MyAccountController();
   // late final FirebaseMessaging _messaging;
   // PushNotification? _notificationInfo;
+
+  final autoSizeGroup = AutoSizeGroup();
+  late AnimationController _borderRadiusAnimationController;
+  late Animation<double> fabAnimation;
+  late Animation<double> borderRadiusAnimation;
+  late CurvedAnimation borderRadiusCurve;
+  late AnimationController _hideBottomBarAnimationController;
 
   _TasksRootView() : super(TasksRootController()) {
     con = controller as TasksRootController;
@@ -56,6 +68,29 @@ class _TasksRootView extends StateMVC<TasksRootView> {
         .snapshots();
 
     employeeIsActivatedStreamFunc();
+
+    _borderRadiusAnimationController = AnimationController(
+      duration: Duration(milliseconds: 500),
+      vsync: this,
+    );
+    borderRadiusCurve = CurvedAnimation(
+      parent: _borderRadiusAnimationController,
+      curve: Interval(0.5, 1.0, curve: Curves.fastOutSlowIn),
+    );
+
+    borderRadiusAnimation = Tween<double>(begin: 0, end: 1).animate(
+      borderRadiusCurve,
+    );
+
+    _hideBottomBarAnimationController = AnimationController(
+      duration: Duration(milliseconds: 200),
+      vsync: this,
+    );
+
+    Future.delayed(
+      Duration(seconds: 1),
+      () => _borderRadiusAnimationController.forward(),
+    );
   }
 
   Future<void> employeeIsActivatedStreamFunc() async {
@@ -86,17 +121,24 @@ class _TasksRootView extends StateMVC<TasksRootView> {
             showToastMessage(
                 context,
                 translate("authentication.unrecognise_device"),
-                Theme.of(context).colorScheme.onBackground);
+                Theme.of(context).colorScheme.onSurface);
             myAccountController.onSignOutPressed(context);
           }
         } else {
           debugPrint("signout 2");
           showToastMessage(context, translate("authentication.please_register"),
-              Theme.of(context).colorScheme.onBackground);
+              Theme.of(context).colorScheme.onSurface);
           myAccountController.onSignOutPressed(context);
         }
       }
     });
+  }
+
+  @override
+  dispose() {
+    _borderRadiusAnimationController.dispose();
+    _hideBottomBarAnimationController.dispose(); // you need this
+    super.dispose();
   }
 
   @override
@@ -137,137 +179,126 @@ class _TasksRootView extends StateMVC<TasksRootView> {
                 minAppVersion: con.appController.appVersion,
               ),
               child: Scaffold(
-                  appBar: AppBarWidget(
-                    color: theme.colorScheme.primary,
-                    isDiscard: false,
-                    type: StaticModelType.notification,
-                    title: widget.appService.navNum == 0
-                        ? translate('app_bar.today_task')
-                        : widget.appService.navNum == 1
-                            ? translate('app_bar.task_calendar')
-                            : widget.appService.navNum == 2
-                                ? translate('app_bar.task_manual')
-                                : widget.appService.navNum == 3
-                                    ? translate('app_bar.my_account')
-                                    : '',
-                    leadingBack: false,
-                    // leadingBack: widget.appService.navNum != 2 ? true : false,
+                appBar: AppBarWidget(
+                  color: theme.colorScheme.primary,
+                  isDiscard: false,
+                  type: StaticModelType.notification,
+                  title: widget.appService.navNum == 0
+                      ? translate('app_bar.today_task')
+                      : widget.appService.navNum == 1
+                          ? translate('app_bar.task_calendar')
+                          : widget.appService.navNum == 2
+                              ? translate('app_bar.task_manual')
+                              : widget.appService.navNum == 3
+                                  ? translate('app_bar.my_account')
+                                  : '',
+                  leadingBack: false,
+                  // leadingBack: widget.appService.navNum != 2 ? true : false,
 
-                    //  backIcon: widget.appService.navNum == 2
-                    // ? Icons.qr_code
-                    // : Icons.assignment_ind,
-                    // : null,
-                    icon: Icons.notifications_active,
-                    userId: con.userId,
-                    // iconTitle: translate('button.help'),
-                    iconTitle: '',
-                    onRightPressed: () => {
-                      context.pushNamed(RouteNames.notification,
-                          pathParameters: {'userId': con.userId!}),
-                    },
-                    // onQrScanPress: () => context.goNamed(RouteNames.manageTask),
+                  //  backIcon: widget.appService.navNum == 2
+                  // ? Icons.qr_code
+                  // : Icons.assignment_ind,
+                  // : null,
+                  icon: Icons.notifications_active,
+                  userId: con.userId,
+                  // iconTitle: translate('button.help'),
+                  iconTitle: '',
+                  onRightPressed: () => {
+                    context.pushNamed(RouteNames.notification,
+                        pathParameters: {'userId': con.userId!}),
+                  },
+                  // onQrScanPress: () => context.goNamed(RouteNames.manageTask),
 
-                    // con.onSignOutPressed(context),
-                    // context.pushNamed(RouteNames.qrCodeScan,
-                    //     params: {'id': con.userId!})
-                  ),
-                  body: pages[widget.appService.navNum],
-                  bottomNavigationBar: Container(
-                    clipBehavior: Clip
-                        .hardEdge, //or better look(and cost) using Clip.antiAlias,
-                    decoration: BoxDecoration(
-                        borderRadius: const BorderRadius.only(
-                          topRight: Radius.circular(20),
-                          topLeft: Radius.circular(20),
+                  // con.onSignOutPressed(context),
+                  // context.pushNamed(RouteNames.qrCodeScan,
+                  //     params: {'id': con.userId!})
+                ),
+                body: pages[widget.appService.navNum],
+                bottomNavigationBar: AnimatedBottomNavigationBar.builder(
+                  itemCount: iconList.length,
+                  tabBuilder: (int index, bool isActive) {
+                    final color = isActive ? Colors.yellow : Colors.white;
+                    return Column(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          iconList[index],
+                          size: 28,
+                          color: color,
                         ),
-                        border: Border.all(
-                            color: theme.colorScheme.tertiary, width: 2)),
-                    child: NavigationBarTheme(
-                        data: NavigationBarThemeData(
-                          labelTextStyle: MaterialStatePropertyAll(
-                            TextStyle(
-                              fontSize: 14,
-                              fontFamily: "Kanit",
-                              color: theme.colorScheme.primary,
-                            ),
-                          ),
-                          indicatorColor: theme.colorScheme.onSecondary,
-                        ),
-                        child: NavigationBar(
-                          height: 60,
-                          backgroundColor: Colors.white,
-                          labelBehavior: NavigationDestinationLabelBehavior
-                              .onlyShowSelected,
-                          animationDuration: const Duration(seconds: 1),
-                          destinations: [
-                            NavigationDestination(
-                              icon: Icon(
-                                Icons.fact_check,
-                                color: theme.colorScheme.onTertiary,
-                              ),
-                              label: translate('app_bar.today_task'),
-                              selectedIcon: Icon(
-                                Icons.fact_check,
-                                color: theme.colorScheme.primary,
-                              ),
-                            ),
-                            NavigationDestination(
-                              icon: Icon(
-                                Icons.calendar_month,
-                                color: theme.colorScheme.onTertiary,
-                              ),
-                              label: translate('app_bar.task_calendar'),
-                              selectedIcon: Icon(
-                                Icons.calendar_month,
-                                color: theme.colorScheme.primary,
-                              ),
-                            ),
-                            NavigationDestination(
-                              icon: Icon(
-                                Icons.lock_clock,
-                                color: theme.colorScheme.onTertiary,
-                              ),
-                              label: translate('app_bar.task_manual'),
-                              selectedIcon: Icon(
-                                Icons.lock_clock,
-                                color: theme.colorScheme.primary,
-                              ),
-                            ),
-                            // NavigationDestination(
-                            //   icon: Icon(
-                            //     Icons.place,
-                            //     color: theme.colorScheme.onTertiary,
-                            //   ),
-                            //   label: translate('app_bar.live_map'),
-                            //   selectedIcon: Icon(
-                            //     Icons.place,
-                            //     color: theme.colorScheme.primary,
-                            //   ),
-                            // ),
-                            NavigationDestination(
-                              icon: Icon(
-                                Icons.person_4,
-                                color: theme.colorScheme.onTertiary,
-                              ),
-                              label: translate('app_bar.my_account'),
-                              selectedIcon: Icon(
-                                Icons.person_4,
-                                color: theme.colorScheme.primary,
-                              ),
-                            )
-                          ],
-                          onDestinationSelected: (int index) {
-                            setState(() {
-                              widget.appService.navNum = index;
-                            });
-                          },
-                          selectedIndex: widget.appService.navNum,
-                        )),
-                  )
-                  // ),
+                        // const SizedBox(height: 4),
+                        index == widget.appService.navNum
+                            ? Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 8),
+                                child: AutoSizeText(
+                                  iconName[index],
+                                  maxLines: 1,
+                                  style: TextStyle(
+                                    color: color,
+                                    fontFamily: "Kanit Light",
+                                  ),
+                                  group: autoSizeGroup,
+                                ),
+                              )
+                            : Container()
+                      ],
+                    );
+                  },
+                  backgroundColor: theme.colorScheme.primary,
+                  activeIndex: widget.appService.navNum,
+                  splashColor: Colors.yellow,
+                  // notchAndCornersAnimation: borderRadiusAnimation,
+                  splashSpeedInMilliseconds: 300,
+                  notchSmoothness: NotchSmoothness.defaultEdge,
+                  gapLocation: GapLocation.none,
+                  leftCornerRadius: 32,
+                  rightCornerRadius: 32,
+                  onTap: (index) =>
+                      setState(() => widget.appService.navNum = index),
+                  hideAnimationController: _hideBottomBarAnimationController,
+                  shadow: BoxShadow(
+                    offset: Offset(0, 1),
+                    blurRadius: 12,
+                    spreadRadius: 0.5,
+                    color: Colors.blueAccent,
                   ),
+                ),
+              ),
             )
           : Container(),
     );
+  }
+
+  final iconList = <IconData>[
+    Ionicons.today_outline,
+    Ionicons.calendar_outline,
+    Ionicons.time_outline,
+    Ionicons.person_outline,
+  ];
+
+  final iconName = [
+    translate("app_bar.today_task"),
+    translate("app_bar.my_task"),
+    translate("app_bar.task_manual"),
+    translate("app_bar.my_account"),
+  ];
+
+  bool onScrollNotification(ScrollNotification notification) {
+    if (notification is UserScrollNotification &&
+        notification.metrics.axis == Axis.vertical) {
+      switch (notification.direction) {
+        case ScrollDirection.forward:
+          _hideBottomBarAnimationController.reverse();
+          break;
+        case ScrollDirection.reverse:
+          _hideBottomBarAnimationController.forward();
+          break;
+        case ScrollDirection.idle:
+          break;
+      }
+    }
+    return false;
   }
 }

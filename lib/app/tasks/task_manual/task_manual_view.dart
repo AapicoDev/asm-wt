@@ -2,6 +2,7 @@
 
 import 'dart:ffi' as ui;
 
+import 'package:animate_gradient/animate_gradient.dart';
 import 'package:asm_wt/app/my_account/my_account_controller.dart';
 import 'package:asm_wt/app/tasks/task_manual/bottomsheet_view_clocking.dart';
 import 'package:asm_wt/app/tasks/task_manual/bottomsheet_with_map.dart';
@@ -27,7 +28,8 @@ class TaskManualView extends StatefulWidget {
   _TaskManualViewState createState() => _TaskManualViewState();
 }
 
-class _TaskManualViewState extends StateMVC<TaskManualView> {
+class _TaskManualViewState extends StateMVC<TaskManualView>
+    with TickerProviderStateMixin {
   MyAccountController? con;
   _TaskManualViewState() : super(MyAccountController()) {
     con = controller as MyAccountController;
@@ -233,35 +235,41 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
           return SingleChildScrollView(
             child: Stack(
               children: [
-                // Background image with 30% height
                 Container(
-                  margin: EdgeInsets.all(15),
-                  height: MediaQuery.of(context).size.height *
-                      0.3, // Set height to 30%
-                  width: MediaQuery.of(context).size.width,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(20)),
-                    image: DecorationImage(
-                      image: AssetImage(
-                        'lib/assets/images/bg.png',
-                      ), // Replace with your image URL
-                      fit: BoxFit.cover, // Adjust the image to cover the area
-                    ),
-                    color: Colors.blue,
-                  ),
-                ),
-                Container(
-                  width: MediaQuery.of(context).size.width,
                   child: SafeArea(
                     child: Padding(
                       padding: EdgeInsets.all(16.0),
                       child: Column(
                         children: [
-                          SizedBox(height: 25),
-                          _buildClockDisplay(), // Use data from Appwrite
-                          SizedBox(height: 5),
-                          _buildClockButtons(context),
-                          SizedBox(height: 15),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: AnimateGradient(
+                              primaryBegin: Alignment.topLeft,
+                              primaryEnd: Alignment.bottomLeft,
+                              secondaryBegin: Alignment.bottomLeft,
+                              secondaryEnd: Alignment.topRight,
+                              primaryColors: const [
+                                Colors.green,
+                                Colors.greenAccent,
+                                Colors.white,
+                              ],
+                              secondaryColors: const [
+                                Colors.white,
+                                Colors.blueAccent,
+                                Colors.blue,
+                              ],
+                              child: Column(
+                                children: [
+                                  SizedBox(height: 25),
+                                  _buildClockDisplay(), // Use data from Appwrite
+                                  SizedBox(height: 5),
+                                  _buildClockButtons(context),
+                                  SizedBox(height: 15),
+                                ],
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 8),
                           _buildTodayEntry(),
                           SizedBox(height: 5),
                           _buildAttendanceHistory(),
@@ -538,7 +546,10 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
                   child: Icon(
                     Icons.visibility,
                     color: Colors.green,
-                  ))
+                  )),
+              SizedBox(
+                width: 20,
+              )
             ],
           ),
           Divider(
@@ -556,79 +567,79 @@ class _TaskManualViewState extends StateMVC<TaskManualView> {
     final taskData = taskProvider.taskData?.documents ?? [];
 
     return Container(
-      // constraints: BoxConstraints(
-      //   maxHeight: MediaQuery.of(context).size.height * 0.45,
-      // ),
       decoration: BoxDecoration(
         color: Colors.grey[200],
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(12),
       ),
-      child: Column(
-        children: [
-          ListTile(
-            title: Text(
-              translate("manual_clocking.attendance_history"),
-              style: TextStyle(fontFamily: "Kanit", fontSize: 15),
-            ),
-            trailing: IconButton(
-              icon: Icon(
-                _isHistoryVisible
-                    ? Icons.keyboard_arrow_up
-                    : Icons.keyboard_arrow_down,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: Column(
+          children: [
+            ListTile(
+              title: Text(
+                translate("manual_clocking.attendance_history"),
+                style: TextStyle(fontFamily: "Kanit", fontSize: 15),
               ),
-              onPressed: () {
-                setState(() {
-                  _isHistoryVisible = !_isHistoryVisible;
-                });
-              },
+              trailing: IconButton(
+                icon: Icon(
+                  _isHistoryVisible
+                      ? Icons.keyboard_arrow_up
+                      : Icons.keyboard_arrow_down,
+                ),
+                onPressed: () {
+                  setState(() {
+                    _isHistoryVisible = !_isHistoryVisible;
+                  });
+                },
+              ),
             ),
-          ),
-          if (_isHistoryVisible)
-            Container(
-              height: MediaQuery.of(context).size.height * 0.30,
-              child: taskData.isEmpty
-                  ? Center(
-                      child: Text(
-                          'No attendance history available.')) // Handle empty data
-                  : ListView.builder(
-                      shrinkWrap:
-                          true, // List view takes only the required space
-                      itemCount: taskData.length, // Number of history records
-                      itemBuilder: (context, index) {
-                        final task = taskData[index];
-                        final clockInTime = task.data['clock_in'];
-                        final clockOutTime = task.data['clock_out'];
-                        // Safely convert the lists from dynamic to double
-                        List<double> clockInLocation = List<double>.from(
-                            (task.data["clock_in_location"] as List).map(
-                                (item) => item is double
-                                    ? item
-                                    : (item as num).toDouble()));
+            if (_isHistoryVisible)
+              Container(
+                height: MediaQuery.of(context).size.height * 0.30,
+                child: taskData.isEmpty
+                    ? Center(
+                        child: Text(
+                            'No attendance history available.')) // Handle empty data
+                    : ListView.builder(
+                        shrinkWrap:
+                            true, // List view takes only the required space
+                        itemCount: taskData.length, // Number of history records
+                        itemBuilder: (context, index) {
+                          final task = taskData[index];
+                          final clockInTime = task.data['clock_in'];
+                          final clockOutTime = task.data['clock_out'];
+                          // Safely convert the lists from dynamic to double
+                          List<double> clockInLocation = List<double>.from(
+                              (task.data["clock_in_location"] as List).map(
+                                  (item) => item is double
+                                      ? item
+                                      : (item as num).toDouble()));
 
-                        List<double> clockOutLocation = List<double>.from(
-                            (task.data["clock_out_location"] as List).map(
-                                (item) => item is double
-                                    ? item
-                                    : (item as num).toDouble()));
-                        final List<String> clockInImages = List<String>.from(
-                            (task.data["clock_in_image"] as List)
-                                .map((item) => item.toString()));
-                        final List<String> clockOutImages = List<String>.from(
-                            (task.data["clock_out_image"] as List)
-                                .map((item) => item.toString()));
-                        return _buildHistoryEntry(
-                          formatDate(task.data['clock_in']),
-                          formatTime(clockInTime),
-                          formatTime(clockOutTime),
-                          clockInLocation,
-                          clockOutLocation,
-                          clockInImages,
-                          clockOutImages,
-                        );
-                      },
-                    ),
-            ),
-        ],
+                          List<double> clockOutLocation = List<double>.from(
+                              (task.data["clock_out_location"] as List).map(
+                                  (item) => item is double
+                                      ? item
+                                      : (item as num).toDouble()));
+                          final List<String> clockInImages = List<String>.from(
+                              (task.data["clock_in_image"] as List)
+                                  .map((item) => item.toString()));
+                          final List<String> clockOutImages = List<String>.from(
+                              (task.data["clock_out_image"] as List)
+                                  .map((item) => item.toString()));
+                          return _buildHistoryEntry(
+                            formatDate(task.data['clock_in']),
+                            formatTime(clockInTime),
+                            formatTime(clockOutTime),
+                            clockInLocation,
+                            clockOutLocation,
+                            clockInImages,
+                            clockOutImages,
+                          );
+                        },
+                      ),
+              ),
+          ],
+        ),
       ),
     );
   }
