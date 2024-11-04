@@ -96,7 +96,7 @@ class TodayTaskController extends ControllerMVC {
 
   Future<void> loadSettingDb() async {
     await settingsService
-        .getSettingsDataByorgId(prefs.getString('organizationId') ?? '')
+        .getSettingsDataByOrgId(prefs.getString('organizationId') ?? '')
         .then((res) => setState(
               () {
                 settingsModel = res;

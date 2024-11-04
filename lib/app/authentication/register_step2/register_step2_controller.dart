@@ -288,7 +288,7 @@ class RegisterStep2Controller extends ControllerMVC {
               if (res.status == 'S')
                 {
                   await allDevicesService.incrementDeviceValueByOrganizationID(
-                      employeeModel?.organization_id),
+                      employeeModel!.organization_id!),
                   await prefs.setString('userId', employeeModel?.staffId ?? ''),
                   await prefs.setString(
                       'organizationId', employeeModel?.organization_id ?? ''),

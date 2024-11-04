@@ -205,7 +205,7 @@ class MyAccountController extends ControllerMVC {
       if (userProfileFile != null) {
         // File imageFile = File(pickedFile.path);
         await usersService
-            .updateUserProfilPhotoByUserID(
+            .updateUserProfilePhotoByUserID(
                 userId, userProfileFile, previousImageName)
             .then((res) async => {
                   if (res.status == "S")
