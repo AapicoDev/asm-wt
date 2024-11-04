@@ -113,6 +113,7 @@ class _TasksRootView extends StateMVC<TasksRootView>
           androidInfo = await deviceInfo.androidInfo;
         }
 
+        // if POS version need to release this
         if (employee.isActivated ?? true) {
           if ((employee.deviceID != (androidInfo?.id ?? identifier)) &&
               employee.phoneNumber != '+66646666666' &&

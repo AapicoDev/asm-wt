@@ -106,7 +106,7 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
                 type == StaticModelType.notification
                     ? StreamBuilder<QuerySnapshot>(
                         stream: _notificationService
-                            .getUnseenItemsSnapshotByDriverId(userId),
+                            .getUnseenItemsSnapshotByDriverId(userId!),
                         builder: (BuildContext context,
                             AsyncSnapshot<QuerySnapshot> snapshot) {
                           if (!snapshot.hasData ||

@@ -5,10 +5,7 @@ import 'package:asm_wt/models/task_status_report_model.dart';
 import 'package:asm_wt/service/base_service.dart';
 
 class TaskStatusReportService {
-  final FirestoreService _firestoreService =
-      FirestoreServiceImpl(); // final AuthService _authService = FirebaseAuthService();
-  // final CollectionReference _newFeedsRef =
-  //     FirebaseFirestore.instance.collection(TableName.dbTaskStatusReportTable);
+  final FirestoreService _firestoreService = FirestoreServiceImpl();
 
   DateTime dateNow = DateTime.now();
   TaskStatusReportModel taskStatusReportModel = TaskStatusReportModel();
@@ -45,42 +42,79 @@ class TaskStatusReportService {
   }
 
   Future<BaseService> increaseCompletedTaskByDocID(String? docID) async {
+    if (docID == null || docID.isEmpty) {
+      return BaseService('F', 'Invalid document ID', null);
+    }
+
     var monthNow = getMonthAbbreviation(dateNow.month);
     var obj = {
       '$monthNow.${TaskStatusReport.Completed}': FieldValue.increment(1)
     };
 
-    return await _firestoreService
-        .updateData("${TableName.dbTaskStatusReportTable}/$docID", obj)
-        .then((value) => BaseService('S', 'Success', null));
+    try {
+      await _firestoreService.updateData(
+          "${TableName.dbTaskStatusReportTable}/$docID", obj);
+      return BaseService('S', 'Success', null);
+    } catch (e) {
+      print('Error increasing completed task by doc ID: $e');
+      return BaseService('F', 'Failed to increase completed task', null);
+    }
   }
 
   Future<BaseService> increaseEarlyFinishTaskByDocID(String? docID) async {
+    if (docID == null || docID.isEmpty) {
+      return BaseService('F', 'Invalid document ID', null);
+    }
+
     var monthNow = getMonthAbbreviation(dateNow.month);
     var obj = {
       '$monthNow.${TaskStatusReport.Early_Finish}': FieldValue.increment(1)
     };
 
-    return await _firestoreService
-        .updateData("${TableName.dbTaskStatusReportTable}/$docID", obj)
-        .then((value) => BaseService('S', 'Success', null));
+    try {
+      await _firestoreService.updateData(
+          "${TableName.dbTaskStatusReportTable}/$docID", obj);
+      return BaseService('S', 'Success', null);
+    } catch (e) {
+      print('Error increasing early finish task by doc ID: $e');
+      return BaseService('F', 'Failed to increase early finish task', null);
+    }
   }
 
   Future<BaseService> increaseLateStartTaskByDocID(String? docID) async {
+    if (docID == null || docID.isEmpty) {
+      return BaseService('F', 'Invalid document ID', null);
+    }
+
     var monthNow = getMonthAbbreviation(dateNow.month);
     var obj = {
       '$monthNow.${TaskStatusReport.Late_Start}': FieldValue.increment(1)
     };
 
-    return await _firestoreService
-        .updateData("${TableName.dbTaskStatusReportTable}/$docID", obj)
-        .then((value) => BaseService('S', 'Success', null));
+    try {
+      await _firestoreService.updateData(
+          "${TableName.dbTaskStatusReportTable}/$docID", obj);
+      return BaseService('S', 'Success', null);
+    } catch (e) {
+      print('Error increasing late start task by doc ID: $e');
+      return BaseService('F', 'Failed to increase late start task', null);
+    }
   }
 
-  Future<TaskStatusReportModel> getTaskStatusReportModelByDocID(
+  Future<TaskStatusReportModel?> getTaskStatusReportModelByDocID(
       String? docId) async {
-    DocumentSnapshot doc = await _firestoreService.getDocumentById(
-        TableName.dbTaskStatusReportTable, docId!);
-    return TaskStatusReportModel.fromDocumentSnapshot(doc);
+    if (docId == null || docId.isEmpty) {
+      print('Invalid document ID');
+      return null;
+    }
+
+    try {
+      DocumentSnapshot doc = await _firestoreService.getDocumentById(
+          TableName.dbTaskStatusReportTable, docId);
+      return TaskStatusReportModel.fromDocumentSnapshot(doc);
+    } catch (e) {
+      print('Error fetching task status report by doc ID: $e');
+      return null;
+    }
   }
 }

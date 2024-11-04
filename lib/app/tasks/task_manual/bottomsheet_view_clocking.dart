@@ -117,7 +117,7 @@ class _ConfirmationSheetViewClockingState
           Text('Clocking data'),
           const SizedBox(height: 20),
           Container(
-            height: 200, // Map height
+            height: 165, // Map height
             child: MapLibreMap(
               styleString:
                   "https://maps.powermap.live/api/v2/map/vtile/styles?name=thailand_th&access_token=b378c575291af30a29f59919fd7e7e4c012d45c4", // MapLibre style URL

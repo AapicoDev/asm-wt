@@ -9,144 +9,182 @@ import 'package:asm_wt/util/custom_func.dart';
 class TasksService {
   final FirestoreService _firestoreService = FirestoreServiceImpl();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
   final CollectionReference _taskRef =
       FirebaseFirestore.instance.collection(TableName.dbTasksTable);
-  // final AuthService _authService = FirebaseAuthService();
 
   Future<TaskModel?> getTaskByTaskId(String taskId) async {
-    final DocumentSnapshot snapshot =
-        await _firestoreService.getDocumentById(TableName.dbTasksTable, taskId);
-
-    if (snapshot.exists) {
-      return TaskModel.fromDocumentSnapshot(snapshot);
-    } else {
-      print('Document does not exist');
+    try {
+      final DocumentSnapshot snapshot = await _firestoreService.getDocumentById(
+          TableName.dbTasksTable, taskId);
+      if (snapshot.exists) {
+        return TaskModel.fromDocumentSnapshot(snapshot);
+      } else {
+        print('Document does not exist');
+        return null;
+      }
+    } catch (e) {
+      print('Error fetching task by task ID: $e');
       return null;
     }
   }
 
   Future<List<TaskModel>?> getCheckedTasksByDriverId(String? driverId) async {
-    //return all tasks if collect`ion match with userID;
-    List<DocumentSnapshot>? documentSnapshots = await _firestoreService
-        .getDocumentsByDriverId(TableName.dbTasksTable, driverId);
+    if (driverId == null || driverId.isEmpty) return null;
 
-    //map the result to the Task Model;
-    if (documentSnapshots?.isNotEmpty ?? false) {
-      final List<TaskModel> taskListMap = documentSnapshots!
-          .map((documentSnapshot) =>
-              TaskModel.fromDocumentSnapshot(documentSnapshot))
-          .toList();
-      return taskListMap;
+    try {
+      List<DocumentSnapshot>? documentSnapshots = await _firestoreService
+          .getDocumentsByDriverId(TableName.dbTasksTable, driverId);
+      if (documentSnapshots?.isNotEmpty ?? false) {
+        return documentSnapshots!
+            .map((snapshot) => TaskModel.fromDocumentSnapshot(snapshot))
+            .toList();
+      }
+      return null;
+    } catch (e) {
+      print('Error fetching checked tasks by driver ID: $e');
+      return null;
     }
-
-    return null;
   }
 
   Future<List<TaskModel>?> getRecentTasksByEmployeeRefID(
       String? employeeRefId) async {
-    List<TaskModel> taskModelList = [];
+    if (employeeRefId == null || employeeRefId.isEmpty) return [];
 
-    List<DocumentSnapshot>? documentSnapshots =
-        await _firestoreService.getRecentDocumentByOneIdInside(
-            TableName.dbTasksTable,
-            "employeeRef",
-            _firestore.doc("${TableName.dbEmployeeTable}/$employeeRefId"));
+    try {
+      List<DocumentSnapshot>? documentSnapshots =
+          await _firestoreService.getRecentDocumentByOneIdInside(
+              TableName.dbTasksTable,
+              "employeeRef",
+              _firestore.doc("${TableName.dbEmployeeTable}/$employeeRefId"));
 
-    if (documentSnapshots?.isNotEmpty ?? false) {
-      for (var task in documentSnapshots!) {
-        taskModelList.add(TaskModel.fromDocumentSnapshot(task));
+      if (documentSnapshots?.isNotEmpty ?? false) {
+        return documentSnapshots!
+            .map((task) => TaskModel.fromDocumentSnapshot(task))
+            .toList();
       }
-
-      return taskModelList;
+      return [];
+    } catch (e) {
+      print('Error fetching recent tasks by employeeRefId: $e');
+      return [];
     }
-
-    return taskModelList;
   }
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> getRecentTasksSnapshotByDriverId(
-      String? driverId) {
-    return FirebaseFirestore.instance
-        .collection(TableName.dbTasksTable)
-        .where('driver_id', isEqualTo: driverId)
-        .where('is_checked_in', isEqualTo: false)
-        .where('driver_start_at', isNull: true)
-        .orderBy('start_at')
-        .snapshots();
+  Future<Stream<QuerySnapshot<Map<String, dynamic>>>>
+      getRecentTasksSnapshotByDriverId(String? driverId) async {
+    try {
+      if (driverId == null || driverId.isEmpty) return Stream.empty();
+
+      return _firestore
+          .collection(TableName.dbTasksTable)
+          .where('driver_id', isEqualTo: driverId)
+          .where('is_checked_in', isEqualTo: false)
+          .where('driver_start_at', isNull: true)
+          .orderBy('start_at')
+          .snapshots();
+    } catch (e) {
+      print('Error fetching recent tasks snapshot by driver ID: $e');
+      return Stream.error('Error fetching recent tasks snapshot');
+    }
   }
 
-  // Stream<QuerySnapshot<Map<String, dynamic>>> getTasksSnapshotByUserId(
-  //     String? userId) {
-  //   return FirebaseFirestore.instance
-  //       .collection(TableName.dbTasksTable)
-  //       .where('employee_id', isEqualTo: userId)
-  //       .orderBy('start_time')
-  //       .snapshots();
-  // }
+  Future<Stream<QuerySnapshot<Map<String, dynamic>>>> getTasksSnapshotByUserId(
+      String? userId) async {
+    try {
+      if (userId == null || userId.isEmpty) return Stream.empty();
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> getTasksSnapshotByUserId(
-      String? userId) {
-    // Calculate the timestamps for 20 days ago and 10 days from now
-    DateTime startDate = DateTime.now().subtract(Duration(days: 15));
-    DateTime endDate = DateTime.now().add(Duration(days: 5));
+      DateTime startDate = DateTime.now().subtract(Duration(days: 15));
+      DateTime endDate = DateTime.now().add(Duration(days: 5));
 
-    return FirebaseFirestore.instance
-        .collection(TableName.dbTasksTable)
-        .where('employee_id', isEqualTo: userId)
-        .where('status',
-            isNotEqualTo: TaskStatus.Delete) // Exclude deleted tasks
-        .where('start_time',
-            isGreaterThanOrEqualTo: startDate) // From 20 days ago
-        .where('start_time',
-            isLessThanOrEqualTo: endDate) // Up to 10 days from now
-        .orderBy('start_time')
-        .snapshots();
-  }
-  Stream<QuerySnapshot<Map<String, dynamic>>> getTodayTaskSnapshotByDriverId(
-      String? driverId) {
-    DateTime now = DateTime.now();
-    DateTime dateNow = DateTime(now.year, now.month, now.day - 1);
-    DateTime tomorrow = DateTime(now.year, now.month, now.day + 1);
-    // final Timestamp nowTimeStamp = Timestamp.fromDate(dateNow);
-
-    return FirebaseFirestore.instance
-        .collection(TableName.dbTasksTable)
-        .where('employee_id', isEqualTo: driverId)
-        .where('is_disabled', isEqualTo: false)
-        .where(Filter.or(Filter("status", isEqualTo: TaskStatus.Start),
-            Filter("status", isEqualTo: TaskStatus.Confirm)))
-        .where('start_time', isGreaterThan: dateNow, isLessThan: tomorrow)
-        .orderBy('start_time')
-        .snapshots();
+      return _firestore
+          .collection(TableName.dbTasksTable)
+          .where('employee_id', isEqualTo: userId)
+          .where('status', isNotEqualTo: TaskStatus.Delete)
+          .where('start_time', isGreaterThanOrEqualTo: startDate)
+          .where('start_time', isLessThanOrEqualTo: endDate)
+          .orderBy('start_time')
+          .snapshots();
+    } catch (e) {
+      print('Error fetching tasks snapshot by user ID: $e');
+      return Stream.error('Error fetching tasks snapshot');
+    }
   }
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> getStartTasksSnapshotByDriverId(
-      String? driverId) {
-    return FirebaseFirestore.instance
-        .collection(TableName.dbTasksTable)
-        .where('driver_id', isEqualTo: driverId)
-        .where('is_checked_in', isEqualTo: false)
-        .where('driver_start_at', isNull: false)
-        .snapshots();
+  Future<Stream<QuerySnapshot<Map<String, dynamic>>>>
+      getTodayTaskSnapshotByDriverId(String? driverId) async {
+    try {
+      if (driverId == null || driverId.isEmpty) return Stream.empty();
+
+      DateTime now = DateTime.now();
+      DateTime dateNow = DateTime(now.year, now.month, now.day - 1);
+      DateTime tomorrow = DateTime(now.year, now.month, now.day + 1);
+
+      return _firestore
+          .collection(TableName.dbTasksTable)
+          .where('employee_id', isEqualTo: driverId)
+          .where('is_disabled', isEqualTo: false)
+          .where(Filter.or(Filter("status", isEqualTo: TaskStatus.Start),
+              Filter("status", isEqualTo: TaskStatus.Confirm)))
+          .where('start_time', isGreaterThan: dateNow, isLessThan: tomorrow)
+          .orderBy('start_time')
+          .snapshots();
+    } catch (e) {
+      print('Error fetching today task snapshot by driver ID: $e');
+      return Stream.error('Error fetching today task snapshot');
+    }
+  }
+
+  Future<Stream<QuerySnapshot<Map<String, dynamic>>>>
+      getStartTasksSnapshotByDriverId(String? driverId) async {
+    try {
+      if (driverId == null || driverId.isEmpty) return Stream.empty();
+
+      return _firestore
+          .collection(TableName.dbTasksTable)
+          .where('driver_id', isEqualTo: driverId)
+          .where('is_checked_in', isEqualTo: false)
+          .where('driver_start_at', isNull: false)
+          .snapshots();
+    } catch (e) {
+      print('Error fetching start tasks snapshot by driver ID: $e');
+      return Stream.error('Error fetching start tasks snapshot');
+    }
   }
 
   Future<BaseService> updateTaskStatusByTaskId(
       String? taskId, Map<String, dynamic> data) async {
-    return await _firestoreService
-        .updateData("${TableName.dbTasksTable}/$taskId", data)
-        .then((value) => BaseService('S', 'Success', data));
+    if (taskId == null || taskId.isEmpty)
+      return BaseService('F', 'Invalid task ID', null);
+
+    try {
+      await _firestoreService.updateData(
+          "${TableName.dbTasksTable}/$taskId", data);
+      return BaseService('S', 'Success', data);
+    } catch (e) {
+      print('Error updating task status by task ID: $e');
+      return BaseService('F', 'Failed to update task status', null);
+    }
   }
 
   Future<BaseService> createUserTaskNote(Map<String, dynamic> data) async {
-    return await _taskRef
-        .add(data)
-        .then((value) => BaseService('S', 'Success', value.id));
+    try {
+      DocumentReference docRef = await _taskRef.add(data);
+      return BaseService('S', 'Success', docRef.id);
+    } catch (e) {
+      print('Error creating user task note: $e');
+      return BaseService('F', 'Failed to create user task note', null);
+    }
   }
 
   Future<BaseService> deleteTaskNotedById(String taskId) async {
-    return await _firestoreService
-        .deleteData("${TableName.dbTasksTable}/$taskId")
-        .then(
-            (value) => BaseService('S', translate("message.successful"), null));
+    if (taskId == null || taskId.isEmpty)
+      return BaseService('F', 'Invalid task ID', null);
+
+    try {
+      await _firestoreService.deleteData("${TableName.dbTasksTable}/$taskId");
+      return BaseService('S', translate("message.successful"), null);
+    } catch (e) {
+      print('Error deleting task note by ID: $e');
+      return BaseService('F', 'Failed to delete task note', null);
+    }
   }
 }

@@ -129,28 +129,35 @@ class LoginController extends ControllerMVC {
                       {
                         if (res.isActivated == true)
                           {
-                            // if (res.deviceID ==
-                            //         (Platform.isIOS
-                            //             ? identifier
-                            //             : androidInfo?.id) ||
-                            //     res.deviceID == null)
-                            //   {
+                            // if POS version just release this condition
+                            if (res.deviceID ==
+                                    (Platform.isIOS
+                                        ? identifier
+                                        : androidInfo?.id) ||
+                                res.deviceID == null ||
+                                phoneNumber.text == '+66646666666' ||
+                                phoneNumber.text == '+66647777777')
+                              {
                             employeeModel.username = res.username,
                             employeeModel.organization_id = res.organization_id,
                             employeeModel.staffId = res.staffId,
                             employeeModel.phoneNumber = res.phoneNumber,
                             await _registerStep2Controller.verifyPhone(
-                                context, employeeModel, 'login', false)
-                            //   }
-                            // else
-                            //   {
-                            //     LoadingOverlay.of(context).hide(),
-                            //     showToastMessage(
-                            //         context,
-                            //         translate(
-                            //             "authentication.unrecognise_device"),
-                            //         Theme.of(context).colorScheme.onBackground),
-                            //   }
+                                  context,
+                                  employeeModel,
+                                  'login',
+                                  false,
+                                )
+                              }
+                            else
+                              {
+                                LoadingOverlay.of(context).hide(),
+                                showToastMessage(
+                                    context,
+                                    translate(
+                                        "authentication.unrecognise_device"),
+                                    Theme.of(context).colorScheme.onSurface),
+                              }
                           }
                         else
                           {
@@ -158,7 +165,7 @@ class LoginController extends ControllerMVC {
                             showToastMessage(
                                 context,
                                 "Please Reactivated Your Account.",
-                                Theme.of(context).colorScheme.onBackground),
+                                Theme.of(context).colorScheme.onSurface),
                           }
                       }
                     else

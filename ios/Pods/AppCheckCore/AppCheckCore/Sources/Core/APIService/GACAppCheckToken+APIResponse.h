@@ -17,7 +17,7 @@
 #import "AppCheckCore/Sources/Public/AppCheckCore/GACAppCheckToken.h"
 
 @class FBLPromise<Result>;
-@class GULURLSessionDataResponse;
+@class GACURLSessionDataResponse;
 
 NS_ASSUME_NONNULL_BEGIN
 
