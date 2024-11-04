@@ -8,32 +8,47 @@ class NotificationService {
   final CollectionReference _notificationRef =
       FirebaseFirestore.instance.collection(TableName.dbNotificationsTable);
 
-  Stream<QuerySnapshot<Object?>> getNotificationSnapshotByDriverId(
-      String driverId) {
-    return _notificationRef
-        .where('to_id', isEqualTo: driverId)
-        .orderBy('created_date', descending: true)
-        .snapshots();
+  Future<Stream<QuerySnapshot<Object?>>> getNotificationSnapshotByDriverId(
+      String driverId) async {
+    try {
+      return _notificationRef
+          .where('to_id', isEqualTo: driverId)
+          .orderBy('created_date', descending: true)
+          .snapshots();
+    } catch (e) {
+      print('Error fetching notifications: $e');
+      return Stream.error('Error fetching notifications');
+    }
   }
 
-  Stream<QuerySnapshot<Object?>> getUnseenItemsSnapshotByDriverId(
-      String driverId) {
-    return _notificationRef
-        .where('to_id', isEqualTo: driverId)
-        .where('view', isEqualTo: false)
-        .orderBy('created_date')
-        .snapshots();
+  Future<Stream<QuerySnapshot<Object?>>> getUnseenItemsSnapshotByDriverId(
+      String driverId) async {
+    try {
+      return _notificationRef
+          .where('to_id', isEqualTo: driverId)
+          .where('view', isEqualTo: false)
+          .orderBy('created_date')
+          .snapshots();
+    } catch (e) {
+      print('Error fetching unseen items: $e');
+      return Stream.error('Error fetching unseen items');
+    }
   }
 
-  Stream<QuerySnapshot<Object?>> getNotificationMaintenanceByDriverId(
-      String driverId) {
-    return _notificationRef
-        .where('to_id', isEqualTo: driverId)
-        .where('noti_code', isEqualTo: 'maintenance')
-        .where('status', isEqualTo: 'approved')
-        .where('view', isEqualTo: false)
-        .orderBy('created_date')
-        .snapshots();
+  Future<Stream<QuerySnapshot<Object?>>> getNotificationMaintenanceByDriverId(
+      String driverId) async {
+    try {
+      return _notificationRef
+          .where('to_id', isEqualTo: driverId)
+          .where('noti_code', isEqualTo: 'maintenance')
+          .where('status', isEqualTo: 'approved')
+          .where('view', isEqualTo: false)
+          .orderBy('created_date')
+          .snapshots();
+    } catch (e) {
+      print('Error fetching maintenance notifications: $e');
+      return Stream.error('Error fetching maintenance notifications');
+    }
   }
 
   Future<BaseService> updateNotificationById(

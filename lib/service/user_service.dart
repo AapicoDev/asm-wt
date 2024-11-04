@@ -18,68 +18,98 @@ class UsersService {
   Future<UserModel?> getUserByUserId(String? userId) async {
     if (userId == null) return null;
 
-    final snapshot = await _firestoreService.getDocumentById(
-        TableName.dbEmployeeTable, userId);
-    if (snapshot.exists) {
-      return UserModel.fromDocumentSnapshot(snapshot);
-    } else {
-      print('Document does not exist');
+    try {
+      final snapshot = await _firestoreService.getDocumentById(
+          TableName.dbEmployeeTable, userId);
+      if (snapshot.exists) {
+        return UserModel.fromDocumentSnapshot(snapshot);
+      } else {
+        print('Document does not exist');
+        return null;
+      }
+    } catch (e) {
+      print('Error fetching user by ID: $e');
       return null;
     }
   }
 
   Stream<QuerySnapshot<Map<String, dynamic>>> getUserSnapshotByStaffID(
       String? staffID) {
-    return _firestore
-        .collection(TableName.dbEmployeeTable)
-        .where('employee_id', isEqualTo: staffID ?? '')
-        .snapshots();
+    try {
+      return _firestore
+          .collection(TableName.dbEmployeeTable)
+          .where('employee_id', isEqualTo: staffID ?? '')
+          .snapshots();
+    } catch (e) {
+      print('Error fetching user snapshot by staff ID: $e');
+      rethrow; // rethrowing since this is a stream
+    }
   }
 
   Stream<QuerySnapshot<Map<String, dynamic>>> getUserSnapshotByUserId(
       String? userId) {
-    return _firestore
-        .collection(TableName.dbEmployeeTable)
-        .where('employee_id', isEqualTo: userId ?? '')
-        .snapshots();
+    try {
+      return _firestore
+          .collection(TableName.dbEmployeeTable)
+          .where('employee_id', isEqualTo: userId ?? '')
+          .snapshots();
+    } catch (e) {
+      print('Error fetching user snapshot by user ID: $e');
+      rethrow;
+    }
   }
 
   Future<EmployeeModel?> checkPhoneNumberIsExist(String? phoneNumber) async {
     if (phoneNumber == null) return null;
 
-    final snapshot = await _firestoreService.getDocumentByOneIdInside(
-        TableName.dbEmployeeTable, "phone_number", phoneNumber);
+    try {
+      final snapshot = await _firestoreService.getDocumentByOneIdInside(
+          TableName.dbEmployeeTable, "phone_number", phoneNumber);
 
-    return snapshot != null
-        ? EmployeeModel.fromDocumentSnapshot(snapshot)
-        : null;
+      return snapshot != null
+          ? EmployeeModel.fromDocumentSnapshot(snapshot)
+          : null;
+    } catch (e) {
+      print('Error checking if phone number exists: $e');
+      return null;
+    }
   }
 
   Future<List<EmployeeModel>?> getEmployeeByDepartmentId(
       String? departmentId) async {
     if (departmentId == null) return [];
 
-    final snapshot = await _firestoreService.getRecentDocumentByOneIdInside(
-      TableName.dbEmployeeTable,
-      "departmentRef",
-      _firestore.doc("${TableName.dbDepartmentTable}/$departmentId"),
-    );
+    try {
+      final snapshot = await _firestoreService.getRecentDocumentByOneIdInside(
+        TableName.dbEmployeeTable,
+        "departmentRef",
+        _firestore.doc("${TableName.dbDepartmentTable}/$departmentId"),
+      );
 
-    return snapshot
-            ?.map((data) => EmployeeModel.fromDocumentSnapshot(data))
-            .toList() ??
-        [];
+      return snapshot
+              ?.map((data) => EmployeeModel.fromDocumentSnapshot(data))
+              .toList() ??
+          [];
+    } catch (e) {
+      print('Error fetching employees by department ID: $e');
+      return [];
+    }
   }
 
   Future<BaseService> createUserAccount(
       Map<String, dynamic> data, String userId) async {
-    return await _userRef
-        .doc(userId)
-        .update(data)
-        .then(
-            (_) => BaseService('S', 'User account updated successfully', data))
-        .catchError((error) =>
-            BaseService('E', 'Failed to update user account: $error', null));
+    try {
+      return await _userRef
+          .doc(userId)
+          .update(data)
+          .then((_) =>
+              BaseService('S', 'User account updated successfully', data))
+          .catchError((error) =>
+              BaseService('E', 'Failed to update user account: $error', null));
+    } catch (e) {
+      print('Error creating user account: $e');
+      return BaseService('E', 'Failed to create user account', null);
+    }
   }
 
   Future<BaseService> updateUserProfilePhotoByUserID(
@@ -87,14 +117,12 @@ class UsersService {
     if (userID == null) return BaseService('E', 'Invalid user ID', null);
 
     try {
-      // Delete previous image if it exists
       if (previousImageName != null) {
         await _storageRef
             .child("images/$userID/profile/$previousImageName")
             .delete();
       }
 
-      // Upload new image
       final uniqueFileName = DateTime.now().millisecondsSinceEpoch.toString();
       final imageRefDir = _storageRef.child("images/$userID/profile");
       final refImageToUpload =
@@ -104,7 +132,6 @@ class UsersService {
       await refImageToUpload.putFile(imageFile);
       final imageUrl = await refImageToUpload.getDownloadURL();
 
-      // Update Firestore with new image info
       final data = {
         'profile_url': imageUrl,
         'profile_file_name': "$uniqueFileName-${userProfileFile.name}",
@@ -115,7 +142,8 @@ class UsersService {
           .then((_) =>
               BaseService('S', 'Profile photo updated successfully', data));
     } catch (e) {
-      return BaseService('E', 'Failed to update profile photo: $e', null);
+      print('Error updating profile photo: $e');
+      return BaseService('E', 'Failed to update profile photo', null);
     }
   }
 
@@ -123,22 +151,32 @@ class UsersService {
       String? empUID, Map<String, dynamic> data) async {
     if (empUID == null) return BaseService('E', 'Invalid employee UID', null);
 
-    return await _firestoreService
-        .updateData("${TableName.dbEmployeeTable}/$empUID", data)
-        .then((_) =>
-            BaseService('S', 'Employee status updated successfully', data))
-        .catchError((error) =>
-            BaseService('E', 'Failed to update employee status: $error', null));
+    try {
+      return await _firestoreService
+          .updateData("${TableName.dbEmployeeTable}/$empUID", data)
+          .then((_) =>
+              BaseService('S', 'Employee status updated successfully', data))
+          .catchError((error) => BaseService(
+              'E', 'Failed to update employee status: $error', null));
+    } catch (e) {
+      print('Error updating employee status: $e');
+      return BaseService('E', 'Failed to update employee status', null);
+    }
   }
 
   Future<BaseService> updateUserInfoByUserId(
       String? userId, Map<String, dynamic> data) async {
     if (userId == null) return BaseService('E', 'Invalid user ID', null);
 
-    return await _firestoreService
-        .updateData("${TableName.dbEmployeeTable}/$userId", data)
-        .then((_) => BaseService('S', 'User info updated successfully', data))
-        .catchError((error) =>
-            BaseService('E', 'Failed to update user info: $error', null));
+    try {
+      return await _firestoreService
+          .updateData("${TableName.dbEmployeeTable}/$userId", data)
+          .then((_) => BaseService('S', 'User info updated successfully', data))
+          .catchError((error) =>
+              BaseService('E', 'Failed to update user info: $error', null));
+    } catch (e) {
+      print('Error updating user info: $e');
+      return BaseService('E', 'Failed to update user info', null);
+    }
   }
 }

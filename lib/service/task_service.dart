@@ -69,65 +69,85 @@ class TasksService {
     }
   }
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> getRecentTasksSnapshotByDriverId(
-      String? driverId) {
-    if (driverId == null || driverId.isEmpty) return Stream.empty();
+  Future<Stream<QuerySnapshot<Map<String, dynamic>>>>
+      getRecentTasksSnapshotByDriverId(String? driverId) async {
+    try {
+      if (driverId == null || driverId.isEmpty) return Stream.empty();
 
-    return _firestore
-        .collection(TableName.dbTasksTable)
-        .where('driver_id', isEqualTo: driverId)
-        .where('is_checked_in', isEqualTo: false)
-        .where('driver_start_at', isNull: true)
-        .orderBy('start_at')
-        .snapshots();
+      return _firestore
+          .collection(TableName.dbTasksTable)
+          .where('driver_id', isEqualTo: driverId)
+          .where('is_checked_in', isEqualTo: false)
+          .where('driver_start_at', isNull: true)
+          .orderBy('start_at')
+          .snapshots();
+    } catch (e) {
+      print('Error fetching recent tasks snapshot by driver ID: $e');
+      return Stream.error('Error fetching recent tasks snapshot');
+    }
   }
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> getTasksSnapshotByUserId(
-      String? userId) {
-    if (userId == null || userId.isEmpty) return Stream.empty();
+  Future<Stream<QuerySnapshot<Map<String, dynamic>>>> getTasksSnapshotByUserId(
+      String? userId) async {
+    try {
+      if (userId == null || userId.isEmpty) return Stream.empty();
 
-    DateTime startDate = DateTime.now().subtract(Duration(days: 15));
-    DateTime endDate = DateTime.now().add(Duration(days: 5));
+      DateTime startDate = DateTime.now().subtract(Duration(days: 15));
+      DateTime endDate = DateTime.now().add(Duration(days: 5));
 
-    return _firestore
-        .collection(TableName.dbTasksTable)
-        .where('employee_id', isEqualTo: userId)
-        .where('status', isNotEqualTo: TaskStatus.Delete)
-        .where('start_time', isGreaterThanOrEqualTo: startDate)
-        .where('start_time', isLessThanOrEqualTo: endDate)
-        .orderBy('start_time')
-        .snapshots();
+      return _firestore
+          .collection(TableName.dbTasksTable)
+          .where('employee_id', isEqualTo: userId)
+          .where('status', isNotEqualTo: TaskStatus.Delete)
+          .where('start_time', isGreaterThanOrEqualTo: startDate)
+          .where('start_time', isLessThanOrEqualTo: endDate)
+          .orderBy('start_time')
+          .snapshots();
+    } catch (e) {
+      print('Error fetching tasks snapshot by user ID: $e');
+      return Stream.error('Error fetching tasks snapshot');
+    }
   }
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> getTodayTaskSnapshotByDriverId(
-      String? driverId) {
-    if (driverId == null || driverId.isEmpty) return Stream.empty();
+  Future<Stream<QuerySnapshot<Map<String, dynamic>>>>
+      getTodayTaskSnapshotByDriverId(String? driverId) async {
+    try {
+      if (driverId == null || driverId.isEmpty) return Stream.empty();
 
-    DateTime now = DateTime.now();
-    DateTime dateNow = DateTime(now.year, now.month, now.day - 1);
-    DateTime tomorrow = DateTime(now.year, now.month, now.day + 1);
+      DateTime now = DateTime.now();
+      DateTime dateNow = DateTime(now.year, now.month, now.day - 1);
+      DateTime tomorrow = DateTime(now.year, now.month, now.day + 1);
 
-    return _firestore
-        .collection(TableName.dbTasksTable)
-        .where('employee_id', isEqualTo: driverId)
-        .where('is_disabled', isEqualTo: false)
-        .where(Filter.or(Filter("status", isEqualTo: TaskStatus.Start),
-            Filter("status", isEqualTo: TaskStatus.Confirm)))
-        .where('start_time', isGreaterThan: dateNow, isLessThan: tomorrow)
-        .orderBy('start_time')
-        .snapshots();
+      return _firestore
+          .collection(TableName.dbTasksTable)
+          .where('employee_id', isEqualTo: driverId)
+          .where('is_disabled', isEqualTo: false)
+          .where(Filter.or(Filter("status", isEqualTo: TaskStatus.Start),
+              Filter("status", isEqualTo: TaskStatus.Confirm)))
+          .where('start_time', isGreaterThan: dateNow, isLessThan: tomorrow)
+          .orderBy('start_time')
+          .snapshots();
+    } catch (e) {
+      print('Error fetching today task snapshot by driver ID: $e');
+      return Stream.error('Error fetching today task snapshot');
+    }
   }
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> getStartTasksSnapshotByDriverId(
-      String? driverId) {
-    if (driverId == null || driverId.isEmpty) return Stream.empty();
+  Future<Stream<QuerySnapshot<Map<String, dynamic>>>>
+      getStartTasksSnapshotByDriverId(String? driverId) async {
+    try {
+      if (driverId == null || driverId.isEmpty) return Stream.empty();
 
-    return _firestore
-        .collection(TableName.dbTasksTable)
-        .where('driver_id', isEqualTo: driverId)
-        .where('is_checked_in', isEqualTo: false)
-        .where('driver_start_at', isNull: false)
-        .snapshots();
+      return _firestore
+          .collection(TableName.dbTasksTable)
+          .where('driver_id', isEqualTo: driverId)
+          .where('is_checked_in', isEqualTo: false)
+          .where('driver_start_at', isNull: false)
+          .snapshots();
+    } catch (e) {
+      print('Error fetching start tasks snapshot by driver ID: $e');
+      return Stream.error('Error fetching start tasks snapshot');
+    }
   }
 
   Future<BaseService> updateTaskStatusByTaskId(
