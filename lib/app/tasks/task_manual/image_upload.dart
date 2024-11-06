@@ -1,8 +1,17 @@
 import 'dart:io';
+import 'package:asm_wt/app/tasks/task_manual/task_manual_controller.dart';
+import 'package:asm_wt/app/tasks/task_manual/watermark_image.dart';
+import 'package:asm_wt/models/location_model.dart';
+import 'package:asm_wt/util/full_screen_image.dart';
+import 'package:asm_wt/util/get_location.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image/image.dart' as img;
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class ImageUploadModel {
   File? imageFile;
@@ -37,6 +46,8 @@ class SingleImageUpload extends StatefulWidget {
 class _SingleImageUploadState extends State<SingleImageUpload> {
   late List<dynamic> images;
   final ImagePicker _picker = ImagePicker();
+  LocationModel? locationdata;
+  bool isLoading = false; // Loading state
 
   @override
   void initState() {
@@ -48,7 +59,15 @@ class _SingleImageUploadState extends State<SingleImageUpload> {
   Widget build(BuildContext context) {
     return Container(
       height: 140,
-      child: buildGridView(),
+      child: Stack(
+        children: [
+          buildGridView(),
+          if (isLoading) // Show the loading indicator when isLoading is true
+            Center(
+              child: CircularProgressIndicator(),
+            ),
+        ],
+      ),
     );
   }
 
@@ -67,11 +86,18 @@ class _SingleImageUploadState extends State<SingleImageUpload> {
                 clipBehavior: Clip.antiAlias,
                 child: Stack(
                   children: <Widget>[
-                    Image.file(
-                      uploadModel.imageFile!,
-                      width: 120,
-                      height: 120,
-                      fit: BoxFit.scaleDown,
+                    GestureDetector(
+                      onTap: () {
+                        FullscreenImageViewer.show(
+                            context, uploadModel.imageFile!.path,
+                            isLocalFile: true);
+                      },
+                      child: Image.file(
+                        uploadModel.imageFile!,
+                        width: 120,
+                        height: 120,
+                        fit: BoxFit.scaleDown,
+                      ),
                     ),
                     Positioned(
                       right: 5,
@@ -117,40 +143,85 @@ class _SingleImageUploadState extends State<SingleImageUpload> {
   }
 
   Future<void> _onAddImageClick(int index) async {
-    final XFile? image = await _picker.pickImage(source: ImageSource.camera);
+    setState(() {
+      isLoading = true; // Set loading to true when starting the process
+    });
+
+    var cameraDevice = index != 1 ? CameraDevice.front : CameraDevice.rear;
+    debugPrint("index: $cameraDevice");
+    final XFile? image = await _picker.pickImage(
+      source: ImageSource.camera,
+      preferredCameraDevice: cameraDevice,
+    );
+    Position? position = await getCurrentLocation();
+    if (position != null) {
+      print("Latitude: ${position.latitude}, Longitude: ${position.longitude}");
+      // check location's name
+      final taskProvider =
+          Provider.of<TaskManualProvider>(context, listen: false);
+      locationdata =
+          await taskProvider.getAreaName(position.latitude, position.longitude);
+    } else {
+      print("Location could not be retrieved");
+    }
+
+    DateTime now = DateTime.now();
+    String formattedDate = DateFormat('yyyy-MM-dd kk:mm:ss').format(now);
     if (image != null) {
-      // Optimize the image before setting it
-      File optimizedImage = await _optimizeImage(File(image.path));
+      var locationString = '${position?.latitude}, ${position?.longitude}';
+      File waterMarkImage = await drawOnXFile(image,
+          '${locationdata != null ? locationdata!.nameTh + "\n🌏 " + locationString : locationString}\n⏰ ${formattedDate}');
+      File optimizedImage = await _optimizeImage(waterMarkImage);
+
       setState(() {
         images[index] = ImageUploadModel(imageFile: optimizedImage);
         _updateImages();
+        isLoading = false; // Set loading to false after the image is processed
+      });
+    } else {
+      setState(() {
+        isLoading = false; // Set loading to false if no image is selected
       });
     }
   }
 
-  // Optimize image by resizing and compressing it
+  // // Optimize image by resizing and compressing it
+  // Future<File> _optimizeImage(File imageFile) async {
+  //   final Uint8List imageBytes = await imageFile.readAsBytes();
+  //   img.Image? decodedImage = img.decodeImage(imageBytes);
+
+  //   if (decodedImage != null) {
+  //     // Resize the image to a maximum width/height (e.g., 800px)
+  //     img.Image resizedImage = img.copyResize(decodedImage, width: 800);
+
+  //     // Encode the image to reduce file size (jpeg quality 85)
+  //     Uint8List optimizedBytes =
+  //         Uint8List.fromList(img.encodeJpg(resizedImage, quality: 85));
+
+  //     // Save the optimized image to a temporary file
+  //     final String tempPath =
+  //         '${imageFile.parent.path}/optimized_${imageFile.path.split('/').last}';
+  //     final File optimizedFile =
+  //         await File(tempPath).writeAsBytes(optimizedBytes);
+
+  //     return optimizedFile;
+  //   }
+
+  //   return imageFile;
+  // }
+
   Future<File> _optimizeImage(File imageFile) async {
-    final Uint8List imageBytes = await imageFile.readAsBytes();
-    img.Image? decodedImage = img.decodeImage(imageBytes);
-
-    if (decodedImage != null) {
-      // Resize the image to a maximum width/height (e.g., 800px)
-      img.Image resizedImage = img.copyResize(decodedImage, width: 800);
-
-      // Encode the image to reduce file size (jpeg quality 85)
-      Uint8List optimizedBytes =
-          Uint8List.fromList(img.encodeJpg(resizedImage, quality: 85));
-
-      // Save the optimized image to a temporary file
-      final String tempPath =
-          '${imageFile.parent.path}/optimized_${imageFile.path.split('/').last}';
-      final File optimizedFile =
-          await File(tempPath).writeAsBytes(optimizedBytes);
-
-      return optimizedFile;
-    }
-
-    return imageFile;
+    final Uint8List? result = await FlutterImageCompress.compressWithFile(
+      imageFile.absolute.path,
+      minWidth: 800,
+      minHeight: 800,
+      quality: 85,
+      rotate: 0,
+    );
+    final File optimizedFile = await File(imageFile.parent.path +
+            '/optimized_${imageFile.uri.pathSegments.last}')
+        .writeAsBytes(result!);
+    return optimizedFile;
   }
 
   void _updateImages() {

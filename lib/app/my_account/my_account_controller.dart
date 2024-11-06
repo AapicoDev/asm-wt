@@ -29,7 +29,7 @@ class MyAccountController extends ControllerMVC {
       _this ??= MyAccountController._(state);
   MyAccountController._(StateMVC? state) : super(state);
   static MyAccountController? _this;
-  
+
   final AuthService _authService = FirebaseAuthService();
   UsersService usersService = UsersService();
 
@@ -60,7 +60,6 @@ class MyAccountController extends ControllerMVC {
     getConnectivity();
     userId = prefs.getString('userId');
     getUserDataByUserId();
-
   }
 
   Future<void> getUserDataByUserId() async {
@@ -330,10 +329,13 @@ class MyAccountController extends ControllerMVC {
     await _authService.signOut().then((value) => {
           Future.delayed(
               const Duration(seconds: StaticDataConfig.static_loading), () {
-            LoadingOverlay.of(context).hide();
             Provider.of<AppService>(context, listen: false).loginState = false;
             prefs.setString('userId', "");
+            prefs.setString('username', "");
+            prefs.setString('email', "");
+            prefs.setString('organizationId', "");
             prefs.setBool('tracking', false);
+            LoadingOverlay.of(context).hide();
             context.pushReplacementNamed(RouteNames.root);
           }),
         });

@@ -6,7 +6,6 @@ import "package:asm_wt/app/authentication/register_step1/register_step1_view.dar
 import "package:asm_wt/app/authentication/register_step2/register_step2_view.dart";
 import "package:asm_wt/app/my_account/account_setting/account_setting_view.dart";
 import "package:asm_wt/app/my_account/qr_code/qr_code_scanner/qr_code_view.dart";
-import "package:asm_wt/app/tasks/management/task/manage_task_view.dart";
 import 'package:asm_wt/app/tasks/tasks_detail/tasks_detail_view.dart';
 import "package:asm_wt/app/tasks/tasks_root_view.dart";
 import "package:asm_wt/models/employee_model.dart";
@@ -153,30 +152,17 @@ class AppRouter {
             ),
           ]),
       GoRoute(
-          name: RouteNames.taskCalendar,
-          path: "/${RouteNames.todayTask}/${RouteNames.taskCalendar}",
-          pageBuilder: (context, state) => buildPageWithDefaultTransition<void>(
-                context: context,
-                state: state,
-                child: TasksRootView(
-                  appService: appService,
-                  key: UniqueKey(),
-                ),
-              ),
-          routes: [
-            GoRoute(
-              name: RouteNames.manageTask,
-              path: RouteNames.manageTask,
-              pageBuilder: (context, state) =>
-                  buildPageWithDefaultTransition<void>(
-                context: context,
-                state: state,
-                child: ManageTaskView(
-                  key: UniqueKey(),
-                ),
-              ),
-            ),
-          ]),
+        name: RouteNames.taskCalendar,
+        path: "/${RouteNames.todayTask}/${RouteNames.taskCalendar}",
+        pageBuilder: (context, state) => buildPageWithDefaultTransition<void>(
+          context: context,
+          state: state,
+          child: TasksRootView(
+            appService: appService,
+            key: UniqueKey(),
+          ),
+        ),
+      ),
       GoRoute(
           name: RouteNames.myAccount,
           path:

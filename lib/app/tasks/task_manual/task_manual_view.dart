@@ -219,7 +219,6 @@ class _TaskManualViewState extends StateMVC<TaskManualView>
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('user detail ${con?.userModel?.toJson()}');
     return Scaffold(
       body: Consumer<TaskManualProvider>(
         builder: (context, taskProvider, child) {
@@ -269,9 +268,9 @@ class _TaskManualViewState extends StateMVC<TaskManualView>
                               ),
                             ),
                           ),
-                          SizedBox(height: 8),
+                          SizedBox(height: 10),
                           _buildTodayEntry(),
-                          SizedBox(height: 5),
+                          SizedBox(height: 10),
                           _buildAttendanceHistory(),
                         ],
                       ),
@@ -293,6 +292,15 @@ class _TaskManualViewState extends StateMVC<TaskManualView>
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color:
+                Colors.black.withOpacity(0.1), // Shadow color with transparency
+            offset: Offset(4.0, 4.0), // Shadow position (x, y)
+            blurRadius: 10.0, // Blur radius to make shadow softer
+            spreadRadius: 2.0, // How much the shadow spreads
+          ),
+        ],
       ),
       child: Center(
         child: Text(
@@ -595,7 +603,7 @@ class _TaskManualViewState extends StateMVC<TaskManualView>
             ),
             if (_isHistoryVisible)
               Container(
-                height: MediaQuery.of(context).size.height * 0.30,
+                height: MediaQuery.of(context).size.height * 0.25,
                 child: taskData.isEmpty
                     ? Center(
                         child: Text(

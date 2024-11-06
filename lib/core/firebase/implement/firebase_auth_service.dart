@@ -14,7 +14,7 @@ class FirebaseAuthService implements AuthService {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
   final FirestoreService _firestoreService = FirestoreServiceImpl();
-  DBCrypt dBCrypt = DBCrypt();
+  final DBCrypt dBCrypt = DBCrypt();
   final CollectionReference _drivers =
       FirebaseFirestore.instance.collection(TableName.dbEmployeeTable);
 
@@ -22,6 +22,10 @@ class FirebaseAuthService implements AuthService {
   Future<BaseService> signInWithUsernameAndPassword(
       String username, String password) async {
     try {
+      if (username.isEmpty || password.isEmpty) {
+        return BaseService('E', 'Username and password required', null);
+      }
+
       QuerySnapshot snapshot =
           await _drivers.where('username', isEqualTo: username).get();
 
@@ -31,16 +35,12 @@ class FirebaseAuthService implements AuthService {
 
         if (dBCrypt.checkpw(password, driverPassword)) {
           String email = document['email'];
-          // Authentication successful.
           return await signInWithEmailAndPassword(email, password);
         }
       }
-
-      // Authentication failed.
-      return BaseService('E', 'Authenication Fail', null);
+      return BaseService('E', 'Authentication Failed', null);
     } catch (e) {
-      // Authentication failed.
-      return BaseService('E', 'Error Sign In', e);
+      return BaseService('E', 'Error Signing In', e);
     }
   }
 
@@ -50,6 +50,10 @@ class FirebaseAuthService implements AuthService {
     final prefs = await SharedPreferences.getInstance();
 
     try {
+      if (email.isEmpty || password.isEmpty) {
+        return BaseService('E', 'Email and password required', null);
+      }
+
       UserCredential userCredential = await _firebaseAuth
           .signInWithEmailAndPassword(email: email, password: password);
 
@@ -58,112 +62,95 @@ class FirebaseAuthService implements AuthService {
             'username', userCredential.user?.displayName ?? '');
         await prefs.setString('userId', userCredential.user?.uid ?? '');
         await prefs.setString('email', userCredential.user?.email ?? '');
-        getUserToken(userCredential.user?.uid);
-        var message =
-            BaseService('S', 'Success Login', userCredential.user?.uid);
-        return message;
+        await getUserToken(userCredential.user?.uid);
+        return BaseService('S', 'Success Login', userCredential.user?.uid);
       }
-
-      return BaseService('E', 'No user found.', null);
+      return BaseService('E', 'No user found', null);
     } on FirebaseAuthException catch (e) {
-      switch (e.code) {
-        case "ERROR_EMAIL_ALREADY_IN_USE":
-        case "account-exists-with-different-credential":
-        case "email-already-in-use":
-          return BaseService(
-              'E', 'Email already used. Go to login page.', null);
-        case "ERROR_WRONG_PASSWORD":
-        case "wrong-password":
-          return BaseService('E', 'Wrong email/password combination.', null);
-        case "ERROR_USER_NOT_FOUND":
-        case "user-not-found":
-          return BaseService('E', 'No user found with this email.', null);
-        case "ERROR_USER_DISABLED":
-        case "user-disabled":
-          return BaseService('E', 'User disabled.', null);
-        case "ERROR_TOO_MANY_REQUESTS":
-        case "operation-not-allowed":
-          return BaseService(
-              'E', 'Too many requests to log into this account.', null);
-        case "ERROR_OPERATION_NOT_ALLOWED":
-          return BaseService(
-              'E', 'Server error, please try again later.', null);
-        case "ERROR_INVALID_EMAIL":
-        case "invalid-email":
-          return BaseService('E', 'Email address is invalid.', null);
-        default:
-          return BaseService('E', 'Login failed. Please try again.', null);
-      }
+      // Handling FirebaseAuthException cases.
+      return _handleAuthException(e);
+    }
+  }
+
+  BaseService _handleAuthException(FirebaseAuthException e) {
+    switch (e.code) {
+      case "email-already-in-use":
+        return BaseService('E', 'Email already in use. Please login.', null);
+      case "wrong-password":
+        return BaseService('E', 'Incorrect email/password combination.', null);
+      case "user-not-found":
+        return BaseService('E', 'No user found with this email.', null);
+      case "user-disabled":
+        return BaseService('E', 'User account disabled.', null);
+      case "operation-not-allowed":
+        return BaseService('E', 'Too many requests. Try again later.', null);
+      case "invalid-email":
+        return BaseService('E', 'Invalid email address.', null);
+      default:
+        return BaseService('E', 'Login failed. Please try again.', null);
     }
   }
 
   @override
   Future<User?> currentUser() async {
-    var user = _firebaseAuth.currentUser;
-    if (user?.uid != null) {
-      return user!;
-    } else {
-      return null;
-    }
+    return _firebaseAuth.currentUser;
   }
 
   @override
   Future<String?> getUserToken(String? userId) async {
-    var token;
-    _firebaseMessaging.deleteToken().then((value) async => {
-          token = await _firebaseMessaging.getToken(),
-          if (token!.isNotEmpty)
-            {
-              saveToken(token, userId ?? ''),
-            }
-        });
+    if (userId == null || userId.isEmpty) return null;
 
-    return token;
+    try {
+      await _firebaseMessaging.deleteToken();
+      String? token = await _firebaseMessaging.getToken();
+      if (token != null && token.isNotEmpty) {
+        await saveToken(token, userId);
+      }
+      return token;
+    } catch (e) {
+      return null;
+    }
   }
 
   Future<void> saveToken(String token, String userId) async {
-    final Map<String, dynamic> data = <String, dynamic>{};
-
-    data['device_token'] = token;
-    await _firestoreService.updateData(
-        "${TableName.dbEmployeeTable}/$userId", data);
+    try {
+      if (token.isNotEmpty && userId.isNotEmpty) {
+        final Map<String, dynamic> data = {'device_token': token};
+        await _firestoreService.updateData(
+            "${TableName.dbEmployeeTable}/$userId", data);
+      }
+    } catch (e) {
+      // Handle token save error.
+    }
   }
 
   @override
   Future<EmployeeModel?> getDriverInfo(String? driverId) async {
+    if (driverId == null || driverId.isEmpty) return null;
+
     try {
       DocumentSnapshot documentSnapshot = await _drivers.doc(driverId).get();
       if (documentSnapshot.exists) {
-        // Authentication failed.
         return EmployeeModel.fromDocumentSnapshot(documentSnapshot);
       }
       return null;
     } catch (e) {
-      // Authentication failed.
       return null;
     }
   }
 
   @override
   Future<String?> getCurrentUserId() async {
-    // final prefs = await SharedPreferences.getInstance();
-    var user = _firebaseAuth.currentUser;
-    if (user?.uid != null) {
-      return user!.uid;
-    } else {
-      return null;
-    }
-
-    // return prefs.getString("userId");
+    return _firebaseAuth.currentUser?.uid;
   }
 
   @override
   Future<BaseService> signOut() async {
     try {
       await _firebaseAuth.signOut();
-      return BaseService('S', 'Successful Sign out', null);
+      return BaseService('S', 'Successful sign out', null);
     } catch (e) {
-      return BaseService('E', 'Error While sign out!', e);
+      return BaseService('E', 'Error signing out', e);
     }
   }
 }

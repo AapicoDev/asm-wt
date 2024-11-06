@@ -1,5 +1,6 @@
 import 'package:asm_wt/app/app_controller.dart';
 import 'package:asm_wt/router/router_name.dart';
+import 'package:asm_wt/widget/loading_overlay_widget.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:asm_wt/app/app_key.dart';
@@ -20,6 +21,7 @@ class LoginView extends StatefulWidget {
 }
 
 class _LoginViewState extends StateMVC<LoginView> {
+  final FocusNode _phoneFocusNode = FocusNode();
   late LoginController con;
   late AppController appCon;
 
@@ -44,6 +46,13 @@ class _LoginViewState extends StateMVC<LoginView> {
   @override
   void initState() {
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    _phoneFocusNode.dispose();
+    super.dispose();
   }
 
   @override
@@ -130,61 +139,57 @@ class _LoginViewState extends StateMVC<LoginView> {
                       ),
                       Form(
                           key: AppKeys.loginScreen,
-                          child: FocusScope(
-                            canRequestFocus: false,
-                            child: IntlPhoneField(
-                              autovalidateMode:
-                                  AutovalidateMode.onUserInteraction,
-                              invalidNumberMessage:
-                                  translate("message.invalid_phone_number"),
-                              onChanged: (phone) {
-                                setState(() {
-                                  con.phoneNumber.text = phone.completeNumber;
-                                });
-                              },
-                              validator: (p0) {
-                                if (p0?.countryISOCode == "TH" &&
-                                    p0?.number.length == 9) {
-                                  con.isPhoneNumberValid = true;
-                                }
-                                return translate("authentication.required");
-                              },
-                              dropdownTextStyle: theme.textTheme.bodyMedium,
-                              decoration: InputDecoration(
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 0, horizontal: 0),
-                                  disabledBorder: OutlineInputBorder(
-                                      borderRadius:
-                                          BorderRadius.circular(border_radius)),
-                                  labelText:
-                                      translate('authentication.phone_number'),
-                                  labelStyle: theme.textTheme.bodyMedium,
-                                  // prefixIcon: prefixIcon,
-                                  // suffixIcon: Padding(
-                                  //     padding: const EdgeInsets.all(10),
-                                  //     child: suffixIcon),
-                                  border: OutlineInputBorder(
-                                      borderRadius:
-                                          BorderRadius.circular(border_radius)),
-                                  enabledBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                          color: Colors.grey.shade300,
-                                          width: 1),
-                                      borderRadius:
-                                          BorderRadius.circular(border_radius)),
-                                  focusedBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                          color: theme.colorScheme.primary,
-                                          width: 1),
-                                      borderRadius:
-                                          BorderRadius.circular(border_radius)),
-                                  hintText: "65 789 8908",
-                                  hintStyle: theme.textTheme.bodyMedium?.merge(
-                                      TextStyle(
-                                          color:
-                                              theme.colorScheme.onTertiary))),
-                              initialCountryCode: 'TH',
-                            ),
+                          child: IntlPhoneField(
+                            focusNode: _phoneFocusNode,
+                            autovalidateMode:
+                                AutovalidateMode.onUserInteraction,
+                            invalidNumberMessage:
+                                translate("message.invalid_phone_number"),
+                            onChanged: (phone) {
+                              setState(() {
+                                con.phoneNumber.text = phone.completeNumber;
+                              });
+                            },
+                            validator: (p0) {
+                              if (p0?.countryISOCode == "TH" &&
+                                  p0?.number.length == 9) {
+                                con.isPhoneNumberValid = true;
+                              }
+                              return translate("authentication.required");
+                            },
+                            dropdownTextStyle: theme.textTheme.bodyMedium,
+                            decoration: InputDecoration(
+                                contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 0, horizontal: 0),
+                                disabledBorder: OutlineInputBorder(
+                                    borderRadius:
+                                        BorderRadius.circular(border_radius)),
+                                labelText:
+                                    translate('authentication.phone_number'),
+                                labelStyle: theme.textTheme.bodyMedium,
+                                // prefixIcon: prefixIcon,
+                                // suffixIcon: Padding(
+                                //     padding: const EdgeInsets.all(10),
+                                //     child: suffixIcon),
+                                border: OutlineInputBorder(
+                                    borderRadius:
+                                        BorderRadius.circular(border_radius)),
+                                enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Colors.grey.shade300, width: 1),
+                                    borderRadius:
+                                        BorderRadius.circular(border_radius)),
+                                focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: theme.colorScheme.primary,
+                                        width: 1),
+                                    borderRadius:
+                                        BorderRadius.circular(border_radius)),
+                                hintText: "65 789 8908",
+                                hintStyle: theme.textTheme.bodyMedium?.merge(
+                                    TextStyle(
+                                        color: theme.colorScheme.onTertiary))),
+                            initialCountryCode: 'TH',
                           )),
                       Row(
                         children: <Widget>[
@@ -215,7 +220,11 @@ class _LoginViewState extends StateMVC<LoginView> {
                               enable: true,
                               fullStyle: true,
                               title: translate('button.sign_in'),
-                              onPressed: () => con.onSignInPressed(context)
+                              onPressed: () async {
+                                con.onSignInPressed(context);
+                                FocusScope.of(context).requestFocus(
+                                    FocusNode()); // Prevent focus on input
+                              }
                               // onPressed: () => context.pushNamed(RouteNames.myTasks)
                               ),
                           const SizedBox(

@@ -1,15 +1,25 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:ionicons/ionicons.dart';
 
 class FullscreenImageViewer extends StatelessWidget {
-  final String imageUrl;
+  final String imageUrlOrPath;
+  final bool isLocalFile;
 
-  const FullscreenImageViewer({required this.imageUrl});
+  const FullscreenImageViewer({
+    required this.imageUrlOrPath,
+    this.isLocalFile = false,
+  });
 
   // Static method to show the dialog with the FullscreenImageViewer widget
-  static void show(BuildContext context, String imageUrl) {
+  static void show(BuildContext context, String imageUrlOrPath,
+      {bool isLocalFile = false}) {
     showDialog(
       context: context,
-      builder: (context) => FullscreenImageViewer(imageUrl: imageUrl),
+      builder: (context) => FullscreenImageViewer(
+        imageUrlOrPath: imageUrlOrPath,
+        isLocalFile: isLocalFile,
+      ),
     );
   }
 
@@ -20,25 +30,30 @@ class FullscreenImageViewer extends StatelessWidget {
       child: Stack(
         alignment: Alignment.center,
         children: [
-          Center(
-            child: Image.network(
-              imageUrl,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return Container(
-                  color: Colors.grey[300],
-                  width: 300,
-                  height: 300,
-                  child: const Center(child: Text('Image not available')),
-                );
-              },
-            ),
+          ClipRRect(
+            borderRadius: BorderRadius.all(Radius.circular(10)),
+            child: isLocalFile
+                ? Image.file(
+                    File(imageUrlOrPath),
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) {
+                      return _errorPlaceholder();
+                    },
+                  )
+                : Image.network(
+                    imageUrlOrPath,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) {
+                      return _errorPlaceholder();
+                    },
+                  ),
           ),
           Positioned(
-            top: 20,
-            right: 20,
+            top: 5,
+            right: 5,
             child: IconButton(
-              icon: Icon(Icons.close, color: Colors.white, size: 30),
+              icon: Icon(Ionicons.close_circle_outline,
+                  color: Colors.white, size: 50),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -46,6 +61,15 @@ class FullscreenImageViewer extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _errorPlaceholder() {
+    return Container(
+      color: Colors.grey[300],
+      width: 300,
+      height: 300,
+      child: const Center(child: Text('Image not available')),
     );
   }
 }

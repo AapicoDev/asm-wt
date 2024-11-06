@@ -1,14 +1,14 @@
 // This is a generated file; do not edit or check into version control.
-FLUTTER_ROOT=/Users/aapicoits/development/flutter
-FLUTTER_APPLICATION_PATH=/Users/aapicoits/Documents/asm-wt-mobile
+FLUTTER_ROOT=/Users/soknathmil/fvm/versions/3.10.0
+FLUTTER_APPLICATION_PATH=/Users/soknathmil/Documents/asm-wt-mobile
 COCOAPODS_PARALLEL_CODE_SIGN=true
 FLUTTER_TARGET=lib/main.dart
 FLUTTER_BUILD_DIR=build
 FLUTTER_BUILD_NAME=1.1.2
-FLUTTER_BUILD_NUMBER=20
+FLUTTER_BUILD_NUMBER=29
 EXCLUDED_ARCHS[sdk=iphonesimulator*]=i386
 EXCLUDED_ARCHS[sdk=iphoneos*]=armv7
 DART_OBFUSCATION=false
 TRACK_WIDGET_CREATION=false
 TREE_SHAKE_ICONS=true
-PACKAGE_CONFIG=/Users/aapicoits/Documents/asm-wt-mobile/.dart_tool/package_config.json
+PACKAGE_CONFIG=/Users/soknathmil/Documents/asm-wt-mobile/.dart_tool/package_config.json

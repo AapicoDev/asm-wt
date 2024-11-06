@@ -273,8 +273,15 @@ class TaskCalendarController extends ControllerMVC {
           newtaskModel.create_date = Timestamp.fromDate(dateNow);
           newtaskModel.status = TaskStatus.Confirm;
           newtaskModel.userId = userId;
-          newtaskModel.employeeModelRefData = FirebaseFirestore.instance
-              .doc('${TableName.dbEmployeeTable}/${userId}');
+          // newtaskModel.employeeModelRefData = FirebaseFirestore.instance
+          //     .doc('${TableName.dbEmployeeTable}/${userId}');
+          try {
+            newtaskModel.employeeModelRefData = FirebaseFirestore.instance
+                .doc('${TableName.dbEmployeeTable}/$userId');
+          } catch (e) {
+            // Handle the error
+            print('Error creating document reference: $e');
+          }
           newtaskModel.isDisable = false;
           newtaskModel.type = NewFeedsType.Request;
           newtaskModel.taskGroup =

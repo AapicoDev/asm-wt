@@ -16,7 +16,7 @@ class UsersService {
   final Reference _storageRef = FirebaseStorage.instance.ref();
 
   Future<UserModel?> getUserByUserId(String? userId) async {
-    if (userId == null) return null;
+    if (userId == null || userId.isEmpty) return null;
 
     try {
       final snapshot = await _firestoreService.getDocumentById(
@@ -28,7 +28,7 @@ class UsersService {
         return null;
       }
     } catch (e) {
-      print('Error fetching user by ID: $e');
+      print('Error fetching user by ID: $e $userId');
       return null;
     }
   }
@@ -72,27 +72,6 @@ class UsersService {
     } catch (e) {
       print('Error checking if phone number exists: $e');
       return null;
-    }
-  }
-
-  Future<List<EmployeeModel>?> getEmployeeByDepartmentId(
-      String? departmentId) async {
-    if (departmentId == null) return [];
-
-    try {
-      final snapshot = await _firestoreService.getRecentDocumentByOneIdInside(
-        TableName.dbEmployeeTable,
-        "departmentRef",
-        _firestore.doc("${TableName.dbDepartmentTable}/$departmentId"),
-      );
-
-      return snapshot
-              ?.map((data) => EmployeeModel.fromDocumentSnapshot(data))
-              .toList() ??
-          [];
-    } catch (e) {
-      print('Error fetching employees by department ID: $e');
-      return [];
     }
   }
 

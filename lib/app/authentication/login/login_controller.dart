@@ -101,6 +101,7 @@ class LoginController extends ControllerMVC {
           ),
         );
       } else {
+        FocusScope.of(context).unfocus();
         LoadingOverlay.of(context).show();
 
         RegExp ifStartWithZero = RegExp(r'^(\+66$)|(^\+66([^0]\d*))');
@@ -138,11 +139,12 @@ class LoginController extends ControllerMVC {
                                 phoneNumber.text == '+66646666666' ||
                                 phoneNumber.text == '+66647777777')
                               {
-                            employeeModel.username = res.username,
-                            employeeModel.organization_id = res.organization_id,
-                            employeeModel.staffId = res.staffId,
-                            employeeModel.phoneNumber = res.phoneNumber,
-                            await _registerStep2Controller.verifyPhone(
+                                employeeModel.username = res.username,
+                                employeeModel.organization_id =
+                                    res.organization_id,
+                                employeeModel.staffId = res.staffId,
+                                employeeModel.phoneNumber = res.phoneNumber,
+                                await _registerStep2Controller.verifyPhone(
                                   context,
                                   employeeModel,
                                   'login',
